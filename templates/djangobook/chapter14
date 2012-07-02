@@ -1,0 +1,1453 @@
+[h2][h2/]
+فصل چهاردهم: Session ها، کاربران، و عضویت در جنگو 
+[/h2]
+
+[p]id="1"[p/]
+وقت آن رسیده است که اعترافی کنیم: ما تا اینجای کار به طور عمد، یک جنبه ی مهم از توسعه ی وب را عقب انداخته ایم. تاکنون، در دست ترجمه/تالیف ...
+[/p]
+
+[p]id="2"[p/]
+البته این درست نمی باشد. مرورگر هایی که سایت های ما را مورد هدف قرار می دهند که در پشت خود انسان های واقعی دارند (حداقل بیشتر اوقات). این نکته ی بزرگی برای رد کردن است: بهترین حالت اینترنت زمانی می باشد که برای وصل شدن به مردم خدمات می دهد، نه ماشین ها. در صورتی که بخواهیم به درستی سایت ها را وادار کنیم، سر انجام باید با افراد در پشت مرورگر ها سر و کار داشته باشیم.
+[/p]
+
+[p]id="3"[p/]
+متاسفانه، این موضوع ساده ای نمی باشد. HTTP طوری طراحی شده است که بی حالت باشد – بدین معنی که، هر درخواست در یک فضای تهی اتفاق می افتد. دوامی بین یک درخواست و درخواست بعدی وجود ندارد، و ما نمی توانیم هر یک از جنبه ها درخواست (آدرس IP، مرورگر و غیره ...) را که به طور مداوم توسط یک شخص به طور پی در پی ارسال می شود را شمارش کنیم.
+[/p]
+
+[p]id="4"[p/]
+در این فصل شما نحوه ی کنترل این فقدان حالت را خواهید آموخت. با پایین ترین سطح (کوکی ها) شروع خواهیم کرد، و به سمت ابزار سطح بالاتر برای کنترل session ها، کاربران و عضویت حرکت خواهیم کرد.
+[/p]
+
+[h3]id="5"[h3/]
+کوکی ها
+[/h3]
+
+[p]id="6"[p/]
+توسعه دهندگان مرورگر مدت ها پیش متوجه این موضوع شدند که وضعیت statelessness یک مشکل بزرگ برای توسعه دهندگان وب به شمار می رود، و در نتیجه کوکی ها چشم به جهان گشودند. کوکی یک تکه ی کوچک از اطلاعات می باشد که مرورگرها از طرف وب سرورها ذخیره می کنند. هر بار درخواست های یک مرورگر از یک صفحه ی فرم و از یک سرور خاص، به کوکی که در ابتدا دریافت شده است پس داده می شوند.
+[/p]
+
+[p]id="7"[p/]
+اجازه دهید نگاهی به نحوه ای که این عمل ممکن است انجام شود بیاندازیم. هنگامی که شما مرورگر خود را باز می کنید و درون آن google.com را تایپ می کنید، مرورگر شما یک درخواست HTTP را به گوگل می فرستد که با چیزی شبیه به این شروع می شود:
+[/p]
+
+[code]
+GET / HTTP/1.1
+Host: google.com
+...
+[/code]
+
+[p]id="8"[p/]
+زمانی که گوگل پاسخ می دهد، یک پاسخ HTTP شبیه به پاسخ زیر خواهد بود:
+[/p]
+
+[code]
+HTTP/1.1 200 OK
+Content-Type: text/html
+Set-Cookie: PREF=ID=5b14f22bdaf1e81c:TM=1167000671:LM=1167000671;
+            expires=Sun, 17-Jan-2038 19:14:07 GMT;
+            path=/; domain=.google.com
+Server: GWS/2.1
+...
+[/code]
+
+[p]id="9"[p/]
+به هدر Set_Cookie دقت کنید. مرورگر شما مقدار کوکی که از این قرار است ذخیره خواهد کرد (PREF=ID=5b14f22bdafle81c:TM=1167000671:LM=1167000671) و در هر بار که شما به سایت دسترسی پیدا کنید آن را به گوگل بر می گرداند. بنابراین در مرتبه ی بعدی که به گوگل دسترسی پیدا می کنید، مرورگر شما یک درخواست مانند زیر را ارسال خواهد کرد:
+[/p]
+
+[code]
+GET / HTTP/1.1
+Host: google.com
+Cookie: PREF=ID=5b14f22bdaf1e81c:TM=1167000671:LM=1167000671
+...
+[/code]
+
+[p]id="10"[p/]
+سپس گوگل می تواند از آن مقدار کوکی برای دانستن این که شما با کسی که قبل تر دسترسی پیدا کرده است یک فرد همسان می باشید استفاده می کند. این مقدار ممکن است برای مثال، یک کلید درون یک پایگاه داده که اطلاعات کاربر را ذخیره می کند باشد. گوگل می تواند (انجام می دهد) از آن برای نمایش نام کاربری حساب شما در صفحه استفاده کند.
+[/p]
+
+[h4]id="11"[h4/]
+قرار دادن و گرفتن کوکی ها
+[/h4]
+
+[p]id="12"[p/]
+هنگامی که در جنگو با ماندگاری سر و کار دارید، بیشتر اوقات از seesion سطح بالا و یا از فریم ورک های کاربر بحث شده در این فصل استفاده خواهید کرد. با این حال، ابتدا به نحوه ی خواندن و نوشتن کوکی ها در سطح پایین نگاهی بیاندازید. این باید به فهم بقیه ی ابزار بحث شده در فصل و در صورتی که شما بخواهید به صورت مستقیم از کوکی ها استفاده کنید به شما کمک خواهد کرد.
+[/p]
+
+[p]id="13"[p/]
+خواندن کوکی ها ساده می باشد. هر آبجکت HttpRequest دارای یک آبجکت COOKIES می باشد که مانند دیکشنری عمل می کند؛ می توانید برای خواند هر کوکی که مرورگر به view ارسال می کند از آن استفاده کنید:
+[/p]
+
+[code]
+def show_color(request):
+    if "favorite_color" in request.COOKIES:
+        return HttpResponse("Your favorite color is %s" % \
+            request.COOKIES["favorite_color"])
+    else:
+        return HttpResponse("You don't have a favorite color.")
+[/code]
+
+[p]id="14"[p/]
+نوشتن کوکی ها قدری پیچیده تر می باشد. نیاز است که از متد set_cookie() در یک آبجکت HttpResponse استفاده کنید. در زیر مثالی وجود دارد که کوکی favorite_color مستقر در یک پارامتر GET را قرار می دهد:
+[/p]
+
+[code]
+def set_color(request):
+    if "favorite_color" in request.GET:
+
+        # Create an HttpResponse object...
+        response = HttpResponse("Your favorite color is now %s" % \
+            request.GET["favorite_color"])
+
+        # ... and set a cookie on the response
+        response.set_cookie("favorite_color",
+                            request.GET["favorite_color"])
+
+        return response
+
+    else:
+        return HttpResponse("You didn't give a favorite color.")
+[/code]
+
+[p]id="15"[p/]
+
+[/p]می توانید همچنین یک تعداد از آرگومان های اختیاری را به response.set_cookie() که جنبه هایی از کوکی را کنترل می کند ارسال کنید. همانطور که در جدل 1-14 مشاهده می کنید.
+
+[puzzle]جدول ۱-۱۴[puzzle/]
+[tr][tr/]
+[th]width="10%"[th/]
+پارامتر
+[/th]
+
+[th]width="10%"[th/]
+پایگاه داده
+[/th]
+[th]width="80%"[th/]
+توضیح
+[/th]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+Max_age
+[/td]
+
+[td][td/]
+None
+[/td]
+
+[td][td/]
+عمر (بر حسب ثانیه) که کوکی باید زنده باشد. در صورتی که این پارامتر None باشد، کوکی تنها تا زمانی که مرورگر بسته شود زنده خواهد ماند.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+expire
+[/td]
+
+[td][td/]
+None
+[/td]
+
+[td][td/]
+زمان و تاریخ واقعی ای، که کوکی باید از بین برود که باید در قالب بندی "Wdy, DD-Mth-YY HH:MM:SS GMT" باشد. در صورت داده این پارامتر، پارامتر max_age باز نویسی می شود.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+path
+[/td]
+
+[td][td/]
+"/"
+[/td]
+
+[td][td/]
+پیشوند مسیری که کوکی برای آن معتبر است. مرورگرها کوکی را تنها به صفحاتی که تحت این مسیر پیشوند می باشد بر می گرداند، بنابراین شما می توانید از این برای جلوگیری از ارسال کوکی ها به بخش های دیگر سایت استفاده کنید.<br>این پارامتر به ویژه هنگامی که سطح زیادی زا دامنه های سایت را کنترل نمی کنید مفید است.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+domain
+[/td]
+[td][td/]
+None
+[/td]
+
+[td][td/]
+دامنه ای که این کوکی برای آن معتبر است. می توانید از این پارامتر برای قرار دادن یک کوکی cross-domain استفاده کنید. برای مثال، domain=".example.com" یک کوکی قرار خواهد داد که توسط دامنه های www.example.com، www2.example.com و sub.domain.example.com قابل خواندن می باشد.<br>در صورتی که این پارامتر None قرار داده شود، یک کوکی تنها توسط دامنه ای که آن را قرار داده قابل خواندن خواهد بود.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+secure
+[/td]
+
+[td][td/]
+False
+[/td]
+
+[td][td/]
+در صورتی که مقدار این پارامتر را True قرار داده شود، این پارامتر به مرورگر خواهد گفت که این کوکی را تنها برای صفحاتی که HTTPS می باشند در دسترس قرار بده.
+[/td]
+[/tr]
+[/puzzle]
+
+[h4]id="16"[h4/]
+The Mixed Blessing of Cookies
+[/h4]
+
+[p]id="17"[p/]
+ممکن است دقت کرده باشید که یک تعداد از مشکلات بالقوه روش کار با کوکی ها وجود دارند. اجازه دهید برخی از این مشکلات را مورد بررسی قرار دهیم:
+[/p]
+
+[ul][ul/]
+[li]id="18"[li/]
+ذخیره سازی کوکی ها ارادی می باشد؛ یک کلاینت ملزم به قبول یا ذخیره کوکی نمی باشد. در واقع، تمام مرورگرها کاربران را قادر به کنترل سیاست خود برای قبول کردن کوکی ها می کند در صورتی که می خواهید تنها کوکی های واجبی که در وب وجود دارند را تماشا کنید، option مرورگر خود یعنی "prompt to accept every cookie" را روشن کنید.
+[/li]
+
+[p]id="19"[p/]
+با وجود تقریبا استفاده ی جهانی آنها، کوکی ها هنوز غیر قابل اطمینان تلقی می شوند. این بدان معنی است که توسعه دهندگان باید بررسی کنند که یک کاربر در واقع کوکی ها را قبل اعتماد به آن ها قبول کرده است.
+[/p]
+
+[li]id="20"[li/]
+کوکی ها (به ویژه آن هایی که در HTTPS ارسال نمی شوند) امن نمی باشند. چرا که داده ی HTTP به صورت متن ساده ارسال می شود، کوکی ها به شدت در برابر حملات جاسوسی آسیب پذیر می باشند. این بدین معنی است که، یک مهاجم جاسوس می تواند یک کوکی را قطع کرده و آن را بخواند. این بدان معنی است که نباید هرگز اطلاعات حساس را در یک کوکی ذخیره کرد.
+[/li]
+
+[p]id="21"[p/]
+حتی یک حمله ی مخرب تر که بک حمله ی man-in-the-middle معروف است وجود دارد، در جایی که یک مهاجم یک کوکی را قطع می کند و از برای نشان دادن خود به صورت یک کاربر دیگر استفاده می کند. فصل بیستم به تفصل این مسائل و راه ها جلوگیری از آن را توضیح داده است.
+[/p]
+
+[li]id="22"[li/]
+کوکی ها حتی از دریافت کنندگان در نظر گرفته ی خود نیز امن نمی باشد. اغلب مرورگر ها روشی ساده برای ویرایش محتوای کوکی های منحصر به فرد تهیه می کنند، و کاربران خبره می توانند همواره با استفاده از ابزاری مانند mechanize (http://wwwsearch.sourceforge.net/mechanize) درخواست های HTTP به صورت دستی بسازند.
+[/li]
+
+[p]id="23"[p/]
+بنابراین شما نمی توانید داده ی درون کوکی ها را که برای دستکاری حساس می باشند را ذخیره کنید. اشتباه رایج در این سناریو ذخیره چیزی شبیه به IsLoggedIn=1 در یک کوکی در هنگامی که کاربر وارد شده است می باشد. متعجب می شوید وقتی تعدادی از سایت ها این اشتباه طبیعی را انجام می دهند؛ فریب دادن سیستم های امنیتی این سایت ها تنها یک ثانیه طول می کشد.
+[/p]
+[/ul]
+
+[h3]id="24"[h3/]
+فریم ورک Session جنگو
+[/h3]
+
+[p]id="25"[p/]
+با تمام این محدودیت ها و حفره های امنیتی بالقوه، واضح است، آن کوکی ها و session های مقاوم مثال هایی از نقطه های درد در توسعه ی وب می باشند. البته، هدف جنگو داروی مسکن موثر بودن می باشد، بنابراین جنگو حاوی یک فریم روک session طراحی شده جهت تسکین دادن این سختی ها برای شما می باشد.
+[/p]
+
+[p]id="26"[p/]
+این فریم ورک session به شما اجازه می دهد داده ی دلخواه را بر اساس هر بازدید کننده ی سایت ذخیره و بازیابی کنید. این فریم ورک داده را در سمت سرور ذخیره می کند و ارسال و دریافت کوکی ها را حذف می کند. کوکی ها تنها از یک ID هش شده استفاده می کنند – نه خود داده – در نتیجه شما را از مشکلات رایج کوکی محافظت می کند.
+[/p]
+
+[p]id="27"[p/]
+اجازه دهید به نحوه ی فعال کردن session ها و استفاده کردن از آن ها در view ها بپردازیم.
+[/p]
+
+[h4]id="28"[h4/]
+فعال کردن Session ها
+[/h4]
+
+[p]id="29"[p/]
+session ها از طریق قسمتی از middleware (به فصل هفتم مراجعه کنید) و مدل جنگو  اجرا می شوند. جهت فعال کردن session ها، نیاز است مراحل زیر را انجام دهید:
+[/p]
+
+[ol][ol/]
+[li]id="30"[li/]
+تنظیم MIDDLEWARE_CLASSES را ویرایش کرده و اطمینان حاصل کنید که MIDDLEWARE_CLASSES حاوی 'django.contrib.sessions.middleware.SessionMiddleware'می باشد.
+[/li]
+
+[li]id="31"[li/]
+اطمینان حاصل کنید که 'django.contrib.sessions' درون تنظیم INSTALLED_APPS وجود دارد (و در صورتیکه ملزم به اضافه کردن آن هستید دستور manage.py syncdb را اجرا کنید).
+[/li]
+[/ol]
+
+[p]id="32"[p/]
+اسکلت بندی پیشفرض تنظیمات ایجاد توسط startproject دارای هر دوی این قسمت ها فوق می باشد، بنابراین در صورتی که آن ها را حذف نکرده باشید، برای کار کردن session ها نیازی به تغییر چیزی نیست.
+[/p]
+
+[p]id="33"[p/]
+در صورتی که نمی خواهید از session ها استفاده کنید، ممکن است بخواهید خط SessionMiddleware را از MIDDLEWARE_CLASSES و 'django.contrib.sessions'از INSTALLED_APPS خود حذف کنید. این شما را تنها از مقدار کمی از بار اضافی حفظ می کند، ولی هر قسمت کوچکی شمارش می شوند.
+[/p]
+
+[h4]id="34"[h4/]
+استفاده از Session ها در view ها
+[/h4]
+
+[p]id="35"[p/]
+هنگامی که SessionMiddleware فعال شده است، هر آبجکت HttpRequest – اولین آرگومان برای هر تابع view جنگو – دارای یک attribute، seesion خواهد بود که یک آبجکت شبیه به دیکشنری می باشد. می تواند درست مثل یک دیکشنری معمولای از آن استفاده کنید. برای مثال در یک view می توانید کاری شبیه به زیر را انجام دهید:
+[/p]
+
+[code]
+# Set a session value:
+request.session["fav_color"] = "blue"
+
+# Get a session value -- this could be called in a different view,
+# or many requests later (or both):
+fav_color = request.session["fav_color"]
+
+# Clear an item from the session:
+del request.session["fav_color"]
+
+# Check if the session has a given key:
+if "fav_color" in request.session:
+    ...
+[/code]
+
+[p]id="36"[p/]
+همچنین می توان از متدهای دیگر دیکشنری همانند keys() و items() در request.session استفاده کنید.
+[/p]
+
+[p]id="37"[p/]
+تعدادی قوانین ساده برای استفاده ی موثر از session های جنگو وجود دارد:
+[/p]
+
+[ul][ul/]
+[li]id="38"[li/]
+از رشته های معمولی پایتون به صورت کلیدهای دیکشنری در request.session (مخالف integer ها، آبجکت ها و غیره ...) استفاده کنید.
+[/li]
+
+[li]id="39"[li/]
+کلیدهای دیکشنری session که با یک خط تیره شروع می شوند، برای استفاده ی داخلی توسط جنگو رزرو شده اند. در عمل، فریم ورک تنها از تعداد کمی از متغیرهای session با خط تیره شروع شده استفاده می کند، ولی در صورتی که در مورد این قبیل متغیرهای اطلاعاتی ندارید (و اگر تمایل دارید با هر تغییراتی در خود جنگو مطابق باشید)، استفاده از پیشوندهای خط تیره، از تداخل جنگو با برنامه ی شما جلوگیری می کند.
+[/li]
+
+[p]id="40"[p/]
+برای مثال، از کلید session با نام _fav_color، مانند زیر استفاده نکنید:
+[/p]
+
+[code]
+request.session['_fav_color'] = 'blue' # Don't do this!
+[/code]
+
+[li]id="41"[li/]
+request.session را با یک آبجکت جدید جایگزین نکنید، و به attribute های آن دسترسی پیدا نکرده و چیزی در آن ها قرار ندهید. از آن مانند یک دیکشنری پایتون استفاده کنید. مثال:
+[/li]
+
+[code]
+request.session = some_other_object # Don't do this!
+
+request.session.foo = 'bar' # Don't do this!
+[/code]
+[/ul]
+
+[p]id="42"[p/]
+اجازه دهید مثال های کوچکی را ذکر کنیم. view ساده ی زیر بعد از این که کاربر یک کامنت را پست می کند مقدار True را در یک متغیر has_commented قرار می دهد. جلوگیری از پست کردن بیشتر از یک کامنت توسط کاربر ساده می باشد:
+[/p]
+
+[code]
+def post_comment(request):
+    if request.method != 'POST':
+        raise Http404('Only POSTs are allowed')
+
+    if 'comment' not in request.POST:
+        raise Http404('Comment not submitted')
+
+    if request.session.get('has_commented', False):
+        return HttpResponse("You've already commented.")
+
+    c = comments.Comment(comment=request.POST['comment'])
+    c.save()
+    request.session['has_commented'] = True
+    return HttpResponse('Thanks for your comment!')
+view ساده ی ورودی یک عضو در سایت:
+
+[/code]
+
+[p]id="43"[p/]
+view ساده ی ورودی یک عضو در سایت:
+[/p]
+
+[code]
+def login(request):
+    if request.method != 'POST':
+        raise Http404('Only POSTs are allowed')
+    try:
+        m = Member.objects.get(username=request.POST['username'])
+        if m.password == request.POST['password']:
+            request.session['member_id'] = m.id
+            return HttpResponseRedirect('/you-are-logged-in/')
+    except Member.DoesNotExist:
+        return HttpResponse("Your username and password didn't match.")
+[/code]
+
+[p]id="44"[p/]
+و کد زیر خروج یک عضو از سایت که از طریق login() فوق وارد سایت شده است:
+[/p]
+
+[code]
+def logout(request):
+    try:
+        del request.session['member_id']
+    except KeyError:
+        pass
+    return HttpResponse("You're logged out.")
+[/code]
+
+[note]
+نکته
+[note/]
+
+[p]id="45"[p/]
+در عمل، روش فوق روشی مناسبی برای ورودی کاربران نمی باشد. فریم ورک authentication که به طور مختصر بحث شده است این وظیفه را برای شما بسیار قدرمتند و با روشی مفید انجام می دهد. این مثال ها عمدا ساده می باشند، به طوری که شما بتوانید به راحتی در جریان کار قرار بگیرید.
+[/p]
+[/note]
+
+[h4]id="46"[h4/]
+آزمون کوکی های ارسال شده
+[/h4]
+
+[p]id="47"[p/]
+همانطور که در بالا ذکر شد، نمی توان به هر کوکی ارسال شده ی مرورگر اطمینان کرد. بنابراین، برای راحتی کار، جنگو روشی ساده برای آزمون کوکی های ارسال شده ی مرورگر تهیه کرده است. تنها کافیست request.session.set_test_cookie() را در یک view فراخوانی کرده و request.session.test_cookie_worked() را در view بعدی بررسی کنید – نه در فراخوانی view همسان.
+[/p]
+
+[p]id="48"[p/]
+این جدایی بین set_test_cookie() و test_cookie_worked به دلیل روش کار کوکی ها ضروری می باشد. زمانی که شما یک کوکی را قرار می دهید، در واقع شما نمی توانید تا درخواست بعدی مرورگر بگویید یک مرورگر آن را ارسال کرده است.
+[/p]
+
+[p]id="49"[p/]
+استفاده از delete_test_cookie() برای تمیز کردن بعد از خودتان تمرین خوبی می باشد. این عمل را بعد از تایید کارکرد کوکی آزمون انجام دهید.
+[/p]
+
+[p]id="50"[p/]
+در زیر مثال کاربرد معمولی موضوع فوق وجود دارد:
+[/p]
+
+[code]
+def login(request):
+
+    # If we submitted the form...
+    if request.method == 'POST':
+
+        # Check that the test cookie worked (we set it below):
+        if request.session.test_cookie_worked():
+
+            # The test cookie worked, so delete it.
+            request.session.delete_test_cookie()
+
+            # In practice, we'd need some logic to check username/password
+            # here, but since this is an example...
+            return HttpResponse("You're logged in.")
+
+        # The test cookie failed, so display an error message. If this
+        # were a real site, we'd want to display a friendlier message.
+        else:
+            return HttpResponse("Please enable cookies and try again.")
+
+    # If we didn't post, send the test cookie along with the login form.
+    request.session.set_test_cookie()
+    return render_to_response('foo/login_form.html')
+[/code]
+
+[note]
+نکته
+[note/]
+
+[p]id="51"[p/]
+یک بار دیگر، توابع داخلی authentication این بررسی را برای شما انجام می دهند.
+[/p]
+[/note]
+
+[h4]id="52"[h4/]
+استفاده از Session ها خارج از view ها
+[/h4]
+
+[p]id="53"[p/]
+به طور داخلی، هر session تنها یک مدل جنگوی معمولی تعریف شده در django.contrib.sessions.models می باشد. هر session توسط هش تصادفی کمتر یا بیشتر 32 حرفی در یک کوکی شناسایی می شود. به این دلیل که session یک مدل معمولی می باشد، می توان با استفاده از API معمولی پایگاه داده ی جنگو به session ها دسترسی پیدا کرد:
+[/p]
+
+[code]
+>>> from django.contrib.sessions.models import Session
+>>> s = Session.objects.get(pk='2b1189a188b44ad18c35e113ac6ceead')
+>>> s.expire_date
+datetime.datetime(2005, 8, 20, 13, 35, 12)
+[/code]
+
+[p]id="54"[p/]
+برای بدست آوردن داده ی session واقعی، نیاز به فراخوانی get_decoded() می باشد. این موضوع ضروری می باشد، چرا که دیکشنری در قالب بندی رمزی شده ذخیره شده است:
+[/p]
+
+[code]
+>>> s.session_data
+'KGRwMQpTJ19hdXRoX3VzZXJfaWQnCnAyCkkxCnMuMTExY2ZjODI2Yj...'
+>>> s.get_decoded()
+{'user_id': 42}
+[/code]
+
+[h4]id="55"[h4/]
+زمانی که Session ها ذخیره شده اند
+[/h4]
+
+[p]id="56"[p/]
+به طور پیشفرض، جنگو تنها در صورتی که session تغییر کند آن ها را درون پایگاه داده ذخیره می کند – این بدین معنی است که اگر هر کدام از مقادیر دیکشنری آن اختصاص داده شود یا حذف شود:
+[/p]
+
+[code]
+# Session is modified.
+request.session['foo'] = 'bar'
+
+# Session is modified.
+del request.session['foo']
+
+# Session is modified.
+request.session['foo'] = {}
+
+# Gotcha: Session is NOT modified, because this alters
+# request.session['foo'] instead of request.session.
+request.session['foo']['bar'] = 'baz'
+[/code]
+
+[p]id="57"[p/]
+برای تغییر این رفتار پیشفرض، مقدار SESSION_SAVE_EVERY_REQUEST را True قرار دهید. در صورتی که SESSION_SAVE_EVERY_REQUEST، True باشد، جنگو در هر درخواست تنها درون پایگاه داده ذخیره می کند، حتی اگر تغییر نکرده باشد.
+[/p]
+
+[p]id="58"[p/]
+توجه داشته باشید که کوکی session تنها زمانی که یک session ساخته شده یا تغییر کرده باشد فرستاده می شود. در صورتی که SESSION_SAVE_EVERY_REQUEST، True باشد، کوکی session در هر درخواست فرستاده خواهد شد. به طور یکسان، بخش expires از یک کوکی session در هر بار که کوکی session فرستاده شود به روز رسانی می شود.
+[/p]
+
+[h4]id="59"[h4/]
+Session های Browser-Length در مقابل Session های مقاوم
+[/h4]
+
+[p]id="60"[p/]
+ممکن است متوجه شده باشید که کوکی گوگل فرستاده شده به ما در ابتدای این فصل حاوی expires=Sun، 17-Jan-2038 19:14:07 GMT; بود. کوکی ها به طور اختیاری می توانند حاوی یک تاریخ انقضا باشند که مرورگر را در هنگام حذف کوکی آگاه می سازد. در صورتی که یک کوکی حاوی مقدار انقضا نباشد، زمانی که کاربر پنجره ی مرورگر را ببندد از بین می رود. می توان رفتار فریم ورک session را رابطه با تنظیم SESSION_EXPIRE_AT_BROWSER_CLOSE کنترل کرد.
+[/p]
+
+[p]id="61"[p/]
+به طور پیشفرض، مقدار SESSION_EXPIRE_AT_BROWSER_CLOSE، False در نظر گرفته شده است، که بدین معنی می باشد که کوکی های session در مرورگرهای کاربران برای SESSION_COOKIE_AGE ثانیه (که پیشفرض آن دو هفته یا 1,209,600 ثانیه) می باشد. در صورتی که نمی خواهید مردم در هر بار که مرورگر را باز می گنند به سایت log in نشوند از این تنظیم می توانید استفاده کنید.
+[/p]
+
+[p]id="62"[p/]
+در صورتی که مقدار SESSION_EXPIRE_AT_BROWSER_CLOSE، True باشد، جنگو از کوکی های browser-length استفاده خواهد کرد.
+[/p]
+
+[h4]id="63"[h4/]
+تنظیمات دیگر Session
+[/h4]
+
+[p]id="64"[p/]
+در کنار تنظیمات ذکر شده، چند تنظیم دیگر بر نحوه ی استفاده ی فریم ورک session جنگو از کوکی ها تاثیر می گذارد، همانطور که در جدول 2-14 نشان داده شده است.
+[/p]
+
+[puzzle]جدول ۲-۱۴[puzzle/]
+[tr][tr/]
+[th]width="20%"[th/]
+تنظیم
+[/th]
+
+[th]width="65%"[th/]
+توضیح
+[/th]
+
+[th]width="15%"[th/]
+پیشفرض
+[/th]
+[/tr]
+
+[tr][tr/]
+[td][td/]SESSION_COOKIE_DOMAIN[/td]
+[td][td/
+]دامنه ی مورد استفاده برای کوکی های session. برای این تنظیم یک رشته مانند ".example.com" برای کوکی های cross‑domain قرار دهید، یا برای یک کوکی استاندارد از None استفاده کنید.
+[/td]
+
+[td][td/]
+None
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+SESSION_COOKIE_NAME
+[/td]
+
+[td][td/]
+نام کوکی ای که برای session ها استفاده می شود. این می تواند هر رشته ای باشد.
+[/td]
+
+[td][td/]
+"sessionid"
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+SESSION_COOKIE_SECURE
+[/td]
+[td][td/]
+در دست ترجمه/تالیف .... در صورتی که این تنظیم True باید، کوکی به صورت "امن" علامت گذاری خواهد شد، که بدین معناست که مرورگر ها مطمئن خواهند بود که کوکی تنها از طریق HTTPS ارسال شده است.
+[/td]
+
+[td][td/]
+False
+[td]
+[/tr]
+[/puzzle]
+
+[note]جزئیات فنی[note/]
+[p]id="65"[p/]
+محض کنجکاوی، در زیر چند نکته ی فنی درباره ی کار عملکرد داخلی فریم ورک session بیان شده است:
+[/p]
+
+[ul][ul/]
+[li]id="66"[li/]
+در دست ترجمه/تالیف .... برای کسب اطلاعات درمورد کارکرد ماژول داخلی پایتون یعنی pickle مستندات پایتون مراجعه کنید.
+[/li]
+
+[li]id="67"[li/]
+داده ی session در جدول پایگاه داده با نام django_session ذخیره می شود.
+[/li]
+
+[li]id="68"[li/]
+در دست ترجمه/تالیف .... در صورتی که هرگز به request.session دسترسی ندارید، جنگو به آن جدول پایگاه داده مراجعه می کند.
+[/li]
+
+[li]id="69"[li/]
+جنگو در صورت نیاز یک کوکی ارسال می کند. در صورتی که هیچ داده ی session ای قرار نگرفته باشد، جنگو کوکی session ای ارسال نخواهد کرد (مگر اینکه مقدار SESSION_SAVE_EVERY_REQUEST، True قرار داده شده باشد).
+[/li]
+
+[li]id="70"[li/]
+فریم ورک session جنگو به طور کلی و تنها بر اساس کوکی می باشد. در دست ترجمه/تالیف ....
+[/li]
+
+[p]id="71"[p/]
+این یک تصمیم طراحی بین المللی می باشد. قرار دادن session ها در URL ها نه تنها باعث زشت شدن URL ها می شود، بلکه همچنین سایت شما را برای یک فرم خاص از سرقت هدر Referer آسیب پذیر می سازد.
+[/p]
+[/ul]
+
+[p]id="72"[p/]
+در صورتی که هنوز کنجکاو هستید، منبع بسیار آسان می باشد؛ برای اطلاعات بیشتر به django.contrib.sessions نگاهی بیاندازید.
+[/p]
+[/note]
+
+[h3]id="73"[h3/]
+کاربران و تصدیق
+[/h3]
+
+[p]id="74"[p/]
+session ها راه تداوم داده را از بین چندین درخواست مرورگر به ما می دهند؛ دومین قسمت معادله استفاده از آن session ها برای ورود کاربر می باشد. البته، نمی توانیم به راحتی به هر کاربری که وارد می شود اعتماد کنیم، بنابراین نیاز به تصدیق کردن آن ها در طول مسیر می باشد.
+[/p]
+
+[p]id="75"[p/]
+به طور طبیعی، جنگو ابزاری را جهت این وظایف مشترک (و بسیاری دیگر) تهیه کرده است. سیستم تصدیق کاربر جنگو حساب ها کاربر، حق دسترسی ها، و session های بر پایه ی کوکی کاربر را کنترل می کند. این سیستم اغلب به صورت یک سیستم auth/auth (تصدیق و تصدیق) مورد مراجعه قرار گرفته است. آن نام عدم اعتبار کاربران را اغلب با یک پردازش دو مرحله ای تشخیص می دهد. نیاز به نکات زیر می باشد:
+[/p]
+
+[ol][ol/]
+[li]id="76"[li/]
+تصدیق کاربری که ادعای کاربر بودن می کند (معمولا توسط بررسی یک نام کاربری و رمز عبور در مقابل یک پایگاه داده از کاربران)
+[/li]
+
+[li]id="77"[li/]
+تصدیق این که کاربر مجاز به اجرای برخی اعمال داده شده (معمولا توسط بررسی در یک جدول از حق دسترسی ها) می باشد.
+[/li]
+[/ol]
+
+[p]id="78"[p/]
+در ادامه ی این نیازمندی ها، سیستم auth/auth جنگو حاوی تعدادی از بخش ها می باشد:
+[/p]
+
+[ul][ul/]
+[li]id="79"[li/]
+کاربران: افرادی که در سایت شما عضویت دارند
+[/li]
+
+[li]id="80"[li/]
+حق دسترسی ها: پرچم های دودویی (yes/no) طراحی شده برای مشخص کردن اینکه آیا یک کاربر می تواند یک وظیفه ی خاص را انجام دهد
+[/li]
+
+[li]id="81"[li/]
+گروه ها: روشی عمومی جهت بکار بردن لیبل ها و حق دسترسی به بیشتر از یک کاربر
+[/li]
+
+[li]id="82"[li/]
+پیام ها: روشی ساده برای به صف کردن و نمایش سیستم پیام ها به کاربران
+[/li]
+[/ul]
+
+[p]id="83"[p/]
+در صورتی که  از ابزار مدیر (بحث شده در فصل ششم) استفاده کرده اید، شما بسیاری از این ابزار را مشاهده کرده اید، و در صورتی که کاربران و گروه ها را در ابزار مدیر ویرایش کرده باشید، شما در واقع در جدول پایگاه داده ی سیستم auth داده ها را ویرایش کرده اید.
+[/p]
+
+[h4]id="84"[h4/]
+فعال ساختن پشتیبانی تصدیق
+[/h4]
+
+[p]id="85"[p/]
+همانند ابزار session، پشتیبانی تصدیق به صورت یک برنامه ی جنگو در django.contrib که نیاز به نصب شدن دارد همراه است. همچنین مانند ابزار session، باید به طور پیشفرض نصب شده باشد، ولی در صورتی که شما آن را حذف کرده باشید، نیاز است مراحل زیر را برای نصب آن دنبال کنید:
+[/p]
+
+[ol][ol/]
+[li]id="86"[li/]
+اطمینان حاصل کنید فریم ورک session همانطور که قبلا در این فصل توضیح داده شد نصب شده باشد. پیگیری کاربران بدیهی است که مستلزم کوکی ها می باشد، و در نتیجه در فریم ورک session ساخته می شود.
+[/li]
+
+[li]id="87"[li/]
+'django.contrib.auth' را در تنظیم INSTALLED_APPS قرار داده و دستور manage.py syncdb را جهت نصب جداول پایگاه داده ی مناسب اجرا کنید.
+[/li]
+
+[li]id="88"[li/]
+از وجود 'django.contrib.auth.middleware.AuthenticationMiddleware'درون تنظیم MIDDLEWARE_CLASSES اطمینان حاصل کنید – بعد از SessionMiddleware.
+[/li]
+[/ol]
+
+[p]id="89"[p/]
+با انجام مراحل فوق، همه چیز برای سر و کار داشتن با کاربران در توابع view آماده می باشد. رابط اصلی که شما برای دسترسی به کاربران در یک view از آن استفاده خواهید کرد request.user می باشد؛ این یک آبجکت است که کاربر فعلی وارد شده به سایت را نشان می دهد. در صورتی که کاربر وارد نشده باشد، به جای آن یک آبجکت AnonymousUser خواهد بود (برای جزئیات بیشتر به ادامه ی این بخش نگاه بیاندازید).
+[/p]
+
+[p]id="90"[p/]
+می توانید به سادگی در صورتی که یک کاربر وارد شده است، با متد is_authenticated() تشخیص دهید:
+[/p]
+
+[code]
+if request.user.is_authenticated():
+    # Do something for authenticated users.
+else:
+    # Do something for anonymous users.
+[/code]
+
+[h4]id="91"[h4/]
+استفاده از کاربران
+[/h4]
+
+[p]id="92"[p/]
+هنگامی که شما یک کاربر دارید – اغلب از request.user، ولی از طریق یکی از روش های مختصر توضیح داده شده – تعدادی از فیلدها و متدهای در دسترس در آن آبجکت دارید. آبجکت های AnonymousUser برخی از این رابط ها را تقلید کرده است، ولی نه تمام آن را، بنابراین باید همواره user.is_authenticated() را قبل از آنکه کاربری را که با آن سر و کار دارید را با حسن نیت تصور کنید بررسی کنید.. جدول 3-14 و 4-14 فیلد ها و متد ها را به ترتیب در آبجکت های User لیست کرده است.
+[/p]
+
+[puzzle]جدول ۳-۱۴[puzzle/]
+[tr][tr/]
+[th]width="15%"[th/]فیلد[/th]
+[th]width="85%"[th/]توضیح[/th]
+[/tr]
+
+[tr][tr/]
+[td][td/]username[/td]
+[td][td/]الزامی؛ 30 حرف یا کمتر. تنها حروف الفبایی (حروف الفبا، عددها، و خط تیره)[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]First_name[/td]
+[td][td/]اختیاری؛ 30 حرف یا کمتر[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]Last_name[/td]
+[td][td/]اختیاری؛ 30 حرف یا کمتر[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]email[/td]
+[td][td/]اختیاری؛ آدرس پست الکترونیک[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]password[/td]
+[td][td/]الزامی؛ یک هش و ابر داده از رمز عبور (جنگو رمز عبور خام را ذخیره نمی کند). برای اطلاعات بیشتر به بخش "رمزهای عبور" مراجعه کنید.[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]Is_staff[/td]
+[td]Boolean. اینکه کاربر می تواند به سایت مدیر دسترسی پیدا کند یا خیر را مشخص می کند.[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]Is_active[/td]
+[td][td/]Boolean. این که این حساب می تواند برای ورود استفاده شده باشد یا خیر را مشخص می کند. این پرچم را به جای حذف حساب ها مقدار False قرار دهید.[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]Is_superuser[/td]
+[td][td/]Boolean. اینکه این کاربر دارای تمام دسترسی ها بدون اختصاص دادن آن ها به طور واضح می باشد یا خیر را مشخص می کند.[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]Last_login[/td]
+[td][td/]یک datetime از آخرین ورود کاربر. به طور پیشفرض زمان/تاریخ فعلی در آن قرار دارد.[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]date_joined[/td]
+[td][td/]تشخیص datetime زمانی که حساب ساخته شده است. به طور پیشفرض زمانی که حساب ساخته شده است مقدار آن زمان/تاریخ فعلی می باشد.[/td]
+[/tr]
+[/puzzle]
+
+[puzzle]جدول ۴-۱۴[puzzle/]
+[tr][tr/]
+[th]width="20%"[th/]متد[/th]
+[th]width="80%"[th/]توضیح[/th]
+[/tr]
+
+[tr][tr/]
+[td][td/]is_authenticated()[/td]
+[td][td/]همواره آبجکت های User "واقعی" مقدار True بر می گرداند. در صورتی که کاربر تصدیق شده باشد این روشی برای گفتن می باشد. این هیچ اشاره ای به حق دسترسی ها نداشته و فعال بودن کاربر را نیز بررسی نمی کند. تنها این را نشان می دهد که کاربر با موفقیت تصدیق شده است.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]is_anonymous()[/td]
+[td][td/]تنها برای آبجکت های AnonylousUser مقدار True بر می گرداند (و مقدار False برای آبجکت های User "واقعی"). عموما، باید استفاده از is_authenticated() را برای این متد ترجیح دهید.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]get_full_name()[/td]
+[td][td/]first_name را بعلاوه ی last_name، با یک فاصله در بین آن ها بر می گرداند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]set_password(passwd)[/td]
+[td][td/]رمز عبور کاربر را برای رشته ی خام داده شده قرار می دهد، در دست ترجمه/تالیف .... در واقع این متد آبجکت User را ذخیره نمی کند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]check_password(passwd)[/td]
+[td][td/]در صورتی که رشته ی خام داده شده رمز عبور درست کاربر باشد مقدار True بر می گرداند. در دست ترجمه/تالیف ....[/td]
+[/tr]
+[tr][tr/]
+[td][td/]get_group_permissions()[/td]
+[td][td/]لیستی از رشته های حق دسترسی که کاربر از طریق گروهی که به آن تعلق دارد در اختیار دارد را بر می گرداند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]get_all_permissions()[/td]
+[td][td/]لیستی از رشته ی حق دسترسی که کاربر دارد، هم حق دسترسی گروه هم کاربر.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]has_perm(perm)[/td]
+[td][td/]در صورتی که کاربر دارای حق دسترسی مشخص شده باشد مقدار True بر می گرداند و perm قالب بندی "package.codename" می باشد. در صورتی که کاربر غیر فعال باشد، این متد همواره مقدار False بر می گرداند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]has_perms(perm_list)[/td]
+[td][td/]در صورتی که کاربر دارای تمام حق دسترسی های تعیین شده باشد مقدار True بر می گرداند. در صورتی که کاربر غیر فعال باشد، هموراه این متد مقدار False بر می گرداند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]has_module_perms(app_lable)[/td]
+[td][td/]در صورتی که کاربر هیچ حق دسترسی ای در app_lable داده شده نداشته باشد مقدار True بر می گرداند. در صورتی که کاربر غیر فعال باشد، این متد هموراه مقدار False بر می گرداند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]get_and_delete_messages()[/td]
+[td][td/]لیستی از آبجکت های Message در صف کاربر بر می گرداند و پیام های صف را حذف می کند.[/td]
+[/tr]
+[tr][tr/]
+[td][td/]email_user(subj, msg)[/td]
+[td][td/]یک پست الکترونیکی به کاربر می فرستد. این پست الکترونیکی از تنظیم DEFAULT_FROM_EMAIL فرستاده می شود. همچنین می توانید یک آرگومان سوم به نام from_email جهت override آدرس From در پست الکترونیکی ارسال کنید.
+[/puzzle]
+
+[p]id="93"[p/]
+در پایان، آبجکت های User دارای دو فیلد many-to-many می باشند: groups و permissions. آبجکت های User می توانند همانند فیلدهای many-to-many دیگر به آبجکت های مربوط به خود دسترسی پیدا کنند:
+[/p]
+
+[code]
+# Set a user's groups:
+myuser.groups = group_list
+
+# Add a user to some groups:
+myuser.groups.add(group1, group2,...)
+
+# Remove a user from some groups:
+myuser.groups.remove(group1, group2,...)
+
+# Remove a user from all groups:
+myuser.groups.clear()
+
+# Permissions work the same way
+myuser.permissions = permission_list
+myuser.permissions.add(permission1, permission2, ...)
+myuser.permissions.remove(permission1, permission2, ...)
+myuser.permissions.clear()
+[/code]
+
+[h4]id="94"[h4/]
+وارد و خارج شدن از سایت
+[/h4]
+
+[p]id="95"[p/]
+جنگو برای کنترل ورود و خروج از سایت، برخی توابع داخلی (و چند فوت و فن جذاب) را ارائه کرده است، ولی قبل از آن، اجازه دهید نگاهی به نحوه ی ورود و خروج از سایت را "به صورت دستی" بیاندازیم. جنگو جهت انجام این اعمال در django.contrib.auth دو تابع با نام های authenticate() و login() را ارائه کرده است.
+[/p]
+
+[p]id="96"[p/]
+جهت تصدیق یک نام کاربری و رمز عبور داده شده، از authenticate() استفاده کنید. این تابع دو آرگومان کیورد username و password را دریافت می کند، و در صورتی که رمز عبور برای نام کاربری داده شده معتبر باشد، یک آبجکت User بر می گرداند. در صورتی که رمز عبور معتبر نباشد، authenticate() مقدار None بر می گرداند:
+[/p]
+
+[code]
+>>> from django.contrib import auth
+>>> user = auth.authenticate(username='john', password='secret')
+>>> if user is not None:
+...     print "Correct!"
+... else:
+...     print "Invalid password."
+[/code]
+
+[p]id="97"[p/]
+authenticate() تنها اعتبار کاربر را تایید می کند. جهت ورود کاربر، از تابع loging() استفاده کنید. این تابع یک آبجکت HttpRequest و یک آبجکت User دریافت کرده و با استفاده از فریم ورک session، ID کاربر را درون session ذخیره می کند.
+[/p]
+
+[p]id="98"[p/]
+مثال زیر نحوه ی استفاده از هر دوی تابع authenticate() و login() را درون یک تابع view نشان می دهد:
+[/p]
+
+[code]
+from django.contrib import auth
+
+def login_view(request):
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    user = auth.authenticate(username=username, password=password)
+    if user is not None and user.is_active:
+        # Correct password, and the user is marked "active"
+        auth.login(request, user)
+        # Redirect to a success page.
+        return HttpResponseRedirect("/account/loggedin/")
+    else:
+        # Show an error page
+        return HttpResponseRedirect("/account/invalid/")
+[/code]
+
+[p]id="99"[p/]
+جهت خروج یک کاربر، از django.contrib.auth.logout() داخل view خود استفاده کنید. این تابع یک آبجکت HttpRequest دریافت کرده و هیچ مقداری بر نمی گرداند:
+[/p]
+
+[code]
+from django.contrib import auth
+
+def logout_view(request):
+    auth.logout(request)
+    # Redirect to a success page.
+    return HttpResponseRedirect("/account/loggedout/")
+[/code]
+
+[p]id="100"[p/]
+دقت داشته باشید که auth.logout() در صورتی که کاربر وارد سایت نشده باشد، هیچ خطایی ایجاد نمی کند.
+[/p]
+
+[p]id="101"[p/]
+در عمل، نیازی به نوشتن توابع login/logout خودتان نخواهید داشت؛ سیستم تصدیق مجموعه ای از view ها برای کنترل ورود و خروج به طور عمومی ارائه کرده است. اولین گام در استفاده از این view های تصدیق، وصل کردن آن ها به URLconf می باشد. نیاز است تکه کد زیر را اضافه کنید:
+[/p]
+
+[code]
+from django.contrib.auth.views import login, logout
+
+urlpatterns = patterns('',
+    # existing patterns here...
+    (r'^accounts/login/$',  login),
+    (r'^accounts/logout/$', logout),
+)
+[/code]
+
+[p]id="102"[p/]
+/accounts/login/ و /accounts/logout/، URL های پیشفرض می باشند که جنگو برای این view استفاده می کند.
+[/p]
+
+[p]id="103"[p/]
+به طور پیشفرض view، login یک template را در registeration/login.html، render می کند (می توانید نام این template را از طریق ارسال یک آرگومان view اضافه تغییر دهید، ``template_name``). این فرم نیاز دارد حاوی یک فیلد username و یک فیلد password باشد. یک template ساده ممکن است چیزی شبیه به کد زیر باشد:
+[/p]
+
+[code html]
+{% extends "base.html" %}
+
+{% block content %}
+
+  {% if form.errors %}
+    <p class="error">Sorry, that's not a valid username or password</p>
+  {% endif %}
+
+  <form action="" method="post">
+    <label for="username">User name:</label>
+    <input type="text" name="username" value='' id="username">
+    <label for="password">Password:</label>
+    <input type="password" name="password" value='' id="password">
+
+    <input type="submit" value="login" />
+    <input type="hidden" name="next" value="{{ next|escape }}" />
+  </form>
+
+{% endblock %}
+[/code]
+
+[p]id="104"[p/]
+در صورتی که وارد شدن موفقیت آمیز باشد، کاربر به طور پیشفرض به /accounts/profile/ تغییر مسیر داده خواهد شد. می توان این حالت را توسط یک فیلد hidden به نام next با URL جهت تغییر مسیر بعد از ورود override کرد. همچنین می تواند این مقدار را به صورت یک پارامتر GET به view، login ارسال کرده و آن به صورت خودکار به صورت متغیر next به context اضافه خواهد شد که می توانید درون آن فیلد hidden آن را درج کنید.
+[/p]
+
+[p]id="105"[p/]
+view، logout کمی متفاوت تر عمل می کند. به طور پیشفرض این view یک template در registration/loggedout.html (که معمولا حاوی یک پیام "you've successfully logged out" می باشد) را render می کند. می توان view را با یک آرگومان اضافه با نام next_page فراخوانی کرد، که view را جهت تغییر مسیر بعد از خروج راهنمایی خواهد کرد.
+[/p]
+
+[h3]id="106"[h3/]
+محدودیت دسترسی برای کاربران وارد شده
+[/h3]
+
+[p]id="107"[p/]
+البته، در دست ترجمه/تالیف ....
+[/p]
+
+[p]id="108"[p/]
+به طور ساده، راه خام جهت محدود کردن دسترسی برای صفحات، بررسی request.user.is_authenticated() و تغییر مسیر به یک صفحه ی ورود می باشد:
+[/p]
+
+[code]
+from django.http import HttpResponseRedirect
+
+def my_view(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/accounts/login/?next=%s' % request.path)
+    # ...
+[/code]
+
+[p]id="109"[p/]
+یا شاید نمایش یک پیام خطا:
+[/p]
+
+[code]
+def my_view(request):
+    if not request.user.is_authenticated():
+        return render_to_response('myapp/login_error.html')
+    # ...
+[/code]
+
+[p]id="110"[p/]
+به صورت یک میانبر، می توان از decorator مناسب login_required استفاده کرد:
+[/p]
+
+[code]
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def my_view(request):
+    # ...
+[/code]
+
+[p]id="111"[p/]
+login_required به شکل زیر عمل می کند:
+[/p]
+
+[ul][ul/]
+[li]id="112"[li/]
+در صورتی که کاربر وارد نشده باشد، به /accounts/login/ تغییر مسیر داده می شود، ارسال شدن مسیر URL فعلی در رشته ی کوئری به صورت next، برای مثال: /accounts/login/?next=/polls/3/.
+[/li]
+
+[li]id="113"[li/]
+در صورتی که کاربر وارد شده باشد، view به صورت معمول اجرا می شود. کد view می تواند. در دست ترجمه/تالیف ....
+[/li]
+[/ul]
+
+[h4]id="114"[h4/]
+محدودیت دسترسی برای کاربرانی که یک آزمون را رد می کنند
+[/h4]
+
+[p]id="115"[p/]
+محدودیت دسترسی بر پایه ی حق دسترسی ها یا برخی آزمون های دیگر، یا ارائه ی یک مکان مختلف برای view ورود اساسا به یک روش کار می کند.
+[/p]
+
+[p]id="116"[p/]
+روش خام اجرای آزمون در request.user به طور مستقیم درون view می باشد. برای مثال، view زیر برای اطمینان از این که کاربر، وارد شده و دارای حق دسترسی polls.can_vote می باشد یا خیر:
+[/p]
+
+[code]
+def vote(request):
+    if request.user.is_authenticated() and request.user.has_perm('polls.can_vote')):
+        # vote here
+    else:
+        return HttpResponse("You can't vote in this poll.")
+[/code]
+
+[p]id="117"[p/]
+بار دیگر، جنگو یک میانبر با نام user_passes_test ارائه کرده است. این میانبر آرگومان هایی دریافت کرده و یک decorator تخصص یافته برای وضعیت خاص شما تولید می کند:
+[/p]
+
+[code]
+def user_can_vote(user):
+    return user.is_authenticated() and user.has_perm("polls.can_vote")
+
+@user_passes_test(user_can_vote, login_url="/login/")
+def vote(request):
+    # Code here can assume a logged-in user with the correct permission.
+    ...
+[/code]
+
+[p]id="118"[p/]
+user_passes_test یک آرگومان الزامی دریافت می کند: یک قابل فراخوانی که یک آبجکت User دریافت کرده و در صورتی که کاربر اجازه ی تماشای صفحه را داشته باشد مقدار True بر می گرداند. توجه داشته باشید که user_passes_test به طور اتوماتیک تصدیق شدن کاربر را بررسی نمی کند؛ شما باید آن را برای خودتان انجام دهید.
+[/p]
+
+[p]id="119"[p/]
+همچنین در این مثال آرگومان دوم (اختیاری) نشان داده شده است، که اجازه ی تعیین URL برای صفحه ی خودتان را می دهد (/accounts/login/ به طور پیشفرض). در صورتی که کاربر آزمون را نگذرانده باشد؛ سپس decorator، user_passes_test کاربر را به login_url تغییر مسیر خواهد داد.
+[/p]
+
+[p]id="120"[p/]
+به دلیل آن که بررسی این که یک کاربر دارای یک حق دسترسی خاص است یا خیر یک وظیفه ی نسبتا مشترک می باشد، جنگو یک میانبر برای آن ارائه کرده است که یک decorator با نام permission_required() می باشد. در دست ترجمه/تالیف ...:
+[/p]
+
+[code]
+from django.contrib.auth.decorators import permission_required
+
+@permission_required('polls.can_vote', login_url="/login/")
+def vote(request):
+    # ...
+[/code]
+
+[p]id="121"[p/]
+دقت داشته باشد که همچنین permission_required() یک پارامتر اختیاری login_url دریافت می کند؛ که این نیز به طور پیشفرض '/accounts/login/' می باشد.
+[/p]
+
+[note]
+محدود کردن دسترسی برای view های جنریک
+[note/]
+
+[p]id="122"[p/]
+یکی از سوالات تکراری پرسیده شده در لیست کاربران جنگو در مورد محدود کردن دسترسی برای یک view جنریک می باشد. برای جواب به این سوال؛ نیاز به نوشتن یک thin wrapper در اطراف view و اشاره URLconf به wrapper خود به جای خود generic view خواهید داشت:
+[/p]
+
+[code]
+from django.contrib.auth.decorators import login_required
+from django.views.generic.date_based import object_detail
+
+@login_required
+def limited_object_detail(*args, **kwargs):
+    return object_detail(*args, **kwargs)
+[/code]
+
+[p]id="123"[p/]
+البته که می توانید، login_required را با هر decorator محدودیت دیگری جا به جا کنید.
+[/p]
+[/note]
+
+[h3]id="124"[h3/]
+مدیریت کاربران، حق دسترسی ها و گروه ها
+[/h3]
+
+[p]id="125"[p/]
+ساده ترین را برای مدیریت سیستم auth تاکنون، از طریق رابط مدیر بوده است. فصل ششم در مورد نحوه ی استفاده از سایت مدیر جنگو را جهت ویرایش کاربران و کنترل حق دسترسی آن ها  بحث کرده است، و اغلب اوقات شما فقط از این رابط استفاده خواهید کرد.
+[/p]
+
+[p]id="126"[p/]
+هر چند API های سطح پایین ای وجود دارند که شما هنگامی که نیاز به کنترل مستقل دارید از آن ها استفاده کنید، و این API ها را در بخش های بعدی توضیح داده ایم.
+[/p]
+
+[h4]id="127"[h4/]
+ساختن کاربران
+[/h4]
+
+[p]id="128"[p/]
+ساختن کاربران با تابع کمکی create_user:
+[/p]
+
+[code]
+>>> from django.contrib.auth.models import User
+>>> user = User.objects.create_user(username='john',
+...                                 email='jlennon@beatles.com',
+...                                 password='glass onion')
+[/code]
+
+[p]id="129"[p/]
+در این نقطه، user یک رابط نمونه ی User حاضر برای ذخیره شدن در پایگاه داده (create_user() در واقع save() خودش را فراخوانی نمی کند) می باشد. همچنین می توانید قبل از ذخیره attribute های آن را تغییر دهید:
+[/p]
+
+[code]
+>>> user.is_staff = True
+>>> user.save()
+[/code]
+
+[h4]id="130"[h4/]
+تغییر رمزهای عبور
+[/h4]
+
+[p]id="131"[p/]
+می توان یک رمز عبور را با set_password() تغییر داد:
+[/p]
+
+[code]
+>>> user = User.objects.get(username='john')
+>>> user.set_password('goo goo goo joob')
+>>> user.save()
+[/code]
+
+[p]id="132"[p/]
+attribute، password را به طور مستقیم قرار ندهید، مگر اینکه کاملا بدانید که چه کار می کنید. رمز عبور در واقع به صورت یک salted hash دخیره شده و در نتیجه نمی تواند به طور مستقیم ویرایش شود.
+[/p]
+
+[p]id="133"[p/]
+به طور رسمی تر، attribute، password از یک آبجکت User یک رشته در این قالب بندی می باشد:
+[/p]
+
+[code]
+آن یک نوع hash، salt و خود hash، جدا شده توسط حرف ($) می باشد.
+[/code]
+
+[p]id="134"[p/]
+hashtype همچنین sha1 (پیشفرض) یا md5 می باشد، الگوریتم استفاده شده برای انجام یک hash یک طرفه از رمز عبور. salt یک رشته ی تصادفی استفاده شده برای اضافه شدن به رمز عبور خام برای ساختن hash برای مثال:
+[/p]
+
+[pre][pre/]
+sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
+[/pre]
+
+[p]id="135"[p/]
+توابع User.set.password() و User.check_password() این مقادیر را در پشت صحنه بررسی کرده و قرار می دهند.
+[/p]
+
+[note]
+hash های اضافه شده
+[note/]
+
+[p]id="136"[p/]
+hash تابع یک طرفه ی پنهانی می باشد – بدین معنی که، می توان به سادگی hash مقدار داده شده را محاسبه کرد، ولی گرفتن یک hash و برگرداندن آن به مقدار اصلی آن تقریبا غیر ممکن است.
+[/p]
+
+[p]id="137"[p/]
+در صورتی که رمزهای عبور را به صورت متن ساده ذخیره کرده باشیم، هر کسی که درون پایگاه داده ی دست داشته باشد به سرعت می تواند رمز عبور همه را بفهمد. ذخیره رمزهای عبور به صورت hash ها احتمال به خطر افتادن اطلاعات پایگاه داده را کاهش می دهد.
+[/p]
+
+[p]id="138"[p/]
+هر چند که، یک حمله کنند با رمز عبور پایگاه داده همچنان می تواند یک حمله ی brute-force را اجرا کرده و میلیون ها رمز عبور را به صورت hash در آورده و آن hash ها را با مقادیر ذخیره شده مقایسه کند. این مدتی طول می کشد ولی کمتر آن که شما ممکن است فکر کنید.
+[/p]
+
+[p]id="139"[p/]
+بدتر از آن rainbow table ها می باشند که به صورت عمومی در دسترس هستند، یا پایگاه های داده ی قبل از محاسبه ی hash ها از میلیون ها رمز عبور. با یک rainbow table، یک مهاجم با تجربه می تواند در چند ثانیه تمام رمزهای عبور را بشکند.
+[/p]
+
+[p]id="140"[p/]
+اضافه کردن یک salt – اساسا یک مقدار اولیه تصادفی – برای hash ذخیره شده یک لایه ی دیگری را جهت سختی در شکستن رمزهای عبور اضافه می کند. زیرا salt ها در هر رمزعبوری متفاوت می باشند، آن ها همچنین از استفاده ی rainbow table جلوگیری می کنند؛ در نتیجه مهاجمان مجبور به سقوط در یک حمله ی brute-force می شوند، در دست ترجمه/تالیف ....
+[/p]
+
+[p]id="141"[p/]
+هنگامی hash های salt شده امن ترین روش برای ذخیره رمزهای عبور نیستند، یک حد وسط بین امنیت و راحتی می باشند.
+[/p]
+[/note]
+
+[h4]id="142"[h4/]
+کنترل عضویت
+[/h4]
+
+[p]id="143"[p/]
+می توان از این ابزار سطح پایین برای ساختن view هایی که به کاربر جهت عضو شدن برای حساب های جدید اجازه می دهند استفاده کرد. توسعه دهندگان مختلف عضویت را به طور متفاوتی انجام می دهند، بنابراین جنگو نوشتن یک view را برای شما ترک کرده است. خوشبختانه، این کار بسیار ساده می بشاد.
+[/p]
+
+[p]id="144"[p/]
+در ساده طرین حالت، می توان یک view کوچک برای اطلاعات الزامی کاربر و ساختن آن کاربران تهیه کرد. جنگو یک فرم داخلی ارائه کرده است که می توان برای این منظور از آن استفاده کرد، که در مثال زیر استفاده خواهیم کرد:
+[/p]
+
+[code]
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+def register(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            new_user = form.save()
+            return HttpResponseRedirect("/books/")
+    else:
+        form = UserCreationForm()
+    return render_to_response("registration/register.html", {
+        'form': form,
+    })
+[/code]
+
+[p]id="145"[p/]
+این فرم یک template با نام registration/register.html را فرض می کند. در اینجا یک مثال از template مورد نظر وجود دارد:
+[/p]
+
+[code html]
+{% extends "base.html" %}
+
+{% block title %}Create an account{% endblock %}
+
+{% block content %}
+  <h1>Create an account</h1>
+
+  <form action="" method="post">
+      {{ form.as_p }}
+      <input type="submit" value="Create the account">
+  </form>
+{% endblock %}
+[/code]
+
+[h4]id="146"[h4/]
+استفاده از تصدیق داده در Template ها
+[/h4]
+
+[p]id="147"[p/]
+کاربر وارد شده ی فعلی و حق دسترسی های وی، زمانی که از RequestContext (فصل نهم را نگاه کنید) استفاده می کنید در template context در دسترس می باشد.
+[/p]
+
+[note]
+نکته
+[note/]
+
+[p]id="148"[p/]
+از نظر فنی، این متغیرها تنها در صورتی که شما از RequestContext استفاده کنید و تنظیم TEMPLATE_CONTEXT_PROCESSORS حاوی "django.core.context_processors.auth" باشد (که به طور پیشفرض این طور است) در template context در دسترس می باشند. بار دیگر برای اطلاعات بیشتر می توانید به فصل نهم مراجعه کنید.
+[/p]
+[/note]
+
+[p]id="149"[p/]
+هنگامی که از RequestContext استفاده می کنید، کاربر فعلی (که می تواند هم یک نمونه از User یا یک نمونه ی AnonymousUser باشد) در متغیر template {{ user }} ذخیره می شود:
+[/p]
+
+[code html]
+{% if user.is_authenticated %}
+[/p]
+{% else %}
+[/p]
+{% endif %}
+[/code]
+
+[p]id="152"[p/]
+حق دسترسی های این کاربر در متغیر template {{ perms }} ذخیره شده اند. این یک پروکسی template‑friendly برای تعدادی از متدهای حق دسترسی می باشد که به طور خلاصه توضیح داده شده است.
+[/p]
+
+[p]id="153"[p/]
+برای استفاده از آبجکت perms دو روش وجود دارد. می توان در صورتی که کاربر دارای هیچ حق دسترسی برای برخی برنامه های داده شده نداشته باشد، برای بررسی آن از چیزی شبیه به این {% if perms.polls %} استفاده کرد، یا می توان در صورتی که کاربر دارای حق دسترسی خاصی می باشد برای بررسی آن از چیزی شبیه به این {% if perms.polls.can_vote %} استفاده کرد.
+[/p]
+
+[p]id="154"[p/]
+در نتیجه، می توان حق دسترسی ها را در عبارت template {% if %} بررسی کرد:
+[/p]
+
+[code html]
+{% if perms.polls %}
+[/p]
+  {% if perms.polls.can_vote %}
+[/p]
+  {% endif %}
+{% else %}
+[/p]
+{% endif %}
+[/code]
+
+[h3]id="158"[h3/]
+حق دسترسی ها، گروه ها و پیام ها
+[/h3]
+
+[p]id="159"[p/]
+چند قسمت دیگر از فریم ورک authentication وجود دارد که تنها به طور روزنامه وار از کنار آن عبور کردیم. در ادامه نگاهی نزدیک تر به آن ها خواهیم داشت.
+[/p]
+
+[h4]id="160"[h4/]
+حق دسترسی ها
+[/h4]
+
+[p]id="161"[p/]
+حق دسترسی ها روشی ساده برای "علامت گذاری" کاربران و گروه ها جهت نشان دادن این که کاربر یا گروه علامت گذاری شده دارای توانایی اجرای برخی کارها می باشد. حق دسترسی ها معمولا توسط سایت مدیر جنگو استفاده شده اند، ولی می توان به سادگی در کد خود نیز از آن ها استفاده کرد.
+[/p]
+
+[p]id="162"[p/]
+سایت مدیر جنگو به صورتی که در زیر بیان شده است از حق دسترسی ها استفاده کرده است:
+[/p]
+
+[ul][ul/]
+[li]id="163"[li/]
+دسترسی به view فرم "add"، و اضافه کردن یک آبجکت که محدود به کاربران با حق دسترسی add برای آن نوع از آبجکت.
+[/li]
+
+[li]id="164"[li/]
+دسترسی به view لیست تغییر، view فرم "change"، و تغییر یک آبجکت که به کاربران با حق دسترسی change برای آن نوع آبجکت محدود شده است.
+[/li]
+
+[li]id="165"[li/]
+دسترسی به حذف یک آبجکت محدود شده به کاربران با حق دسترسی delete برای آن نوع از آبجکت.
+[/li]
+[/ul]
+
+[p]id="166"[p/]
+حق دسترسی ها به صورت globally برای هر نوع از آجکت، نه هر نمونه ی خاص از آبجکت قرار داده شده اند. برای مثال، می توان گفت "Mary قادر است اخبار را تغییر دهد" ولی حق دسترسی ها اجازه نمی دهد که به عنوان مثال بگویید "Mary قادر است اخبار تغییر دهید، ولی تنها آنهایی را که خود او ساخته است" یا "Mary قادر است تنها اخباری را تغییر دهید که دارای یک وضعیت خاصی، انتشار یا ID خاص باشد."
+[/p]
+
+[p]id="167"[p/]
+این ها سه حق دسترسی اساسی می باشد – اضافه کردن، تغییر دادن، و حذف کردن – که به طور خودکار برای هر مدل جنگو ایجاد شده اند. در پشت صحنه، این حق دسترسی ها هنگامی که شما دستور manage.py sycdb را اجرا می کنید درون جدول پایگاه داده با نام auth_permission اضافه می شوند.
+[/p]
+
+[p]id="168"[p/]
+این حق دسترسی ها فرمی از "<app>.<action>_<object_name>" می باشند. بدین معنی که اگر دارای یک برنامه ی polls (نظرسنجی) با یک مدل Choice می باشید، حق دسترسی های "polls.add_choice"، "polls.change_choice" و "polls.delete_choice" را بدست خواهید آورد.
+[/p]
+
+[p]id="169"[p/]
+درست مثل کاربران، حق دسترسی ها در یک مدل جنگو موجود در django.contrib.auth.models اجرا شده اند. این یعنی این که می توان در صورت تمایل ارتباط با permission ها، به طور مستقیم از API پایگاه داده ی جنگو استفاده کرد.
+[/p]
+
+[h4]id="170"[h4/]
+گروه ها
+[/h4]
+
+[p]id="171"[p/]
+گروه ها یک view جنریک از طبقه بندی کاربران می باشد، بنابراین می توان حق دسترسی ها، یا برخی چیزهای دگر را برای آن کاربران بکار برد. یک کاربر می تواند به هر تعدادی از گروه ها تعلق داشته باشد.
+[/p]
+
+[p]id="172"[p/]
+یک کاربر در یک گروه به طور خودکار دارای حق دسترسی های داده به آن گروه می باشد. برای مثال، در صورتی که گروه Site editors دارای حق دسترسی can_edit_home_page باشد، هر کاربر در آن گروه آن حق دسترسی را خواهد داشت.
+[/p]
+
+[p]id="173"[p/]
+گروه ها همچنین روش مناسبی برای طبقه بندی کاربران برای دادن برخی لیبل ها یا قابلیت تمدید به آن ها می باشد. برای مثال، می توان یک گروه با نام 'Special users' ایجاد نمود، و آن قبیل از کاربرانی را که می خواهیم در یک بخش از سایت که تنها برای دسترسی کاربران در نظر گرفته شده است فعالیت کنند را در آن قرار دهیم، یا پیام هایی که تنها برای کاربران در نظر گرفته ایم را به آن ها ارسال کنیم.
+[/p]
+
+[p]id="174"[p/]
+همانند کاربران، ساده ترین روش برای مدیریت گروه ها، از طریق رابط مدیر می باشد. هر چند، گروه ها نیز تنها مدل های جنگو می باشند که در django.contrib.auth.models وجود دارند. بنابراین شما می توانید همواره برای سرو کار داشتن با گروه ها در سطح پایین از API پایگاه داده ی جنگو استفاده کنید.
+[/p]
+
+[h4]id="175"[h4/]
+پیام ها
+[/h4]
+
+[p]id="176"[p/]
+سیستم پیام یک روش سبک جهت به صف کردن پیام برای کاربران داده شده می باشد. یک پیام، مرتبط با یک User می باشد. هیچ مفهومی از انقضا یا برچسب زمانی وجودد ندارد.
+[/p]
+
+[p]id="177"[p/]
+پیام ها توسط رابط مدیر جنگو بعد از اعمال موفقیت آمیز استفاده می شوند. زمانی که شما یک آجکت ایجاد می کند، متوجه ی یک پیام "The object was created successfully" در بالای صفحه ی مدیر خواهید شد.
+[/p]
+
+[p]id="178"[p/]
+می توانید از یک API هم شکل برای صف بندی و نمایش پیام ها در برنامه ی خودتان استفاده کنید. API ساده می باشد:
+[/p]
+
+[ul][ul/]
+[li]id="179"[li/]
+جهت ایجاد یک پیام جدید، از user.message_set.create(message='message_text') استفاده کنید.
+[/li]
+
+[li]id="180"[li/]
+جهت بازیابی/حدف پیام ها، از user.get_and_delete_messages() استفاده کنید، که یک لیست از آبجکت های Message در صف کاربران (در صورت وجود) بر می گرداند و پیام های از صف را حذف می کند.
+[/li]
+[/ul]
+
+[p]id="181"[p/]
+در مثال view زیر، سیستم یک پیام برای کاربر بعد از ساختن یک playlist ذخیره می کند:
+[/p]
+
+[code]
+def create_playlist(request, songs):
+    # Create the playlist with the given songs.
+    # ...
+    request.user.message_set.create(
+        message="Your playlist was added successfully."
+    )
+    return render_to_response("playlists/create.html",
+        context_instance=RequestContext(request))
+[/code]
+
+[p]id="182"[p/]
+هنگامی که شما از RequestContext استفاده می کند، کاربر وارد شده ی فعلی و پیام او در template context به صورت متغیر template {{ message }}در دسترس هستند. در زیر یک مثال از کد template وجود دارد که پیام ها را نمایش می دهد:
+[/p]
+
+[code html]
+{% if messages %}
+[ul][ul/]
+    {% for message in messages %}
+[/li]
+    {% endfor %}
+[/ul]
+{% endif %}
+[/code]
+
+[p]id="184"[p/]
+دقت داشته باشید که RequestContext در پشت صحنه get_and_delete_messages را فراخوانی می کند، بنابراین هر پیامی حذف شده خواهد بود حتی اگر آن ها را نمایش ندهید.
+[/p]
+
+[p]id="185"[p/]
+در پایان، دقت داشته باشید که این فریم ورک پیام ها تنها با کاربران در پایگاده داده ی کاربر کار می کنند. برای ارسال پیام ها به کاربران anonymous، از فریم ورک session به طور مستقیم استفاده کنید.
+[/p]
+
+[h3]id="186"[h3/]
+گام بعدی
+[/h3]
+
+[p]id="187"[p/]
+سیستم session و authorization بسیار جذاب می باشد. اغلب اوقات، شما نیازی به تمام ویژگی های توضیح داده شده در این فصل نخواهید داشت، ولی هنگامی که نیاز به اجازه ی تعامل های پیچیده بین کاربران می باشد، داشتن تمام آن قدرت در دسترس خوب می باشد.
+[/p]
+
+[p]id="188"[p/]
+در فصل بعدی، نگاهی به زیر ساخت cashing جنگو خواهید داشت، که روشی مناسب برای بالا بردن کارایی برنامه می باشد.
+[/p]

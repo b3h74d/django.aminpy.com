@@ -1,0 +1,546 @@
+<h2 >
+فصل یازدهم: View های Generic در جنگو 
+</h2>
+
+<p id="1">
+در اینجا دوباره موضوع تکراری این کتاب وجود دارد: در بدترین شکل ممکن، توسعه ی وب کار خسته کننده ای خواهد بود، تاکنون، نحوه ی تلاش جنگو برای انجام برخی از این کارهای یکنواخت، در مدل و لایه ی template گفته شده است، همچنین توسعه دهندگان، این یکنواختی را در سطح view نیز تجربه کرده اند.
+</p>
+
+<p id="2">
+view های generic جنگو، برای ساده کردن این یکنواختی ها توسعه داده شده اند. view های generic برخی از الگوها و روندهای مشترک یافت شده در توسعه ی view را، در نظر گرفته و آن ها را طوری طراحی کرده اند که شما بتوانید به سرعت view های مشترک را بدون اینکه مجبور باشید کد زیادی بنویسید ایجاد کنید. در حقیقت، تقریبا هر مثال view ای در فصل های گذشته بیان شده است، می توانند با استفاده از view های generic بازنویسی شوند.
+</p>
+
+<p id="3">
+فصل هشتم به طور خلاصه نحوه ی ایجاد یک view generic را توضیح داده است. جهت مرور، می توانیم بعضی از وظایف مشترک را شناسایی کنیم، مانند نمایش یک لیست از آبجکت ها، و نوشتن کدی که یک لیست از هر آبجکتی رانمایش دهد. سپس مدل مورد نظر می تواند به صورت یک آرگومان اضافه به URLconf ارسال شود.
+</p>
+
+<p id="4">
+جنگو view های generic را برای انجام کارهای زیر ارائه کرده است:
+</p>
+
+<ul >
+<li id="5">
+انجام وظایف ساده و مشترک: تغییر مسیر به یک صفحه ی متفاوت، یا ارائه ی یک template داده شده.
+</li>
+
+<li id="6">
+نمایش صفحات "list" و "detail" برای یک آبجکت تک. view های event_list و entry_list از فصل هشتم مثال های از لیست view ها می باشند. یک صفحه ی تک event یک مثال از آنچه را که ما "detail" view می نامیم می باشد.
+</li>
+
+<li id="7">
+ارائه دادن آبجکت های بر اساس تاریخ در صفحات بایگانی سال/ماه/روز، همراه با جزئیات و صفحات "latest". وبلاگ سال، ماه و روز (http://www.djangoproject.com/weblog/) بایگانی با این ها ساخته شده اند، به صورت نوعی بایگانی روزنامه خواهد بود.
+</li>
+</ul>
+
+<p id="8">
+روی هم رفته، این view ها، رابط های ساده ای برای انجام رایج ترین وظایفی که توسعه دهندگان با آن روبرو هستند تهیه شده اند.
+</p>
+
+<h3 id="9">
+استفاده از View های Generic
+</h3>
+
+<p id="10">
+تمام این view ها با ساختن پیکربندی دیکشنری های در فایل URLconf شما، و ارسال کردن آن دیکشنری ها به صورت عضو سوم از تاپل URLconf برای الگوی داده شده استفاده می شوند. (بخش "ارسال انتخاب های اضافه برای توابع view" را در فصل هشتم برای مرور کلی درباره ی این تکنیک مطالعه کنید.)
+</p>
+
+<p id="11">
+برای مثال، در اینجا یک URLconf ساده وجود دارد که شما می توانید برای ارائه ی یک صفحه ی استاتیک "about" از آن استفاده کنید:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
+
+urlpatterns = patterns('',
+    (r'^about/$', direct_to_template, &#123;
+        'template': 'about.html'
+    &#125;)
+)
+</pre>
+
+<p id="12">
+هر چند کد فوق ممکن است در نگاه اول کمی جادویی به نظر برسد – نگاه کنید، یک view بدون هیچ کدی! – کد فوق دقیقا با مثال فصل هشتم یکی می باشد: view مورد نظر در آن مثال یعنی direct_to_template به سادگی اطلاعات را از پارامترهای اضافه ی دیکشنری دریافت کرده و زمان render شدن view از آن اطلاعات استفاده می کند.
+</p>
+
+<p id="13">
+به این دلیل که view های generic مانند توابع view دیگر یک تابع view عادی می باشد، می توان آن ها را، درون view های خودمان دوباره استفاده کنیم. به عنوان مثال، اجازه دهید مثال "about" را برای مرتبط ساختن URL ها از حالت /about/&lt;whatever&gt;/ برای about/&lt;whatever&gt;.html به طور ثابت render شده گسترش دهیم. ما این کار را با اولین اصلاح URLconf برای اشاره به تابع view انجام خواهیم داد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
+from mysite.books.views import about_pages
+
+urlpatterns = patterns('',
+    (r'^about/$', direct_to_template, &#123;
+        'template': 'about.html'
+    &#125;),
+    (r'^about/(\w+)/$', about_pages),
+)
+</pre>
+
+<p id="14">
+در قدم بعدی، view مورد نظر یعنی about_pages را خواهیم نوشت:
+</p>
+
+<pre class="brush: py">
+from django.http import Http404
+from django.template import TemplateDoesNotExist
+from django.views.generic.simple import direct_to_template
+
+def about_pages(request, page):
+    try:
+        return direct_to_template(request, template="about/%s.html" % page)
+    except TemplateDoesNotExist:
+        raise Http404()
+</pre>
+
+<p id="15">
+در اینجا با direct_to_template مانند توابع دیگر رفتار کرده ایم. به این خاطر که این تابع یک HttpResponse بر می گرداند، می توانیم به سادگی آن را همانطور که هست برگردانیم. تنها مقداری رفتار خاص در کد فوق وجود دارد که آن هم سر و کار داشتن با template های نا معلوم می باشد. ما قصد استفاده از یک template ای که وجود ندارد و باعث بروز یک خطای سرور می شود را نداریم، بنابراین خطاهای TemplateDoesNotExist را کنترل کرده و خطای 404 را به جای آن بر گردانده ایم.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='/statics/images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+آیا از نظر امنیتی یک آسیب پذیری در اینجا وجود دارد؟
+</h4>
+
+<p id="16">
+خوانندگان تیزبین ممکن است متوجه حفره ی امنیتی شده باشند: ما با استفاده محتویاتی که در میان عبارات دیگر جا داده شده اند استفاده کرده ایم (template="about/%s.html"). در نگاه اول، این شبیه به یک آسیب پذیری کلاسیک directory traversal می باشد (که در فصل بیستم به تفصیل درباره ی آن بحث شده است). ولی آیا واقعا اینطور است؟
+</p>
+
+<p id="17">
+نه دقیقا. بله، یک مقدار با هدف مخرب ساخته شده از page می تواند موجب directory traversal شود، درست است که page از URL درخواست گرفته است، ولی نه هر مقداری که قبول شده خواهد بود. نکته ی کلیدی در URLconf این است که: در مثال فوق، از regular expression \w+ برای تطبیق بخش page از URL استفاده شده است، و \w تنها حروف الفبا و اعداد را قبول می کند. در نتیجه، هر حروف مخربی (مانند نقطه ها و علامت های \) قبل از اینکه به خود view برسند طرد خواهند شد.
+</p>
+</td></tr></table>
+
+<h3 id="18">
+View های Generic آبجکت ها
+</h3>
+
+<p id="19">
+view مورد نظر یعنی direct_to_template قطعا مفید می باشد، ولی view های generic هنگامی که برای ارائه دادن view ها در محتوای پایگاه داده استفاده می شوند بیشتر خواهند درخشید. به این دلیل که مانند یک وظیفه ی مشترک می باشد، جنگو تعدادی از view های generic داخلی را ارائه کرده است که تولید کردن لیست و جزئیات view های آبجکت ها را فوق العاده آسان کرده است.
+</p>
+
+<p id="20">
+اجازه دهید نگاهی به یکی از این view های generic با نام "object list" بیاندازیم. ما از آبجکت Publisher که در فصل پنجم از آن استفاده شده است، در اینجا استفاده کرده ایم:
+</p>
+
+<pre class="brush: py">
+class Publisher(models.Model):
+    name = models.CharField(max_length=30)
+    address = models.CharField(max_length=50)
+    city = models.CharField(max_length=60)
+    state_province = models.CharField(max_length=30)
+    country = models.CharField(max_length=50)
+    website = models.URLField()
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+</pre>
+
+<p id="21">
+جهت ساختن یک صفحه ی لیست از تمام ناشران، ما از یک URLconf مانند زیر استفاده می کنیم:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from django.views.generic import list_detail
+from mysite.books.models import Publisher
+
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+&#125;
+
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info)
+)
+</pre>
+
+<p id="22">
+تمام چیزی که برای نوشتن نیاز است کد پایتون می باشد. ولی هنوز نیاز به نوشتن یک template داریم. می توان یک کلید دیگر با نام template_name در آرگومان های اضافه دیکشنری که شامل template مورد نظر می باشد به publisher_info اضافه کرد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from django.views.generic import list_detail
+from mysite.books.models import Publisher
+
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+    'template_name': 'publisher_list_page.html',
+&#125;
+
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info)
+)
+</pre>
+
+<p id="23">
+در صورت نبودن template_name، به هر حال generic view مورد نظر یعنی object_list از نام آبجکت یکی را استنباط خواهد کرد. در این مورد، template استنباط شده، "books/publisher_list.html" خواهد بود – جزء "books" از نام app گرفته شده است، هنگامی که جزء "publisher" تنها حروف کوچک از نام مدل است آن را تعریف می کند.
+</p>
+
+<p id="24">
+این template در مقابل یک context حاوی یک متغیر به نام object_list، render خواهد شد که حاوی تمام آبجکت های publisher است. یک template خیلی ساده ممکن است شبیه به چیزی مانند زیر باشد:
+</p>
+
+<pre class="brush: html">
+&#123;% extends "base.html" %&#125;
+
+&#123;% block content %&#125;
+    &lt;h2&gt;Publishers&lt;/h2&gt;
+    <ul >
+        &#123;% for publisher in object_list %&#125;
+</li>
+        &#123;% endfor %&#125;
+    </ul>
+&#123;% endblock %&#125;
+</pre>
+
+<p id="26">
+(توجه داشته باشید که template فوق فرض می کند یک base.html وجود دارد، همانطور که در فصل چهارم در یک مثال ایجاد کردیم.)
+</p>
+
+<p id="27">
+در دست ترجمه/تالیف ...
+</p>
+
+<h3 id="28">
+گسترش View های Generic
+</h3>
+
+<p id="29">
+شکی وجود ندارد که استفاده از view های generic می تواند سرعت توسعه را به شکل قابل ملاحظه ای افزایش دهد. در اغلب پروژه ها، در دست ترجمه/تالیف .... در واقع، یکی از رایج ترین سوالات پاسخ داده شده توسط توسعه دهندگان جدید جنگو، نحوه ی ایجاد کردن کنترل یک مجموعه ای از شرایط گسترده تر view های generic می باشد.
+</p>
+
+<p id="30">
+خوشبختانه، تقریبا در هر یک از این موارد، روش هایی برای گسترش ساده ی view های generic برای کنترل یک آرایه ی بزرگتر از موارد استفاده وجود دارد.
+</p>
+
+<h4 id="31">
+ایجاد Template Context های مساعد
+</h4>
+
+<p id="32">
+ممکن است توجه کرده باشید لیست ناشران یعنی درون متغیری با نام object_list ذخیره شده است. زمانی این کد زیباتر خواهد شد که، این نام زمانی برای نویسندگان template مساعد خواهد بود که به جای نام object_list نام آن publisher_list باشد؛ محتویات این متغیر با این نام واضح تر خواهد بود.
+</p>
+
+<p id="33">
+نام این متغیر را می توان به سادگی با آرگومان template_object_name تغییر داد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from django.views.جنریک import list_detail
+from mysite.books.models import Publisher
+
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+    'template_name': 'publisher_list_page.html',
+    'template_object_name': 'publisher',
+&#125;
+
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info)
+)
+</pre>
+
+<p id="34">
+درون template، view جنریک یک _list به template_object_name اضافه می کند.
+</p>
+
+<p id="35">
+ایجاد یک template_object_name مفید همواره یک ایده ی خوب می باشد. همکاران شما کسانی که template ها را طراحی می کند از شما ممنون خواهند بود.
+</p>
+
+<h4 id="36">
+اضافه کردن context اضافه
+</h4>
+
+<p id="37">
+گاهی اوقات، ممکن است نیاز باشد برخی اطلاعات اضافه فراتر از اطلاعات تهیه شده توسط view جنریک ارائه شوند. برای مثال، یک لیست از تمام ناشران دیگر در هر صفحه ی جزئیات هر ناشر را تصور کنید. view جنریک مورد نظر یعنی object_detail ناشر را برای context تهیه می کند، ولی به نظر می رسد هیچ راهی برای بدست آوردن یک لیست از تمام ناشران در آن template وجود ندارد.
+</p>
+
+<p id="38">
+ولی باید متذکر شد که راهی وجود دارد: تمام view های جنریک یک پارامتر اختیاری اضافه به نام extra_context دریافت می کنند. این که دیکشنری از آبجکت های اضافه می باشد که به context ارسال شده به template اضافه خواهد شد. بنابراین، جهت ایجاد لیست ناشران، از یک دیکشنری اطلاعات مانند زیر استفاده کرده ایم:
+</p>
+
+<pre class="brush: py">
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+    'template_object_name': 'publisher',
+    'extra_context': &#123;'book_list': Book.objects.all()&#125;
+&#125;
+</pre>
+
+<p id="39">
+کد فوق یک متغیر &#123;&#123; book_list &#125;&#125; در context موجود در template قرار می دهد. این الگو می تواند برای ارسال هر اطلاعاتی به درون template برای view جنریک استفاده شود که بسیار نیز مفید می باشد.
+</p>
+
+<p id="40">
+هر چند، در واقع یک اشکال ظریف در اینجا وجود دارد – می توانید آن را حدس بزنید؟
+</p>
+
+<p id="41">
+مشکل باید هنگامی که کوئری های درون extra_context ارزیابی شدند ایجاد شود. زیرا این مثال Book.objects.all() را درون URLconf قرار داده است، در این حالت تنها یک بار ارزیابی می شود (هنگامی که URLconf برای اولین بار بارگذاری می شود). هنگامی که شما ناشران را حذف یا اضافه می کنید، دقت خواهید داشت که view جنریک تا زمانی که وب سرور را دوباره بارگذاری نکرده اید، این تغییرات را منعکس نخواهد کرد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='/statics/images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+نکته
+</h4>
+<p id="42">
+این مشکل در مورد آرگومان view جنریک، queryset اعمال نمی شود. چرا که جنگو می داند که QuerySet خاص نباید هرگز ذخیره سازی (cache) شود، view جنریک زمانی هر view می خواهد render شود cache مناسبی را انجام می دهد.
+</p>
+</td></tr></table>
+
+<p id="43">
+راه حل، استفاده از یک callback در extra_context به جای متغیر می باشد. هر چیز قابل فراخوانی (مانند یک تابع) ارسال شده به extra_context زمانی که view ارائه شود ارزیابی خواهد شد (به جای تنها یک بار). می توانید با تعریف یک تابع مشکل فوق را حل کنید:
+</p>
+
+<pre class="brush: py">
+def get_books():
+    return Book.objects.all()
+
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+    'template_object_name': 'publisher',
+    'extra_context': &#123;'book_list': get_books&#125;
+&#125;
+</pre>
+
+<p id="44">
+یا می توانید از یک روش کوتاه تر که بر این واقعیت تکیه دارد که Book.objects.all خودش قابل فراخوانی می باشد استفاده کنید:
+</p>
+
+<pre class="brush: py">
+publisher_info = &#123;
+    'queryset': Publisher.objects.all(),
+    'template_object_name': 'publisher',
+    'extra_context': &#123;'book_list': Book.objects.all&#125;
+&#125;
+</pre>
+
+<p id="45">
+به Book.objects.all بدون پرانتز پایانی توجه کنید. این حالت به تابع در واقع بدون فراخوانی آن رجوع می شود.
+</p>
+
+<h3 id="46">
+تماشای زیر مجموعه ای از آبجکت ها
+</h3>
+
+<p id="47">
+اکنون اجازه دهید نگاه نزدیک تری به کلید queryset که در طول این مسیر از آن استفاده کرده ایم داشته باشیم. اغلب view های جنریک از این آرگومان های queryset را دریافت می کنند – این نحوه ی فهم view می باشد که کدام مجموعه از آبجکت ها را نمایش دهد (بخش "انتخاب آبجکت ها" در فصل پنچم برای مقدمه ی آبجکت های Queryset را مطالعه کنید).
+</p>
+
+<p id="48">
+برای برگزیدن یک مثال ساده، می خواهیم یک لیست از کتاب ها را از با تاریخ انتشار چیدمان کنیم.
+</p>
+
+<pre class="brush: py">
+book_info = &#123;
+    'queryset': Book.objects.order_by('-publication_date'),
+&#125;
+
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info),
+    (r'^books/$', list_detail.object_list, book_info),
+)
+</pre>
+
+<p id="49">
+مثال فوق کاملا ساده می باشد، ولی یک با حالتی ظریف ایده ای را نشان می دهد. البته، معمولا بیشتر از چند بار آبجکت ها می خواهید که چیدمان کنید. در صورتی که می خواهید لیستی از کتاب ها با یک ناشر خواص ارائه دهید، می توانید از تکنیکی یکسان استفاده کنید:
+</p>
+
+<pre class="brush: py">
+apress_books = &#123;
+    'queryset': Book.objects.filter(publisher__name='Apress Publishing'),
+    'template_name': 'books/apress_list.html'
+&#125;
+
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info),
+    (r'^books/apress/$', list_detail.object_list, apress_books),
+)
+</pre>
+
+<p id="50">
+دقت داشته باشید که به همراه یک queryset فیلتر شده، همچنین از یک نام template سفارشی استفاده کرده ایم. در صورتی که این کار را انجام ندهیم، view جنریک از template همسان به صورت آبجکت لیست "vanilla" استفاده خواهد کرد، که ممکن است آنچه که می خواهید نباشد.
+</p>
+
+<p id="51">
+همچنین دقت داشته باشید که روش خیلی ظریفی برای انجام کتاب های ناشر خاص نمی باشد. در صورتی که بخواهید صفحه ی ناشر دیگری را اضافه کنید، نیاز تعدادی خط دیگر در URLconf و بیش از چند ناشر می باشد. در بخش بعدی با این مشکل سر و کار خواهیم داشت.
+</p>
+
+<h3 id="52">
+فیلتر کردن پیچیده با توابع wrapper
+</h3>
+
+<p id="53">
+نیاز رایج دیگر، فیلتر کردن آبجکت های داده شده در یک صفحه ی لیست از طریق برخی کلیدها در URL می باشد. کمی قبل تر، نام ناشر را به طور مستقیم درون URLconf قرار می دادیم، ولی چه می شد اگر می خواستیم یک view بنویسیم که تمام کتاب ها را از طریق برخی ناشران دلخواه نمایش دهد؟ راهکار wrap کردن جنریک view مورد نظر یعنی object_list جهت اجتناب از نوشتن مقدار زیادی کد به صورت دستی می باشد. به طور معمول، با نوشتن یک URLconf شروع می کنیم:
+</p>
+
+<pre class="brush: py">
+urlpatterns = patterns('',
+    (r'^publishers/$', list_detail.object_list, publisher_info),
+    (r'^books/(\w+)/$', books_by_publisher),
+)
+</pre>
+
+<p id="54">
+در قدم بعدی، view مورد نظر یعنی books_by_publisher را خواهیم نوشت:
+</p>
+
+<pre class="brush: py">
+from django.shortcuts import get_object_or_404
+from django.views.جنریک import list_detail
+from mysite.books.models import Book, Publisher
+
+def books_by_publisher(request, name):
+
+    # Look up the publisher (and raise a 404 if it can't be found).
+    publisher = get_object_or_404(Publisher, name__iexact=name)
+
+    # Use the object_list view for the heavy lifting.
+    return list_detail.object_list(
+        request,
+        queryset = Book.objects.filter(publisher=publisher),
+        template_name = 'books/books_by_publisher.html',
+        template_object_name = 'book',
+        extra_context = &#123;'publisher': publisher&#125;
+    )
+</pre>
+
+<p id="55">
+کد فوق جواب می دهد، زیرا واقعا هیچ چیز خاصی درباره ی view های جنریک وجود ندارد – کد فوق تنها توابع پایتون می باشد. همانند هر تابع view ای، view های جنریک مجموعه ای خاص از آرگومان ها دریافت کرده و آبجکت های HttpResponse را بر می گردانند. در نتیجه، wrap کردن یک تابع در اطراف یک view جنریک به طور باور نکردنی ساده می باشد که کار اضافه قبل (یا بعد؛ به بخش بعدی را مطالعه کنید) view جنریک را کنترل می کند.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='/statics/images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+نکته</h4>
+<p id="56">
+دقت داشته باشید که در مثال قبلی، publisher جاری در حال نمایش را در extra_context ارسال نمودیم. این معمولا فکر خوبی برای wrapper های از این نوع می باشد؛ که اجازه می دهد template آبجکت "parent" ای را که در حال حاضر در حال جستجو می باشد را بشناسد.
+</p>
+</td></tr></table>
+
+<h4 id="57">
+انجام کار اضافه
+</h4>
+
+<p id="58">
+آخرین الگوی رایجی که مورد بحث قرار خواهیم داد، انجام کار اضافه قبل یا بعد از فراخوانی view جنریک می باشد.
+</p>
+
+<p id="59">
+تصور کنید یک فیلد last_accessed در آبجکت Author موجود می باشد که برای پیگیری آخرین زمانی که کسی author را نگاه کرده است استفاده می شود. view جنریک object_dtail، البته هیچ چیزی درباره ی این فیلد نمی داند، ولی یک بار دیگر به سادگی یک view سفارشی، برای نگه داشتن فیلد به روز رسانی شده می نویسیم.
+</p>
+
+<p id="60">
+در ابتدا، نیاز به اضافه کردن یک بخش جزئیات نویسنده در URLconf برای اشاره به یک view سفارشی داریم:
+</p>
+
+<pre class="brush: py">
+from mysite.books.views import author_detail
+
+urlpatterns = patterns('',
+    # ...
+    (r'^authors/(?P&lt;author_id&gt;\d+)/$', author_detail),
+    # ...
+)
+</pre>
+
+<p id="61">
+سپس تابع wrapper خودمان را می نویسیم:
+</p>
+
+<pre class="brush: py">
+import datetime
+from django.shortcuts import get_object_or_404
+from django.views.جنریک import list_detail
+from mysite.books.models import Author
+
+def author_detail(request, author_id):
+    # Delegate to the view جنریک and get an HttpResponse.
+    response = list_detail.object_detail(
+        request,
+        queryset = Author.objects.all(),
+        object_id = author_id,
+    )
+
+    # Record the last accessed date. We do this *after* the call
+    # to object_detail(), not before it, so that this won't be called
+    # unless the Author actually exists. (If the author doesn't exist,
+    # object_detail() will raise Http404, and we won't reach this point.)
+    now = datetime.datetime.now()
+    Author.objects.filter(id=author_id).update(last_accessed=now)
+
+    return response
+</pre>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='/statics/images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+نکته
+</h4>
+
+<p id="62">
+کد فوق در واقع کار نخواهد کرد مگر این که شما یک فیلد last_accessed به مدل Author اضافه کنید و یک template با نام books/author_detail.html بسازید.
+</p>
+</td></tr></table>
+
+<p id="63">
+می توان یک روش همسان برای تغییر پاسخ برگدانده شده از طریق view جنریک استفاده کرد. در صورتیکه بخواهیم یک نسخه ی متنی از لیست نویسندگان با قابلیت دانلود تهیه کنیم، می توان از یک view شبیه به زیر استفاده کرد:
+</p>
+
+<pre class="brush: py">
+def author_list_plaintext(request):
+    response = list_detail.object_list(
+        request,
+        queryset = Author.objects.all(),
+        mimetype = 'text/plain',
+        template_name = 'books/author_list.txt'
+    )
+    response["Content-Disposition"] = "attachment; filename=authors.txt"
+    return response
+</pre>
+
+<p id="64">
+کد فوق جواب خواهد داد، چرا که view ها جنریک آبجکت های ساده ی HttpResponse را بر می گردانند که می توانند مانند دیکشنری برای مجموعه ای از HTTP header ها رفتار کنند. ضمنا Content-Disposition، به مرورگر یاد می دهد که صفحه به جای اینکه در مرورگر نمایش دهد، آن را دانلود و ذخیره کند.
+</p>
+
+<h3 id="65">
+گام بعدی
+</h3>
+
+<p id="66">
+در این فصل تنها به تعدادی از view های جنریک موجود در جنگو پرداخته شد، ولی فکر کلی ارائه شده در اینجا باید برای هر view جنریک به طور خیلی نزدیک بکار برده شود.
+</p>
+
+<p id="67">
+در فصل بعدی نحوه ی deploy کدرن برنامه های جنگو مورد بررسی قرار داده خواهد شد.
+</p>

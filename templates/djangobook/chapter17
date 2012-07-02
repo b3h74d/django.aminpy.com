@@ -1,0 +1,472 @@
+[h2][h2/]
+فصل هفدهم: مبحث Middleware جنگو 
+[/h2]
+
+[p]id="1"[p/]
+در مواردی، نیاز به اجرای یک قطعه کد در هر درخواستی که جنگو کنترل می کند خواهید داشت. این کد ممکن است نیاز باشد درخواست را قبل از آن که view آن را کنترل کند، ویرایش کند. این کد ممکن است نیاز باشد اطلاعات درباره ی درخواست برای اهداف debug و غیره ثبت کند.
+[/p]
+
+[p]id="2"[p/]
+می توان این کار را با فریم ورک middleware جنگو انجام داد، که مجموعه ای از hook ها درون پردازش request/response جنگو می باشند. این فریم ورک یک سیستم "plug-in" سطح پایین و light قادر به تغییر سراسری ورودی و خروجی جنگو می باشد.
+[/p]
+
+[p]id="3"[p/]
+هر جزء middleware مسئول انجام برخی کارهای خاص می باشد. در صورتی که این کتاب را کامل خوانده باشید، middleware را بارها و بارها دیده اید:
+[/p]
+
+[ul][ul/]
+[li]id="4"[li/]
+تمام ابزار session و کاربر که در فصل چهاردهم مشاهده شد توسط چند تکه ی کوچک از middleware ممکن می شود (بیشتر به خصوص، middleware، request.session و request.user را برای شما در view ها قابل دسترس می کند).
+[/li]
+
+[li]id="5"[li/]
+sitewide cache بحث شده در فصل پانزدهم در واقع تنها یک قطعه از middleware می باشد که در صورتی که پاسخ برای view مورد نظر cache شده باشد، فراخوانی آن تابع view را دور می زند.
+[/li]
+
+[li]id="6"[li/]
+برنامه های flatpages، redirects و csrf در فصل شانزدهم تمام کارهای خارق العاده خود را از طریق اجزای middleware انجام می دهند.
+[/li]
+[/ul]
+
+[p]id="7"[p/]
+این فصل ماهیت middleware و نحوه ی کارکرد آن را به طور عمیق تر بحث کرده و نحوه ی نوشتن middleware خودتان را توضیح می دهد.
+[/p]
+
+[h3]id="8"[h3/]
+Middleware چیست؟
+[/h3]
+
+[p]id="9"[p/]
+اجازه دهید یا یک مثال خیلی ساده شروع کنیم. 
+[/p]
+
+[p]id="10"[p/]
+سایت های پر ترافیک اغلب نیاز به قرار دادن جنگو در پشت یک پروکسی load-balancing (فصل دوازدهم را مشاهده کنید) دارند. این می تواند موجب پیچیدگی های کوچکی شود و یکی از این پیچیدگی ها این است که IP از راه دور هر درخواست (request.META["REMOTE_IP"]) متعادل کننده ی بار آن خواهد بود، نه در واقع IP ای که request ایجاد می کند. متعادل کننده های بار (load balancers) توسط یک header ویژه به نام X-Forwarded-For جهت درخواست آدرس IP واقعی با این موضوع سر و کار دارند.
+[/p]
+
+[p]id="11"[p/]
+(در دست ترجمه ...):
+[/p]
+
+[code]
+class SetRemoteAddrFromForwardedFor(object):
+    def process_request(self, request):
+        try:
+            real_ip = request.META['HTTP_X_FORWARDED_FOR']
+        except KeyError:
+            pass
+        else:
+            # HTTP_X_FORWARDED_FOR can be a comma-separated list of IPs.
+            # Take just the first one.
+            real_ip = real_ip.split(",")[0]
+            request.META['REMOTE_ADDR'] = real_ip
+[/code]
+
+[p]id="12"[p/]
+(توجه: اگر چه HTTP header با نام X-Forwarded-For وجود دارد، جنگو آن را به صورت request.META['HTTP_X_FORWARDED_FOR'] قابل دسترس می کند. به استثنای content-length و content-type، هر HTTP header ای درون درخواست با تبدیل تمام کاراکتر به حروف بزرگ، به کلید های request.META تبدیل می شود، به جای هر hyphen با خط تیره و یک پیشوند HTTP_ به نام آن.)
+[/p]
+
+[p]id="13"[p/]
+در صورتی که این middleware نصب شده باشد (بخش بعدی را مشاهده کنید)، مقدار هر X‑Forwarded‑For به طور خودکار درون request.META['REMOTE_ADDR'] درج می شود. این بدین معنی است که برنامه ی جنگوی شما نسبت به این موضوع که آیا آن ها پشت یک پروکسی load-blancing هستند یا خیر نگرانی نخواهد داشت، آن ها می توانند به سادگی به request.META['REMOT_ADDR'] دسترسی پیدا کنند و آن در صورتی که یک پروکسی استفاده شده باشد یا خیر کار خواهد کرد.
+[/p]
+
+[p]id="14"[p/]
+در واقع، این یک نیاز به اندازه ی کافی رایج می باشد که این قسمت از middleware در یک بخش داخلی جنگو باشد. آن در django.middleware.http قرار دارد، و می توان در فصل بعدی درباره ی آن بیشتر مطالعه کرد.
+[/p]
+
+[h3]id="15"[h3/]
+نصب Middleware
+[/h3]
+
+[p]id="16"[p/]
+در صورتی که این کتاب را به صورت کامل خوانده باشید، مثال هایی از نصب middleware را تاکنون مشاهده کرده اید؛ بسیاری از مثال ها در فصل های قبلی دارای بعضی middleware های ضروری می باشد. برای کامل کردن، در زیر نحوه ی نصب middleware وجود دارد.
+[/p]
+
+[p]id="17"[p/]
+جهت فعال کردن یک جزء middleware، آیتم یا جزء مورد نظر را به تاپی MIDDLEWARE_CLASSES موجود در ماژول تنظیمات (settings.py) اضافه کنید. درون MIDDLEWARE_CLASSES، هر جزء middleware توسط یک رشته نشان داده شده است: مسیر کامل نام کلاس middleware. برای مثال، در زیر MIDDLEWARE_CLASSES پیشفرض ساخته شده توسط django‑admin startproject وجود دارد:
+[/p]
+
+[code]
+MIDDLEWARE_CLASSES = (
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+)
+[/code]
+
+[p]id="18"[p/]
+نصب جنگو نیاز به هیچ middleware ای ندارد – در  صورت تمایل، MIDDLEWARE_CLASSES می تواند خالی باشد – ولی توصیه می شود که CommonMiddleware را که به طور مختصر توضیح می دهیم فعال کنید.
+[/p]
+
+[p]id="19"[p/]
+ترتیب قرار گیری مهم می باشد. درون درخواست و فازهای view، جنگو middlewre را با توجه به ترتیب داده شده ی آن ها در MIDDLEWARE_CLASSES بکار می برد، و در پاسخ و فازهای exception، جنگو middleware را با طور برعکس ترتیب بکار می برد. بدین معنی که، جنگو با MIDDLEWARE_CLASSES به صورت یک نوعی از "wrapper" در اطراف تابع view رفتار می کند: در درخواست به سمت پایین لیست به view حرکت کرده، و در پاسخ بر می گردد.
+[/p]
+
+[h3]id="20"[h3/]
+متدهای Middleware
+[/h3]
+
+[p]id="21"[p/]
+اکنون که ماهیت middleware و نحوه عمکرد آن را می دانید، اجازه دهید به تمام متدهایی که کلاس های middleware می توانند تعریف کنند نگاهی بیاندازیم.
+[/p]
+
+[h4]id="22"[h4/]
+مقدار ده اولیه: [چپ]__init__(self)[/چپ]
+[/h4]
+
+[p]id="23"[p/]
+از [چپ]__init__()[/چپ] جهت راه اندازی systemwide برای یک کلاس middleware داده شده استفاده کنید.
+[/p]
+
+[p]id="24"[p/]
+(در دست ترجمه ...)، هر کلاس middleware فعال شده ای تنها یک بار در هر پردازش سرور instantiated شده است. این بدین معنی است که [چپ]__init__()[/چپ] تنها یک بار فراخونی می شود – در زمان راه اندازی سرور – نه برای درخواست های فردی.
+[/p]
+
+[p]id="25"[p/]
+دلیل رایج برای اجرای یک متد [چپ]__init__()[/چپ] بررسی این موضوع می باشد که middleware واقعا ضروری می باشد یا خیر. در صورتی که __init__()، django.core.exceptions.MiddlewareNotUsed را بوجود آورد، در آن هنگام جنگو middleware را از توده ی middleware حذف خواهد کرد. ممکن است از خصوصیت برای بررسی برخی قسمت های نرم افزار که کلاس middleware ضروری می باشد استفاده کنید، یا بررسی این که آیا سرور در حالت debug اجرا می شود یا خیر، (در دست ترجمه ...).
+[/p]
+
+[p]id="26"[p/]
+در صورتی که یک کلاس middleware یک متد [چپ]__init__()[/چپ] تعریف کند، متد نباید هیچ آرگومانی بیشتر از self دریافت کند.
+[/p]
+
+[h4]id="27"[h4/]
+پردازشگر درخواست: [چپ]process_request(self, request)[/چپ]
+[/h4]
+
+[p]id="28"[p/]
+این متد به محض این که درخواست دریافت شود فراخوانی می شود – قبل از آن که جنگو URL را برای تعیین view ای که باید اجرا شود تجزیه کند. این متد آبجکت HttpRequest را ارسال می کند، که شما ممکن است در صورت تمایل آن را اصلاح کنید.
+[/p]
+
+[p]id="29"[p/]
+process_request() باید یا یک آبحکت HttpResponse و یا None بر گرداند.
+[/p]
+
+[ul][ul/]
+[li]id="30"[li/]
+در صورتی که None بر گرداند، جنگو پردازش این request را ادامه خواهد داد، اجرای هر middleware دیگر و سپس view متناظر.
+[/li]
+
+[li]id="31"[li/]
+در صورتی که یک آبجکت HttpResponse بر گرداند، جنگو هر دوی هر middleware دیگر (از هر نوع) یا view متناظر را فراخوانی نخواهد کرد. جنگو بلافاصله آن HttpResponse را بر خواهد گرداند.
+[/li]
+[/ul]
+
+[h4]id="32"[h4/]
+پردازشگر [چپ]View: process_view(self, request, view, args, kwargs)[/چپ]
+[/h4]
+
+[p]id="33"[p/]
+این متد بعد از آن که پردازشگر درخواست فراخوانی شده و تعیین view جهت اجرا توسط جنگو صورت گرفت فراخوانی می شود، ولی قبل آن view واقعا اجرا می شود.
+[/p]
+
+[p]id="34"[p/]
+آرگومان های ارسال شده به این view در جدول شماره ی 1-17 نشان داده شده اند.
+[/p]
+
+[puzzle]جدول شماره 1-2[puzzle/]
+[tr][tr/]
+[th][th/]
+آرگومان
+[/th]
+
+[th][th/]
+توضیح
+[/th]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+request
+[/td]
+
+[td][td/]
+آبجکت HttpRequest.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+view
+[/td]
+
+[td][td/]
+تابع پایتون که جنگو برای کنترل این request فراخوانی خواهد کرد. این آرگومان واقعا خود آبجکت تابع می باشد، نه نام تابع به صورت یک رشته.
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+args
+[/td]
+
+[td][td/]
+لیست آرگومان های موضعی ه به view ارسال خواهد شد، شامل آرگومان request نمی شود (که همواره اولین آرگومان view می باشد).
+[/td]
+[/tr]
+
+[tr][tr/]
+[td][td/]
+kwargs
+[/td]
+
+[td][td/]
+دیکشنری آرگومان های کیورد که به view ارسال خواهند شد
+[/td]
+[/tr]
+[/puzzle]
+
+[p]id="35"[p/]
+درست مثل process_request()، process_view() باید یک آبجکت HttpResponse یا None بر گرداند.
+[/p]
+
+[ul][ul/]
+[li]id="36"[li/]
+در صورتی که None بر گرداند، جنگو پردازش این درخواست اجرای هر middleware دیگر و سپس view متناظر را ادامه خواهد داد.
+[/li]
+
+[li]id="37"[li/]
+در صورتی که یک آبجکت HttpResponse بر گرداند، جنگو هر دوی هر middleware دیگر (از هر نوع) یا view متناظر را فراخوانی نخواهد کرد. جنگو بلافاصله آن HttpResponse را بر خواهد گرداند.
+[/li]
+[/ul]
+
+[h4]id="38"[h4/]
+پردازشگر پاسخ: [چپ]process_response(self, request,response)[/چپ]
+[/h4]
+
+[p]id="39"[p/]
+این متد بعد از فراخوانی شدن تابع view و تولید شدن response فراخوانی می شود. در اینجا، پردازشگر محتوای یک پاسخ را تغییر داده یا اصلاح می کند. یک مورد استفاده ی آشکار، فشرده سازی محتوا می باشد، از قبیل gzip کردن HTML درخواست.
+[/p]
+
+[p]id="40"[p/]
+پارامترها باید کاملا واضح و آشکار باشند: request آبجکت درخواست می باشد، و response آبجکت پاسخ برگردانده شده از view است.
+[/p]
+
+[p]id="41"[p/]
+بر خلاف درخواست و پردازشگرهای view که ممکن است None برگردانند، process_response() باید یک آبجکت HttpResponse برگرداند. آن reponse می تواند همان اصل ارسال شده به تابع (احتمالا اصلاح شده) باشد یا یک نمونه ی جدید باشد.
+[/p]
+
+[h4]id="42"[h4/]
+پردازشگر خطا: [چپ]process_exception(self, request,exception)[/چپ]
+[/h4]
+
+[p]id="43"[p/]
+این متد تنها در صورتی که چیزی اشتباه شود و view یک خطای cache نشده ایجاد کند فراخوانی می شود. می توان از این hook برای ارسال تذکرهای خطا استفاده کرد،
+[/p]
+
+[p]id="44"[p/]
+پارامترهای این تابع همسان با آبجکت های request ای می باشد که تا کنون با آن سر و کار داشته ایم، و exception آبجکت واقعی Exception ایجاد توسط تابع view می باشد.
+[/p]
+
+[p]id="45"[p/]
+[چپ]process_exception()[/چپ] باید یا یک None و یا یک آبجکت HttpResponse برگرداند.
+[/p]
+
+[ul][ul/]
+[li]id="46"[li/]
+در صورتی که None برگرداند، جنگو پردازش این درخواست را با کنترل خطای داخلی فریم ورک ادامه خواهد داد.
+[/li]
+
+[li]id="47"[li/]
+در صورتی که یک آبجکت HttpResponse برگرداند، جنگو از آن پاسخ به جای کنترل خطای داخلی فریم ورک استفاده می کند.
+[/li]
+[/ul]
+
+[note]نکته[note/]
+[p]id="48"[p/]
+جنگو تعداد کلاس های middleware (توضیح داده شده در بخش بعدی) ارائه می کند که مثال های خوبی را ایجاد می کند. خواندن کد آن ها احساس خوبی نسبت به قدرت middleware به شما می دهد.
+[/p]
+
+[p]id="49"[p/]
+همچنین می توانید تعدادی مثال های ایجاد شده توسط جامعه ی جنگو توزیع شده است را در wiki جنگو بیابید:
+[/p]
+
+[pre][pre/]
+http://code.djangoproject.com/wiki/ContributeMiddleware
+[/pre]
+[/note]
+
+[h3]id="50"[h3/]
+Middleware داخلی
+[/h3]
+
+[p]id="51"[p/]
+جنگو برخی middleware های داخلی را که با مشکلات رایج سر و کار دارند را ارائه میکند، که در بخش های زیر بحث می کنیم.
+[/p]
+
+[h4]id="52"[h4/]
+Middleware پشتیبانی Authentication
+[/h4]
+
+[p]id="53"[p/]
+کلاس Middleware: django.contrib.ath.middleware.AuthenticationMiddleware.
+[/p]
+
+[p]id="54"[p/]
+این middleware پشتیبانی authentication را فعال می کند. این middleware اتریبیوت request.user نشان داده شده در کاربر وارد شده ی فعلی به هر آبجکت HttpRequest ورودی اضافه می کند.
+[/p]
+
+[p]id="55"[p/]
+برای اطلاعات بیشتر به فصل چهاردهم مراجعه کنید.
+[/p]
+
+[h4]id="56"[h4/]
+"Common" Middleware
+[/h4]
+
+[p]id="57"[p/]
+کلاس middleware: django.middleware.common.CommonMiddleware.
+[/p]
+
+[p]id="58"[p/]
+این middleware، تهسیلاتی برای افراد کمال گرا اضافه کرده است:
+[/p]
+
+[ul][ul/]
+[li]id="59"[li/]
+(در دست ترجمه ...):
+[/li]
+
+[code]
+import re
+
+DISALLOWED_USER_AGENTS = (
+    re.compile(r'^OmniExplorer_Bot'),
+    re.compile(r'^Googlebot')
+)
+[/code]
+
+[p]id="60"[p/]
+به import re توجه داشته باشید، چرا که DISALLOWED_USER_AGENT نیازمند مقادیر آن جهت کامپایل regex ها می باشد (مثلا، خروجی [چپ]re.compile()[/چپ]). فایل تنظیمات پایتونی می باشد، بنابراین برای بکار بردن عبارات import درون آن کاملا مناسب می باشد.
+[/p]
+
+[li]id="61"[li/]
+باز نویسی بر اساس تنظیمات APPEND_SLASH و PREPEND_WWW انجام می دهد: در صورتی که APPEND_SLASH دارای مقدار True باشد، URL هایی که علامت "/" جلو را نداشته باشند به URL همسان دارای علامت "/" جلو تغییر مسیر داده خواهند شد، مگر آن که قسمت آخر مسیر حاوی یک پایان باشد. بنابراین foo.com/bar به [چپ]foo.com/bar/[/چپ] تغییر مسیر داده می شود، ولی foo.com/bar/file.txt بدون تغییر ارسال می شود.
+[/li]
+
+[p]id="62"[p/]
+در صورتی که PREPEND_WWW مقدار True داشته باشد، URL هایی که "www." ابتدایی را نداشته باشند، به URL همسان با "www." در ابتدای آن تغییر مسیر داده می شوند.
+[/p]
+
+[p]id="63"[p/]
+هر دوی این option ها به معنای عادی سازی URL ها می باشند. فلسفه این است که هر URL باید در یک – و تنها یک – مکان وجود دارشته باشد. از نظر فنی آدرس example.com/bar متفاوت از [چپ]example.com/bar/[/چپ] می باشد، که به نوبه ی خود متفاوت از [چپ]www.example.com/bar/[/چپ] می باشد. یک indexer موتور جستجو با این ها به صورت آدرس های جدا رفتار می کند، که برای رتبه ی موتور جستجوی سایت مضر می باشد، بنابراین عادی سازی URL ها بهترین عمل می باشد.
+[/p]
+
+[li]id="64"[li/]
+ETag ها را بر اساس تنظیم USE_ETAGS کنترل می کند: ETag ها یک سطح بهینه سازی HTTP برای cache صفحات به طور مشروط می باشد. در صورتی که USE_ETAGS مقدار True باشد، جنگو توسط محتوای صفحه ی MD5-hashing یک Etag برای هر درخواست محاسبه می کند، و در صورت لزوم مواظب ارسال پاسخ های Not Modified خواهد بود.
+[/li]
+
+[p]id="65"[p/]
+همچنین توجه داشته باشید که یک GET middleware شرطی، که به طور اختصار توضیح داده شده، ETag ها و یک مقدار بیشتر را کنترل می کند.
+[/p]
+[/ul]
+
+[h4]id="66"[h4/]
+فشرده سازی Middleware
+[/h4]
+
+[p]id="67"[p/]
+کلاس middleware: django.middleware.gzip.GZipMiddleware.
+[/p]
+
+[p]id="68"[p/]
+این middleware به طور خودکار محتوا را برای مرورگرهایی که فشرده سازی gzip را می فهمند (تمام مرورگرهای مدرن) فشرده می سازد. این middleware می تواند تا حد زیادی مقدار bandwidth ای که یک وب سرور مصرف می کند را کاهش دهد. در عوض مقداری زمان جهت فشرده سازی صفحات خواهد برد.
+[/p]
+
+[p]id="69"[p/]
+ما معمولا سرعت را bandwith ترجیح می دهیم، ولی در صورتی که شما بر عکس این را ترجیح می دهید، تنها کافیست این middleware را فعال کنید.
+[/p]
+
+[h4]id="70"[h4/]
+GET Middleware شرطی
+[/h4]
+
+[p]id="71"[p/]
+کلاس middleware: django.middleware.http.ConditionalGetMiddleware.
+[/p]
+
+[p]id="72"[p/]
+این middleware اعمال شرطی GET را پشتیبانی می کند. در صورتی که پاسخ دارای یک Last-Modified یا Etag یا header باشد، و درخواست دارای If-None-Match یا If-Modified-Since باشد، پاسخ توسط یک پاسخ 304 ("Not modified") جایگزین می شود. پشتیبانی ETag وابسته به تنظیم USE_ETAGS می باشد و انتظار دارد که header پاسخ Etag قبلا قرار گرفته باشد. همانطور که در بالا بحث شد، هدر ETag توسط common middleware قرار گرفته است.
+[/p]
+
+[p]id="73"[p/]
+همچنین محتوای هر پاسخ به یک درخواست HEAD را نیز حذف می کند و هدرهای پاسخ DATE و Content-Length را برای هر درخواستی قرار می دهد.
+[/p]
+
+[h4]id="74"[h4/]
+پشتیبانی پروکسی معکوس (X-Forwarded-For Middleware)
+[/h4]
+
+[p]id="75"[p/]
+کلاس middleware: django.middleware.http.SetRemoteAddrFromForwardedFor.
+[/p]
+
+[p]id="76"[p/]
+این مثالی است که در بخش "Middleware چیست؟" بررسی شد. این middleware، request.META['REMOTE_ADDR'] بر اساس request.META['HTTP_X_FORWARDED_FOR'] قرار می دهد، در صورتی که دومی قرار بگیرد. این در صورتی که در پشت یک پروکسی معکوس نشسته باشین که موجب شود هر REMOTE_ADDR درخواست به 127.0.0.1 قرار گرفته باشد مفید است.
+[/p]
+
+[note]خطر![note/]
+[p]id="77"[p/]
+این middleware، HTTP_X_FORWARDED_FOR را معتبر نمی سازد.
+[/p]
+
+[p]id="78"[p/]
+در صورتی که در پشت یک پروکسی معکوس نمی باشید که به طور خودکار HTTP_X_FORWARDED_FOR قرار گرفته باشد، از این middleware استفاده نکنید. هر کسی می تواند مقدار HTTP_X_FORWARDED_FOR فریب دهد، و به دلیل آنکه این REMOTE_ADDR بر اساس HTTP_X_FORWARDED_FOR قرار داده شده است، بدین معنی است که هر کسی می تواند آدرس IP خود را جا بزند.
+[/p]
+
+[p]id="79"[p/]
+تنها زمانی که کاملا به مقدار HTTP_X_FORWARDED_FOR اعتماد دارید از این middleware استفاده کنید.
+[/p]
+[/note]
+
+[h4]id="80"[h4/]
+Middleware پشتیبانی Session
+[/h4]
+
+[p]id="81"[p/]
+کلاس middleware: django.contrib.sessions.middleware.SessionMiddleware.
+[/p]
+
+[p]id="82"[p/]
+این middleware پشتیبانی session را فعال می کند. برای جزئیات بیشتر به فصل چهاردهم مراجعه کنید.
+[/p]
+
+[h4]id="83"[h4/]
+Sitewide Cache Middleware
+[/h4]
+
+[p]id="84"[p/]
+کلاس middleware: django.middleware.cache.UpdateCacheMiddleware و django.middleware.cache.FetchFromCacheMiddleware.
+[/p]
+
+[p]id="85"[p/]
+این middleware ها با یکدیگر برای cache هر صفحه ی تولید شده توسط جنگو کار می کنند. این موضوع به تفصیل در فصل پانزدهم بحث شده است.
+[/p]
+
+[h4]id="86"[h4/]
+Transaction Middleware
+[/h4]
+
+[p]id="87"[p/]
+کلاس middleware: django.middleware.transaction.TransactionMiddleware.
+[/p]
+
+[p]id="88"[p/]
+این middleware، COMMIT یا ROLLBACK پایگاه داده را به فاز request/response پیوند می دهد. در صورتی که یک تابع view با موفقیت اجرا شود، یک COMMIT صادر می شود. در صورتی که view یک خطا ایجاد کند، یک ROLLBACK صادر می شود.
+[/p]
+
+[p]id="89"[p/]
+ترتیب این middleware درون لیست اهمنیت دارد. ماژول های middleware خارج از اجرای آن با commit‑on‑save اجرا می شوند – رفتار پیشفرض جنگو. ماژول های middleware داخل آن (دیرتر درون لیست می آیند) که در زیر کنترل transactionهمسان به صورت توابع view خواهد بود اجرا می شوند.
+[/p]
+
+[p]id="90"[p/]
+Appendix B را برای اطلاعات بیشتر درباره ی transaction های پایگاه داده مشاهده کنید.
+[/p]
+
+[h3]id="91"[h3/]
+گام بعدی
+[/h3]
+
+[p]id="92"[p/]
+فصل بعدی درباره ی یکپارچه سازی Application ها و دیتابیس های Legacy صحبت می کند.
+[/p]

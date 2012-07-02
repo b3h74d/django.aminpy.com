@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block tuhead %}
+	<script type="text/javascript" src="/statics/javascripts/shCore.js"></script>
+	<script type="text/javascript" src="/statics/javascripts/shBrushPython.js"></script>
+	<script type="text/javascript" src="/statics/javascripts/shBrushXml.js"></script>
+	<script type="text/javascript" src="/statics/javascripts/shBrushSql.js"></script>
+	<script type="text/javascript" src="/statics/javascripts/shBrushCss.js"></script>
+	<script type="text/javascript" src="/statics/javascripts/shBrushBash.js"></script>
+	<link type="text/css" rel="stylesheet" href="/statics/stylesheets/shCoreAminpy.css" />
+	<script type="text/javascript">SyntaxHighlighter.all();</script>
+{% endblock %}
+
+{% block head %}
+    <div class='phn'>
+        <div style="text-align: center; float: left;">
+        {% block badilink %}
+            <a href='{% block badi %}{% endblock %}'>بعدی</a>
+        {% endblock %}
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='/toc'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        {% block ghablilink %}
+            <a href='{% block ghabli %}{% endblock %}'>قبلی</a>
+        {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+<h2>{% block titr %}{% endblock %}</h2>
+{% block foot %}
+    <div class='phn1'>
+        <div style="text-align: center; float: left;">
+        {% block badilink1 %}
+            <a href='{% block badi1 %}{% endblock %}'>بعدی</a>
+        {% endblock %}
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='/toc'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        {% block ghablilink1 %}
+            <a href='{% block ghabli1 %}{% endblock %}'>قبلی</a>
+        {% endblock %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}پروفایل کاربر{% endblock %}
+{% block profile %}
+<span style="color: white;font-weight:bold;">
+خوش آمدید {{ user }}
+</span>
+{% endblock %}
+{% block body %}
+
+<h3>پروفایل</h3><br />
+
+<table>
+	<tr>
+	<td>
+	<table style="color: black; font-size: 10pt">
+		<tr>
+			<td colspan="2"><b>{{ profile.user.get_full_name }}</b></td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<img src="/statics/images/ranks/{{ profile.rank }}.gif" width="20%" />
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">{{ profile.user.email }}</td>
+		</tr>
+		<tr>
+			<td>ویرایش های تایید شده</td>
+			<td><b>{{ profile.accepted_edition }}</b></td>
+		</tr>
+		<tr>
+			<td>ویرایش های انجام شده</td>
+			<td><b>{{ correction_no }}</b></td>
+		</tr>
+		<tr>
+		<td colspan="2"><a href="/accounts/changepassword/" class="content">
+			تغییر رمز عبور
+		</a></td>
+		</tr>
+	</table>
+	</td>
+	<td width="30px">
+	</td>
+	</tr>
+</table>
+{% endblock %}
