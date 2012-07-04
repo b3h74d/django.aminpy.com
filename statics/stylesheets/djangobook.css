@@ -2,7 +2,7 @@ body {
 	background-color: #092E20;
 	color: #487858;
 	direction: rtl;
-	font-family: tahoma, serif;
+	font-family: "DejaVu Sans", tahoma, serif;
 	font-size: 10pt;
 	text-align: center;
 }
@@ -175,6 +175,7 @@ a {
 
 a:link,a:visited {
 	color: lightgreen;
+	font-family: tahoma;
 }
 
 a.index:link,a.index:visited {
