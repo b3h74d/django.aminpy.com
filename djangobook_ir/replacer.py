@@ -47,8 +47,8 @@ def replacer():
     bash_code = '<pre class="brush: bash">'
     end_code = '</pre>'
 
-    book_path = "%s/templates/djangobook/" % (PROJECT_PATH)
-    include_path = "%s/templates/includes/" % (PROJECT_PATH)
+    book_path = "%s/../templates/djangobook/" % (PROJECT_PATH)
+    include_path = "%s/../templates/includes/" % (PROJECT_PATH)
 
     for path in os.listdir(book_path):
         if path[0] != ".":
