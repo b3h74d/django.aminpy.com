@@ -7,3 +7,4 @@
 ._*
 db.sqlite
 templates/includes/
+static/
