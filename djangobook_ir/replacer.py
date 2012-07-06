@@ -134,6 +134,10 @@ def replacer():
             matn = matn.replace("[a/]", ">")
             matn = matn.replace("[/a]", "</a>")
 
+            matn = matn.replace("[pre]", "<pre" )
+            matn = matn.replace("[pre/]", ">")
+            matn = matn.replace("[/pre]", "</pre>")
+
             matn = matn.replace("[code]", python_code)
             matn = matn.replace("[code python]", python_code)
             matn = matn.replace("[code py]", python_code)
