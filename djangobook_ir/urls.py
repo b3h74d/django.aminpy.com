@@ -12,10 +12,9 @@ urlpatterns = patterns('',
 
     (r'^$', views.index),
     (r'^', include("contactus.urls")),
-    (r'^toc/$', views.toc),
-    (r'^aboutbook/$', views.about_book),
-#    (r'^admin/', include(admin.site.urls)),
-    (r'^chapter(?P<number>\d\d)/$', views.controller),
+    (r'^djangobook/$', views.toc),
+    (r'^aboutdjangobook/$', views.about_book),
+    (r'^djangobook(?P<number>\d\d)/$', views.controller),
 )
 
 if settings.DEBUG:
