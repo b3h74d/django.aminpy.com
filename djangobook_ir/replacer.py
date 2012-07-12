@@ -83,11 +83,11 @@ def replacer():
             matn = matn.replace("[/button]", "</button>")
 
             matn = matn.replace("[h2]", "<h2 ")
-            matn = matn.replace("[h2/]", ">")
+            matn = matn.replace("«هد/»", ">")
             matn = matn.replace("[/h2]", "</h2>")
 
             matn = matn.replace("[h3]", "<h3 ")
-            matn = matn.replace("[h3/]", ">")
+            matn = matn.replace("«هس/»", ">")
             matn = matn.replace("[/h3]", "</h3>")
 
             matn = matn.replace("[h4]", "<h4 ")
