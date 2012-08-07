@@ -1,7 +1,7 @@
 # Django settings for djangobook_ir project.
 import os
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
