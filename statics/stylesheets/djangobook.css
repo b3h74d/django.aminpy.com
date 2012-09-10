@@ -2,7 +2,7 @@ body {
 	background-color: #092E20;
 	color: #487858;
 	direction: rtl;
-	font-family: "DejaVu Sans", tahoma, serif;
+	font-family: serif, tahoma;
 	font-size: 10pt;
 	text-align: center;
 }
@@ -110,7 +110,7 @@ pre {
 }
 
 h1,h2,h3,h4 {
-	font-family: b titr, serif;
+	font-family: b titr, serif, tahoma;
 	text-align: right;
 	color: #092E20;
 	margin-bottom: -10px;
@@ -166,7 +166,7 @@ h4.note {
 }
 
 th {
-	font-family: b titr, b koodak;
+	font-family: b titr, serif, tahoma;
 }
 
 a {
@@ -175,7 +175,7 @@ a {
 
 a:link,a:visited {
 	color: lightgreen;
-	font-family: tahoma;
+	font-family: serif, tahoma;
 }
 
 a.index:link,a.index:visited {
