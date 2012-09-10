@@ -1,3 +1,8 @@
+@font-face {
+	font-family: "b titr";
+	src: url("/statics/fonts/BTitrBd.ttf") format("truetype");
+}
+
 body {
 	background-color: #092E20;
 	color: #487858;
@@ -110,7 +115,7 @@ pre {
 }
 
 h1,h2,h3,h4 {
-	font-family: b titr, serif, tahoma;
+	font-family: "b titr", serif, tahoma;
 	text-align: right;
 	color: #092E20;
 	margin-bottom: -10px;
@@ -166,7 +171,7 @@ h4.note {
 }
 
 th {
-	font-family: b titr, serif, tahoma;
+	font-family: "b titr", serif, tahoma;
 }
 
 a {
