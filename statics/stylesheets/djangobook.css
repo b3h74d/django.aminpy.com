@@ -12,8 +12,8 @@ body {
 	text-align: center;
 }
 
-p {
-	line-height: 25px;
+p, ul, li {
+	line-height: 26px;
 }
 
 .main {
