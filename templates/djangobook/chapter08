@@ -373,7 +373,6 @@ def foo_view(request):
 def bar_view(request):
     m_list = MyModel.objects.filter(is_new=True)
     return render_to_response('template2.html', {'m_list': m_list})
-در کد فوق تقریبا همه چیز تکرار شده است و این نحوه ی کد زنی به هیچ وجه
 [/code]
 
 [p]id="51"[p/]
