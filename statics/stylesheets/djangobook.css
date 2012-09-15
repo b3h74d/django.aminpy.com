@@ -116,6 +116,8 @@ pre {
 	background-color: #E0FFB8;
 	font-size: 10pt;
 	font-family: "Courier New", Courier, mono, serif;
+	padding: 9px;
+  text-align: left;
 }
 
 h1,h2,h3,h4 {
