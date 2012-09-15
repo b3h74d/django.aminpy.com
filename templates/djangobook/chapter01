@@ -135,14 +135,14 @@ urlpatterns = patterns('',
 <html><head><title>Books</title></head>
 <body>
 <h1>Books</h1>
-[ul][ul/]
+<ul><ul/>
 {% for book in book_list %}
-[li]id="19"[li/]
+<li>id="19"<li/>
 {{ book.name }}
-[/li]
+</li>
 
 {% endfor %}
-[/ul]
+</ul>
 </body></html>
 [/code]
 
