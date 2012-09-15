@@ -1278,9 +1278,9 @@ def register(request):
 
 [code html]
 {% if user.is_authenticated %}
-[/p]
+  <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
 {% else %}
-[/p]
+  <p>Welcome, new user. Please log in.</p>
 {% endif %}
 [/code]
 
@@ -1298,12 +1298,12 @@ def register(request):
 
 [code html]
 {% if perms.polls %}
-[/p]
+  <p>You have permission to do something in the polls app.</p>
   {% if perms.polls.can_vote %}
-[/p]
+    <p>You can vote!</p>
   {% endif %}
 {% else %}
-[/p]
+  <p>You don't have permission to do anything in the polls app.</p>
 {% endif %}
 [/code]
 
@@ -1424,11 +1424,11 @@ def create_playlist(request, songs):
 
 [code html]
 {% if messages %}
-[ul][ul/]
+<ul>
     {% for message in messages %}
-[/li]
+    <li>{{ message }}</li>
     {% endfor %}
-[/ul]
+</ul>
 {% endif %}
 [/code]
 

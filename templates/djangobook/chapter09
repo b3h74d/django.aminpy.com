@@ -1349,9 +1349,9 @@ def books_for_author(author):
 
 [code]
 <ul>
-	{% for book in books %}
-		</li>
-	{% endfor %}
+    {% for book in books %}
+        </li>
+    {% endfor %}
 </ul>
 [/code]
 

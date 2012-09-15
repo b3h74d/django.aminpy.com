@@ -191,11 +191,11 @@ urlpatterns = patterns('',
 
 {% block content %}
     <h2>Publishers</h2>
-    [ul][ul/]
+    <ul>
         {% for publisher in object_list %}
-[/li]
+            <li>{{ publisher.name }}</li>
         {% endfor %}
-    [/ul]
+    </ul>
 {% endblock %}
 [/code]
 
