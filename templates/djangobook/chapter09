@@ -1326,11 +1326,11 @@ def current_time(token):
 [/p]
 
 [code html]
-[ul][ul/]
-[/li]
-[/li]
-[/li]
-[/ul]
+<ul>
+    <li>The Cat In The Hat</li>
+    <li>Hop On Pop</li>
+    <li>Green Eggs And Ham</li>
+</ul>
 [/code]
 
 [p]id="224"[p/]
@@ -1348,11 +1348,11 @@ def books_for_author(author):
 [/p]
 
 [code]
-[ul][ul/]
-{% for book in books %}
-[/li]
-{% endfor %}
-[/ul]
+<ul>
+	{% for book in books %}
+		</li>
+	{% endfor %}
+</ul>
 [/code]
 
 [p]id="227"[p/]
