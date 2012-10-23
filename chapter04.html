@@ -1,0 +1,2006 @@
+
+<html>
+<head>
+<meta name="google-site-verification" content="4pN93apsdh0knxnQvjVcXz3FbZSJ3N1zZ2yRLeJZhsQ" />
+<meta name="msvalidate.01" content="1309BF972A6186CC2B633EA8127F134E" />
+<title>Template ها در جنگو</title>
+<meta name="keywords" content="جنگو, کتاب, قالب, ارث بری, django, book, template, view, get_template, include, inheritance" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-language" content="fa" />
+
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link rel="stylesheet" href="stylesheets/djangobook.css"
+				type="text/css" />
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push([ '_setAccount', 'UA-24333256-1' ]);
+	_gaq.push([ '_trackPageview' ]);
+
+	(function() {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+				: 'http://www')
+				+ '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+
+
+
+</head>
+
+<body>
+	<div class='main'>
+		<div class="top">
+			
+				<a href="http://djangobook.ir" class="top">صفحه اصلی</a>
+			
+			 | 
+			
+				<a href="toc.html" class="top">فهرست مطالب</a>
+			
+			 | 
+
+			
+				<a href="about_book.html" class="top">درباره کتاب</a>
+			
+			 | 
+
+			
+				<a href="http://aminpy.com" class="top">تماس با ما</a>
+			
+			 | 
+			<a href="http://www.pythonbook.ir" title="جدید">
+				پایتون
+			</a>
+		</div>
+		
+		
+    <div class='phn'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter05.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter03.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+
+		<div style="padding-bottom: 20px; padding-top: 10px;">
+			<a href="http://www.djangobook.ir/">
+			<h1 style='color: white;'>کتاب جنگو</h1>
+		</a></div>
+
+		
+		<div class="aval">
+			
+<h2 >
+Template ها در جنگو 
+</h2>
+
+<p id="1">
+در فصل گذشته دیدیم که کد HTML را می توانیم به صورت یک متن به طور مستقیم درون view بگنجانیم:
+</p>
+
+<pre class="brush: py">
+def current_datetime(request):
+    now = datetime.datetime.now()
+    html = "&lt;html&gt;&lt;body&gt;It is now %s.&lt;/body&gt;&lt;/html&gt;" % now
+    return HttpResponse(html)
+</pre>
+
+<ul >
+<li id="2">
+یکی از معایب روش بالا این است که برای هرگونه اعمال تغییر در طراحی صفحه نیازمند تغییر در کد پایتون می باشیم. می دانیم که طراحی سایت نیازمند تغییرات متعددی است در نتیجه استفاده از این روش موجب تغییر به مراتب بیشتر کد پایتون می باشد. بنابراین مناسب تر آن است که طراحی صفحه و ایجاد تغییرات در آن، نیازی به اصلاح و تغییر کد پایتون نداشته باشد.
+</li>
+
+<li id="3">
+نوشتن کد پایتون و طراحی HTML دو موضوع متفاوت از یکدیگر بوده و نظم و قانون مربوط به خود را دارند، و بیشتر محیط های توسعه ی وب حرفه ای این مسئولیت ها را جدا کرده و به افراد جدا (حتی به بخش و حوزه ی جدا) واگذار می کنند. طراحان و کد نویسان HTML/CSS نباید نیاز به ویرایش کد پایتون برای کار خود داشته باشند.
+</li>
+
+<li id="4">
+اگر طراحان بتوانند بر روی کدهای html در همان زمان که برنامه نویسان در حال کار با کدهای پایتون هستند، کار کنند. بهترین بهره وری از کار را خواهیم داشت زیرا دیگر نیازی نیست که یک فرد منتظر تمام کردن کد توسط فردی دیگر باشد چرا که در یک فایل کد HTML و کد پایتون هر دو به صورت جداگانه وجود دارد.
+</li>
+</ul>
+
+<p id="5">
+این حالت را (که کد HTML به طور مستقیم درون view قرار بگیرد) به اصطلاح hard-code می نامند، بدین معنا که کد HTML به صورت غیر مستقل داخل کد پایتون قرار دارد و تغییر آن کار ساده ای نخواهد بود.
+</p>
+
+<p id="6">
+اگرچه تکنیک فوق برای توضیح و یا شرح نحوه ی کارکرد view در فصل قبلی مناسب به نظر می آید، اما به دلایل ذکر شده در بالا این ایده ی خوبی نیست که کد HTML به صورت hard-code به طور مستقیم درون view قرار گیرد.
+</p>
+
+<p id="7">
+همانطور که ذکر کردیم جدا کردن طراحی صفحه از کد پایتون مربوط به آن بسیار واضح و منطقی است. با استفاده از سیستم template جنگو می توانیم کدهای مربوط به HTML را از کد پایتون جداسازی کنیم، که در این فصل به این موضوع خواهیم پرداخت.
+</p>
+
+<h3 id="8">
+قواعد Template System
+</h3>
+
+<p id="9">
+template جنگو یک رشته ای از متن می باشد که برای جدا کردن نمایش یک سند از داده ی خود در نظر گرفته شده است. قالب حفره ها و تکه کدهای (تگ های template) مختلفی را تعریف می کند که نحوه ای که سند باید نمایش داده شود را تنظیم می کند. به طور معمول template ها برای تولید HTML استفاده می شوند، اما template های جنگو به همان اندازه در تولید هر فرمت متنی توانا هستند.
+</p>
+
+<p id="10">
+بیایید با یک مثال ساده شروع کرده و آن را مورد بررسی قرار دهیم:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Ordering notice&lt;/title&gt;&lt;/head&gt;
+
+&lt;body&gt;
+
+&lt;h1&gt;Ordering notice&lt;/h1&gt;
+
+&lt;p&gt;Dear &#123;&#123; person_name &#125;&#125;,&lt;/p&gt;
+
+&lt;p&gt;Thanks for placing an order from &#123;&#123; company &#125;&#125;. It's scheduled to
+ship on &#123;&#123; ship_date|date:"F j, Y" &#125;&#125;.&lt;/p&gt;
+
+&lt;p&gt;Here are the items you've ordered:&lt;/p&gt;
+
+&lt;ul&gt;
+&#123;% for item in item_list %&#125;
+    &lt;li&gt;&#123;&#123; item &#125;&#125;&lt;/li&gt;
+&#123;% endfor %&#125;
+&lt;/ul&gt;
+
+&#123;% if ordered_warranty %&#125;
+    &lt;p&gt;Your warranty information will be included in the packaging.&lt;/p&gt;
+&#123;% else %&#125;
+    &lt;p&gt;You didn't order a warranty, so you're on your own when
+    the products inevitably stop working.&lt;/p&gt;
+&#123;% endif %&#125;
+
+&lt;p&gt;Sincerely,&lt;br /&gt;&#123;&#123; company &#125;&#125;&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="11">
+template فوق یک HTML بنیادی با برخی متغیرها و تگ های template استفاده شده در آن می باشد. بیایید template فوق را مورد بررسی قرار دهیم.
+</p>
+
+<ul >
+<li id="12">
+هر متنی که داخل دو آکولاد قرار گرفته باشد (مانند &#123;&#123; person_name &#125;&#125;) یک متغیر است. این بدین معنی می باشد که "مقدار ارزش متغیر با نام داده شده را درج کند" به عبارت دیگر اگر (person_name) داخل آکولاد قرار نگیرد خروجی Dear person_name را درج خواهد کرد و نام شخص را به ما نشان نمی دهد. (چطور ارزش متغیرها را می توان تعیین کرد؟ در این فصل خواهید فهمید.)
+</li>
+
+<li id="13">
+هر متنی که داخل یک آکولاد و علامت درصد قرار بگیرد (مانند &#123;% if ordered_warranty %&#125;) یک تگ template می باشد. تعریف یک تگ بسیار وسیع می باشد: تگ به template می گوید که "کاری را انجام بده".
+</li>
+
+<p id="14">
+مثال template فوق حاوی یک تگ <span dir='ltr'>for (&#123;% for item in item_list %&#125;)</span> و یک تگ <span dir='ltr'>if (&#123;% if ordered_warranty %&#125;)</span> می باشد. 
+</p>
+
+<p id="15">
+تگ for بسیار شبیه به عبارت for در پایتون می باشد، که به ما اجازه می دهد درون سرتاسر آیتم های یک لیست به ترتیب بگردید و یا تغییراتی را بر روی همه یا یک سری از آیتم ها اعمال کنیم. تگ if همانطور که انتظار آن می رود، به صورت یک عبارت if منطقی عمل می کند. در این مورد خاص، تگ مورد نظر بررسی می کند که آیا ارزش متغیر ordered_warranty ،True می باشد یا خیر. اگر بدین صورت بود یعنی اگر مقدار آن True بود، سیستم template جنگو هر آنچه که بین &#123;% if ordered_warranty %&#125; و &#123;% else %&#125; باشد را نمایش خواهد داد، در غیر اینصورت سیستم template جنگو هر آنچه را که بین &#123;% else %&#125; و &#123;% endif %&#125; باشد را نمایش خواهد داد. توجه داشته باشید که تک &#123;% else %&#125; کاملا اختیاری می باشد.
+</p>
+
+<li id="16">
+نهایتا، پاراگراف دوم template فوق حاوی یک مثال از filter می باشد، که مناسب ترین روش برای تغییر قالب بندی (formatting) یک متغیر می باشد. در این مثال، &#123;&#123; ship_date|date:"F j, Y" &#125;&#125;، متغیر ship_date به فیلتر date ارسال شده، و آرگومان "F j, Y" نیز به فیلتر date داده شده است. فیلتر date تاریخ را بر اساس آرگومان تغیین شده قالب بندی می کند. فیلترها با استفاده از علامت (|) مربوط می شوند، همانند کاربرد آن در یونیکس.
+</li>
+</ul>
+
+<p id="17">
+هر قالب جنگو به چندین تگ و فیلتر داخلی (built-in) دسترسی دارد، تعدادی از آن ها در ادامه فصل های کتاب مورد بحث قرار خواهند گرفت. همچنین این امکان وجود دارد که فیلتر و تگ برای خودتان ایجاد کنید؛ که در فصل نهم این کتاب بیان خواهد شد.
+</p>
+
+<h3 id="18">
+استفاده از template جنگو
+</h3>
+
+<p id="19">
+بیایید وارد بحث template جنگو شویم، تا شما نحوه ی کارکرد آن را مشاهده کنید، ولی هنوز نمی خواهیم قالب جنگو را با view هایی که در فصل گذشته ساخته شد به هم مرتبط کنیم. هدف در اینجا این است که با نحوه ی کار template جنگو، مستقل از دیگر بخش ها آشنا شوید. (به عبارت دیگر: به طور معمول شما template جنگو را همراه با یک view استفاده خواهید کرد، ولی می خواهیم این موضوع را روشن کنیم که template جنگو تنها کتابخانه ی پایتون می باشد که شما می توانید آن را در هرجایی استفاده کنید، نه فقط در view های جنگو.)
+</p>
+
+<p id="20">
+در اینجا ابتدایی ترین راه که می تونید  قالب جنگو را در کد پایتون استفاده کنید آمده است:
+</p>
+
+<p id="21">
+ساختن آبجکت Template از طریق ایجاد کد قالب به صورت رشته.
+</p>
+
+<p id="22">
+فراخوانی متد <span dir='ltr'>render()</span> از آبجکت Template با دادن یک مجموعه ای از متغیرها (the context). این متد قالب را به صورت رشته ی کامل با تمام متغیرها و تگ های قالب بر می گرداند.
+</p>
+
+<p id="23">
+به کد زیر توجه کنید:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django import template
+&gt;&gt;&gt; t = template.Template('My name is &#123;&#123; name &#125;&#125;.')
+&gt;&gt;&gt; c = template.Context(&#123;'name': 'Adrian'&#125;)
+&gt;&gt;&gt; print t.render(c)
+My name is Adrian.
+&gt;&gt;&gt; c = template.Context(&#123;'name': 'Fred'&#125;)
+&gt;&gt;&gt; print t.render(c)
+My name is Fred.
+</pre>
+
+<p id="24">
+در بخش بعدی جزئیات هر خط از کد بالا شرح داده خواهد شد.
+</p>
+
+<h4 id="25">
+ساختن آبجکت های template
+</h4>
+
+<p id="26">
+ساده ترین راه برای ساختن آبجکت Template به طور مستقیم به عنوان نمونه ذکر کردن آن می باشد. کلاس Template درون ماژول django.template می باشد و سازنده ی (cunstructor) آن یک آرگومان دریافت می کند که کد خام template می باشد. بیایید نمونه آن را درون interactive interpreter پایتون مشاهده کنیم.
+</p>
+
+<p id="27">
+درون دایرکتوری mysite ساخته شده توسط دستور django-admin.py startproject (بیان شده در فصل دوم)، دستور python manage.py shell را تایپ کرده و interactive interpreter را باز کنید.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+خط فرمان ویژه ی پایتون
+</h4>
+<p id="28">
+در صورتیکه در گذشته از پایتون استفاده کرده باشید، ممکن است متعجب شوید که چرا بجای فرمان python، از فرمان python manage.py shell استفاده شده است. هر دو فرمان باعث باز شدن interactive interpreter خواهد شد، با این تفاوت که دستور manage.py shell قبل از آغاز شدن interpreter، به جنگو اعلام می کند که از کدام فایل تنظیمات استفاده کند. بسیاری از قسمت ها در جنگو، حاوی سیستم template می باشد، که شما قادر به استفاده از آن ها نخواهید بود مگر آنکه فریم ورک بداند از کدام تنظیمات استفاده کند.
+</p>
+
+<p id="29">
+اگر در مورد نحوه ی انجام کار فوق کنجکاو هستید، در اینجا توضیح نحوه ی عملکرد آن در پشت صحنه، وجود دارد. جنگو به دنبال یک متغیر محیطی با نام DJANGO_SETTINGS_MODULE می گردد که باید در مسیر import فایل settings.py شما قرار گرفته باشد. به عنوان مثال، با فرض اینکه mysite مسیر پایتون شما می باشد، DJANGO_SETTINGS_MODULE ممکن است در 'mysite.settings'، قرار گرفته باشد.
+</p>
+
+<p id="30">
+هنگامی که شما فرمان python manage.py shell را اجرا می کنید، فرمان مذکور به DJANGO_SETTINGS_MODULE توجه می کند. شما را تشویق می کنیم برای به حداقل رساندن پیچیدگی و تنظیماتی که باید انجام دهید از python manage.py shell در این مثال ها استفاده کنید 
+</p>
+
+<p id="31">
+هنگامی که با جنگو بیشتر آشنا شوید، احتمالا استفاده از manage.py shell را کنار گذاشته و خودتان به صورت دستی DJANGO_SETTINGS_MODULE را در .bash_profile یا محیط های دیگر تنظیم خواهید داد.
+</p>
+</td></tr></table>
+
+<p id="32">
+اجازه دهید با اصول اولیه سیستم template جنگو آشنا شویم:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template
+&gt;&gt;&gt; t = Template('My name is &#123;&#123; name &#125;&#125;.')
+&gt;&gt;&gt; print t
+</pre>
+
+<p id="33">
+با وارد کردن کد فوق، چیزی شبیه به این مشاهده خواهید کرد:
+</p>
+
+<pre>
+&lt;django.template.Template object at 0xb7d5f24c&gt;
+</pre>
+
+<p id="34">
+عبارت 0xb7d5f24c هویت آبجکت پایتون می باشد که در هر زمان متفاوت می باشد واز حیطه بحث ما خارج می باشد.
+</p>
+
+<p id="35">
+هنگامی که یک آبجکت Template ایجاد می کنید، سیستم template جنگو کد template را به صورت داخلی کامپایل می کند، و شکل بهینه آن برای ارائه دادن (rendering) آماده می شود، اما در صورتیکه کد template شما دارای اشکال باشد، فراخوانی <span dir='ltr'>Template()</span> موجب بروز خطا خواهد شد: 
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template
+&gt;&gt;&gt; t = Template('&#123;% notatag %&#125;')
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in ?
+  ...
+django.template.TemplateSyntaxError: Invalid block tag: 'notatag'
+</pre>
+
+<p id="36">
+در موارد زیر خطای TemplateSyntaxError رخ خواهد داد:
+</p>
+
+<ul >
+<li id="37">
+تگ های نا معتبر
+</li>
+
+<li id="38">
+آرگومان های نا معتبر درون تگ های معتبر
+</li>
+
+<li id="39">
+فیلترهای نا معتبر
+</li>
+
+<li id="40">
+آرگومان های نا معتبر درون فیلترهای معتبر
+</li>
+
+<li id="41">
+کد template نا معتبر
+</li>
+
+<li id="42">
+تگ های بسته نشده (تگ های for باید بسته شوند)
+</li>
+</ul>
+
+<h4 id="43">
+ارائه دادن (rendering) یک Template
+</h4>
+
+<p id="44">
+هنگامی که شما یک آبجکت Template دارید، می توانید از طریق یک context به آن داده ارسال کنید. context مجموعه ای از نام متغیرهای template و ارزش های آن ها می باشد. Template با استفاده از context متغیرهای خودش را با ارزش مورد نظر جایگزین کرده و تگ ها را نیز اجرا می کند.
+</p>
+
+<p id="45">
+context با کلاس Context در جنگو نشان داده می شود، که درون ماژول django.template قرار دارد. سازنده ی آن یک آرگومان اختیاری دریافت می کند: یک دیکشنری نام های متغیر و ارزش های آن. برای پر کردن template متد <span dir='ltr'>render()</span> آبجکت Template را با context فراخوانی می کنیم:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Context, Template
+&gt;&gt;&gt; t = Template('My name is &#123;&#123; name &#125;&#125;.')
+&gt;&gt;&gt; c = Context(&#123;'name': 'Stephane'&#125;)
+&gt;&gt;&gt; t.render(c)
+u'My name is Stephane.'
+</pre>
+
+<p id="46">
+نکته ای که باید در اینجا اشاره کنیم این است که مقدار برگشتی (t.render(c یک رشته ی معمولی پایتون نمی باشد، بلکه یک آبجکت یونیکد است. که با نمایش حرف u در ابتدای آن نشان داده می شود. جنگو در سراسر فریم ورک به جای رشته ی معمولی پایتون از آبجکت های یونیکد استفاده می کند. پشتیبانی یونیکد جنگو نسبتااز طیف گسترده ای از حروف برای برنامه های شما بدون زحمت و دردسر پشتیبانی می کند.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+دیکشنری ها و context ها
+</h4>
+<p id="47">
+دیکشنری پایتون یک رابطه ی بین کلید ها و ارزش های متغیر می باشد. یک context همانند یک دیکشنری می باشد، با این تفاوت که حالت تابعی به خود گرفته است و در فصل نهم مورد بحث قرار خواهد گرفت.
+</p>
+</td></tr></table>
+
+<p id="48">
+نام متغیرها باید با حروف الفبای انگلیسی شروع شوند (A-Z or a-z) و می توانند حاوی حروف الفبا، عدد، خط تیره (_) و نقطه باشند (نقطه ها مورد ویژه ای هستند که بعدا راجع به آن صحبت خواهیم کرد.)، همچنین نام متغیرها به حروف کوچک و بزرگ حساس می باشند.
+</p>
+
+<p id="49">
+در اینجا یک مثال از کامپایل template و rendering آن شبیه به مثالی که در ابتدای فصل مشاهده کردید وجود دارد، 
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; raw_template = """&lt;p&gt;Dear &#123;&#123; person_name &#125;&#125;,&lt;/p&gt;
+...
+... &lt;p&gt;Thanks for placing an order from &#123;&#123; company &#125;&#125;. It's scheduled to
+... ship on &#123;&#123; ship_date|date:"F j, Y" &#125;&#125;.&lt;/p&gt;
+...
+... &#123;% if ordered_warranty %&#125;
+... &lt;p&gt;Your warranty information will be included in the packaging.&lt;/p&gt;
+... &#123;% else %&#125;
+... &lt;p&gt;You didn't order a warranty, so you're on your own when
+... the products inevitably stop working.&lt;/p&gt;
+... &#123;% endif %&#125;
+...
+... &lt;p&gt;Sincerely,&lt;br /&gt;&#123;&#123; company &#125;&#125;&lt;/p&gt;"""
+&gt;&gt;&gt; t = Template(raw_template)
+&gt;&gt;&gt; import datetime
+&gt;&gt;&gt; c = Context(&#123;'person_name': 'John Smith',
+...     'company': 'Outdoor Equipment',
+...     'ship_date': datetime.date(2009, 4, 2),
+...     'ordered_warranty': False&#125;)
+&gt;&gt;&gt; t.render(c)
+u"&lt;p&gt;Dear John Smith,&lt;/p&gt;\n\n&lt;p&gt;Thanks for placing an order from Outdoor
+Equipment. It's scheduled to\nship on April 2, 2009.&lt;/p&gt;\n\n\n&lt;p&gt;You
+didn't order a warranty, so you're on your own when\nthe products
+inevitably stop working.&lt;/p&gt;\n\n\n&lt;p&gt;Sincerely,&lt;br /&gt;Outdoor Equipment
+&lt;/p&gt;"
+</pre>
+
+<p id="50">
+اجازه دهید کد فوق را مورد بررسی قرار دهیم:
+</p>
+
+<ul >
+<li id="51">
+در ابتدا کلاس های Template و Context از ماژول django.template به درون برنامه import شده اند.
+</li>
+
+<li id="52">
+متن خام template درون متغیر raw_template ذخیره شده است. باید توجه داشته باشیم که در رشته های معمولی تنها می توان از یک خط استفاده کرد. واگر بخواهیم از رشته های چند خطی استفاده کنیم بایستی از علامت (" " ") برای رشته ی مورد نظر استفاده کنیم.
+</li>
+
+<li id="53">
+در قدم بعدی، یک آبجکت template به نام t ساخته شده و رشته ی raw_template به سازنده ی آن ارسال شده است.
+</li>
+
+<li id="54">
+ماژول datetime از کتابخانه ی استاندارد پایتون درون برنامه import شده است، چرا که در ادامه ی کار مورد استفاده قرار خواهد گرفت.
+</li>
+
+<li id="55">
+یک آبجکت context به نام c ساخته شده است، سازنده ی context یک دیکشنری پایتون دریافت می کند که نام های متغیرها را با ارزش ها مرتبط می سازد. برای مثال در اینجا person_name به 'John Smith'، company به 'Outdoor Equipment'، و غیره مرتبط شده است.
+</li>
+
+<li id="56">
+در نهایت، متد <span dir='ltr'>render()</span> از آبجکت template فراخوانی شده، و context به آن ارسال شده است. این متد یک template قابل ارائه را بر می گرداند، بدین معنی که تمام متغیرها با ارزش و مقدار واقعی جایگزین شده و تمام تگ های template اجرا شده اند.
+</li>
+
+<p id="57">
+توجه داشته باشید که پاراگراف "You didn't order a warranty" نمایش داده می شود چرا که متغیر ordered_warranty به صورت False ارزیابی شده است. همچنین توجه کنید تاریخ April 2, 2009 به حالت آن قالب بندی که برای آن مشخص شده است نمایش داده شده است (F j, Y). 
+</p>
+
+<p id="58">
+در صورتیکه تازه با زبان برنامه نویسی پایتون آشنا شده باشید، ممکن است تعجب کنید که رشته ی خروجی به رفتن به خط بعد حرف (n\) را نمایش می دهد. دلیل زیرکی interactive interpreter پایتون می باشد: فراخوانی (t.render(c یک رشته بر می گرداند، و interactive interpreter به صورت پیشفرض به جای شکل چاپی رشته شکل نمایشی آن را نشان می دهد. در صورتیکه می خواهید رشته با حالت چاپی نمایش داده شود، یعنی بجای حرف (n\) رشته به خط بعد برود، می توانید از عبارت print استفاده کنید: (print t.render(c.
+</p>
+</ul>
+
+<p id="59">
+مسائل فوق اصول استفاده از template system جنگو می باشد: نوشتن یک رشته ی template، ساختن آبجکت Template، ساختن Context و فراخوانی متد <span dir='ltr'>render()</span>.
+</p>
+
+<h4 id="60">
+Context های چندگانه در یک Template
+</h4>
+
+<p id="61">
+با یک آبجکت Template می توانید چندین context را ارائه دهید. برای مثال:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; t = Template('Hello, &#123;&#123; name &#125;&#125;')
+&gt;&gt;&gt; print t.render(Context(&#123;'name': 'John'&#125;))
+Hello, John
+&gt;&gt;&gt; print t.render(Context(&#123;'name': 'Julie'&#125;))
+Hello, Julie
+&gt;&gt;&gt; print t.render(Context(&#123;'name': 'Pat'&#125;))
+Hello, Pat
+</pre>
+
+<p id="62">
+هر گاه مانند مثال فوق از template همسان برای چندین context استفاده می کنید ، بسیار بهینه تر می باشد اگر یک مرتبه یک آبجکت Template ساخته و سپس متد <span dir='ltr'>render()</span> را برای چند بار فراخوانی کنید:
+</p>
+
+<pre class="brush: py">
+# Bad
+for name in ('John', 'Julie', 'Pat'):
+    t = Template('Hello, &#123;&#123; name &#125;&#125;')
+    print t.render(Context(&#123;'name': name&#125;))
+
+# Good
+t = Template('Hello, &#123;&#123; name &#125;&#125;')
+for name in ('John', 'Julie', 'Pat'):
+    print t.render(Context(&#123;'name': name&#125;))
+</pre>
+
+<p id="63">
+تجزیه ی template جنگو کاملا سریع می باشد. در پشت صحنه بیشترین تجزیه در جنگو از طریق فراخوانی یک regular expression می باشد. این متضاد با موتور های template ای می باشد که پایه اساس آنها XML باشد، چرا که بسیار کند تر از موتور template جنگو می باشند.
+</p>
+
+<h4 id="64">
+متغیرهای دیگر قابل ارسال به Context
+</h4>
+
+<p id="65">
+مثال های آورده شده تاکنون، یک مقدار ساده را به context ها ارسال کرده اند که به غیر مثال datetime.date غالبا رشته بوده اند. در صورتی که template system جنگو با ظرافت خاصی تعداد بیشتری از داده های با ساختار پیچیده را مانند لیست ها، دیکشنری ها و آبجکت های ساخته شده را نیز کنترل می کند.
+</p>
+
+<p id="66">
+کلید گذشتن از داده های با ساختار پیچیده در template های جنگو حرف نقطه ( . ) می باشد، با استفاده از نقطه می توان به کلیدهای دیکشنری، attribute ها، متد ها و اندیس های یک آبجکت نیز دسترسی داشت.
+</p>
+
+<p id="67">
+بهترین توضیح استفاده از چند مثال می باشد. برای نمونه، فرض کنید شما یک دیکشنری پایتون را به یک template ارسال کرده اید. برای دسترسی به مقادیر دیکشنری مورد نظر با کلید دیکشنری از  یک نقطه استفاده کنید:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; person = &#123;'name': 'Sally', 'age': '43'&#125;
+&gt;&gt;&gt; t = Template('&#123;&#123; person.name &#125;&#125; is &#123;&#123; person.age &#125;&#125; years old.')
+&gt;&gt;&gt; c = Context(&#123;'person': person&#125;)
+&gt;&gt;&gt; t.render(c)
+u'Sally is 43 years old.'
+</pre>
+
+<p id="68">
+به طور مشابه، نقطه ها همچنین اجازه می دهند به attribute های آبجکت نیز دسترسی پیدا کنید. برای مثال، آبجکت datetime.date پایتون دارای attribute های year، month و day می باشد، می توان با استفاده از یک نقطه به attribute های آن در template جنگو دسترسی پیدا کرد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; import datetime
+&gt;&gt;&gt; d = datetime.date(1993, 5, 2)
+&gt;&gt;&gt; d.year
+1993
+&gt;&gt;&gt; d.month
+5
+&gt;&gt;&gt; d.day
+2
+&gt;&gt;&gt; t = Template('The month is &#123;&#123; date.month &#125;&#125; and the year is &#123;&#123; date.year &#125;&#125;.')
+&gt;&gt;&gt; c = Context(&#123;'date': d&#125;)
+&gt;&gt;&gt; t.render(c)
+u'The month is 5 and the year is 1993.'
+</pre>
+
+<p id="69">
+در مثال زیر از یک کلاس ساخته شده استفاده شده است که نشان می دهد از نقطه ها می توان جهت دسترسی به آبجکت های دلخواه نیز استفاده کرد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; class Person(object):
+...     def __init__(self, first_name, last_name):
+...         self.first_name, self.last_name = first_name, last_name
+&gt;&gt;&gt; t = Template('Hello, &#123;&#123; person.first_name &#125;&#125; &#123;&#123; person.last_name &#125;&#125;.')
+&gt;&gt;&gt; c = Context(&#123;'person': Person('John', 'Smith')&#125;)
+&gt;&gt;&gt; t.render(c)
+u'Hello, John Smith.'
+</pre>
+
+<p id="70">
+از طریق نقطه ها همچنین می توانند به متدهای درون یک آبجکت نیز دسترسی پیدا کرد. برای مثال هر رشته ی پایتون، دارای متدهای <span dir='ltr'>upper()</span> و <span dir='ltr'>isdigit()</span> می باشد، و می توان آن ها را در template جنگو فراخوانی و استفاده کرد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; t = Template('&#123;&#123; var &#125;&#125; -- &#123;&#123; var.upper &#125;&#125; -- &#123;&#123; var.isdigit &#125;&#125;')
+&gt;&gt;&gt; t.render(Context(&#123;'var': 'hello'&#125;))
+u'hello -- HELLO -- False'
+&gt;&gt;&gt; t.render(Context(&#123;'var': '123'&#125;))
+u'123 -- 123 -- True'
+</pre>
+
+<p id="71">
+توجه داشته باشید که پرانتزهای مربوط به متدها را در template نباید به کار برد. همچنین نمی توان به متدها آرگومان ارسال کرد؛ شما می توانید تنها متدهایی را فراخوانی کنید که هیچ آرگومانی دریافت نمی کنند. (کمی بعد در این فصل این فلسفه توضیح داده خواهد شد.) 
+</p>
+
+<p id="72">
+همچنین نقطه ها برای دسترسی به اندیس های لیست نیز استفاده می شوند، برای مثال:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; t = Template('Item 2 is &#123;&#123; items.2 &#125;&#125;.')
+&gt;&gt;&gt; c = Context(&#123;'items': ['apples', 'bananas', 'carrots']&#125;)
+&gt;&gt;&gt; t.render(c)
+u'Item 2 is carrots.'
+</pre>
+
+<p id="73">
+اندیس های منفی لیست را در template نمی توان استفاده کرد، برای مثال، متغیر &#123;&#123; items.-1 &#125;&#125; موجب بروز خطای TemplateSyntaxError خواهد شد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+لیست های پایتون
+</h4>
+<p id="74">
+یادآوری: لیست های پایتون با اندیس صفر شروع می شوند، بدین معنی که اولین اندیس صفر، دومین اندیس یک و به همین ترتیب ادامه خواهد داشت.
+</p>
+</td></tr></table>
+
+<p id="75">
+کاربرد نقطه ها در template را می توان بدین شکل خلاصه کرد: هنگامی که template system با یک نقطه در مقابل نام یک متغیر برخورد می کند، به دنبال مسائل زیر جستجو خواهد کرد:
+</p>
+
+<ul >
+<li id="76">
+دیکشنری (مانند <span dir='ltr'>foo["bar"]</span>)
+</li>
+
+<li id="77">
+attribute (مانند foo.bar)
+</li>
+
+<li id="78">
+فراخوانی متد (مانند <span dir='ltr'>foo.bar()</span>)
+</li>
+
+<li id="79">
+اندیس لیست (مانند <span dir='ltr'>foo[2]</span>)
+</li>
+</ul>
+
+<p id="80">
+نقطه ها می توانند به صورت تودرتو نیز استفاده شوند. به عنوان نمونه،مثال زیر از عبارت &#123;&#123; person.name.upper &#125;&#125; استفاده کرده است که ابتدا درون یک دیکشنری به جستجو می پردازد (<span dir='ltr'>person['name']</span>) سپس یک متد را فراخوانی می کند (<span dir='ltr'>upper()</span>):
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; person = &#123;'name': 'Sally', 'age': '43'&#125;
+&gt;&gt;&gt; t = Template('&#123;&#123; person.name.upper &#125;&#125; is &#123;&#123; person.age &#125;&#125; years old.')
+&gt;&gt;&gt; c = Context(&#123;'person': person&#125;)
+&gt;&gt;&gt; t.render(c)
+u'SALLY is 43 years old.'
+</pre>
+
+<h3 id="81">
+فراخوانی متد و رفتار آن
+</h3>
+
+<p id="82">
+فراخوانی متد کمی پیچیده تر از دیگر انواع جستجو می باشد. در زیر مواردی که باید به خاطر داشته باشیم بیان شده است:
+</p>
+
+<ul >
+
+<li id="83">
+اگر در طی فراخوانی متد، یک متد خطایی تولید کرد، آن خطا اعمال خواهد شد مگر آنکه کلاس آن خطا دارای attribute ای به نام silent‑variable‑failure با مقدار True باشد. در صورتیکه کلاس خطا دارای attribute مورد نظر باشد، متغیر درون template مقدار خالی را نشان خواهد داد، به عنوان مثال:
+</li>
+
+<pre class="brush: py">
+&gt;&gt;&gt; t = Template("My name is &#123;&#123; person.first_name &#125;&#125;.")
+&gt;&gt;&gt; class PersonClass3:
+...     def first_name(self):
+...         raise AssertionError, "foo"
+&gt;&gt;&gt; p = PersonClass3()
+&gt;&gt;&gt; t.render(Context(&#123;"person": p&#125;))
+Traceback (most recent call last):
+...
+AssertionError: foo
+
+&gt;&gt;&gt; class SilentAssertionError(AssertionError):
+...     silent_variable_failure = True
+&gt;&gt;&gt; class PersonClass4:
+...     def first_name(self):
+...         raise SilentAssertionError
+&gt;&gt;&gt; p = PersonClass4()
+&gt;&gt;&gt; t.render(Context(&#123;"person": p&#125;))
+u'My name is .'
+</pre>
+
+<li id="84">
+فراخوانی متد تنها زمانی کار خواهد کرد که متد مورد نظر هیچ آرگومان ضروری نداشته باشد. در غیر اینصورت system در پی نوع دیگر بعدی (اندیس لیست) خواهد رفت.
+</li>
+
+<li id="85">
+بدیهی است که برخی از متدها دارای اثرات زیان آور، و حتی می توانند یک حفره ی امنیتی باشند، و اجازه ی دسترسی template system به آن متدها کاری ناشیانه می باشد.
+</li>
+
+<p id="86">
+به عنوان نمونه، فرض کنید شما یک آبجکت BankAccount دارید که دارای یک متد <span dir='ltr'>delete()</span> می باشد. اگر یک template حاوی چیزی شبیه به این باشد &#123;&#123; account.delete &#125;&#125;، در صورتیکه account آبجکت BankAccount باشد، هنگام ارائه template آبجکت مورد نظر حذف خواهد شد!
+</p>
+
+<p id="87">
+برای جلوگیری از این موضوع، باید بدین شکل عمل کرد:
+</p>
+
+<pre class="brush: py">
+def delete(self):
+    # Delete the account
+delete.alters_data = True
+</pre>
+
+<p id="88">
+template system هر متدی که با روش فوق مشخص شده باشد را اجرا نخواهد کرد. در مثال فوق، اگر یک template حاوی &#123;&#123; account.delete &#125;&#125; باشد و متد <span dir='ltr'>delete()</span> دارای alter_data=True باشد، در این صورت متد <span dir='ltr'>delete()</span> هنگام ارائه ی template اجرا نخواهد شد و بجای آن، بی صدا رد خواهد شد.
+</p>
+</ul>
+
+<h4 id="89">
+نحوه ی کنترل متغیرهای نا معتبر
+</h4>
+
+<p id="90">
+به صورت پیشفرض، اگر یک متغیر وجود نداشته باشد، template system آن را به صورت یک رشته ی خالی ارائه می دهد. به عنوان مثال:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Template, Context
+&gt;&gt;&gt; t = Template('Your name is &#123;&#123; name &#125;&#125;.')
+&gt;&gt;&gt; t.render(Context())
+u'Your name is .'
+&gt;&gt;&gt; t.render(Context(&#123;'var': 'hello'&#125;))
+u'Your name is .'
+&gt;&gt;&gt; t.render(Context(&#123;'NAME': 'hello'&#125;))
+u'Your name is .'
+&gt;&gt;&gt; t.render(Context(&#123;'Name': 'hello'&#125;))
+u'Your name is .'
+</pre>
+
+<p id="91">
+سیستم template بجای بروز خطا، آرام از کنار آن می گذرد. در صورت بروز خطا در این مورد برنامه به دلیل مچ نبودن حروف بزرگ و کوچک از روال عادی خارج می شود، در دنیای واقعی، برای یک وب سایت غیر قابل قبول است که به دلیل یک خطای نوشتاری در یک template کوچک همه چیز غیر قابل دسترس شده و برنامه متوقف شود.
+</p>
+
+<h4 id="92">
+بازی با آبجکت های Context
+</h4>
+
+<p id="93">
+در اغلب مواقع، آبجکت های Context را با ارسال داده ی دیکشنری به آن تعریف می کنند. می توان ایتم های آبجکت Context را بعد از تعریف نیز مانند دیکشنری استاندارد پایتون حذف یا اضافه کرد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.template import Context
+&gt;&gt;&gt; c = Context(&#123;"foo": "bar"&#125;)
+&gt;&gt;&gt; c['foo']
+'bar'
+&gt;&gt;&gt; del c['foo']
+&gt;&gt;&gt; c['foo']
+Traceback (most recent call last):
+  ...
+KeyError: 'foo'
+&gt;&gt;&gt; c['newvariable'] = 'hello'
+&gt;&gt;&gt; c['newvariable']
+'hello'
+</pre>
+
+<h3 id="94">
+تگ ها و فیلترهای اولیه ی Template
+</h3>
+
+<p id="95">
+همانطور که گفته شد، سیستم template جنگو تعدادی تگ ها و فیلترهای داخلی را با خود حمل می کند. در این بخش خلاصه ای از متداول ترین تگ ها و فیلترها را مورد بررسی قرار خواهیم داد.
+</p>
+
+<h4 id="96">
+تگ if/else
+</h4>
+
+<p id="97">
+تگ &#123;% if %&#125; یک متغیر را مورد ارزیابی قرار می دهد، و در صورتی که مقدار متغیر True (مانند وجود داشتن، خالی نبودن، و مقدار False نبودن) بود، سیستم template جنگو هر آنچه را که بین تگ &#123;% if %&#125; و &#123;% endif %&#125; باشد را نمایش خواهد داد، مانند:
+</p>
+
+<pre class="brush: html">
+&#123;% if today_is_weekend %&#125;
+    &lt;p&gt;Welcome to the weekend!&lt;/p&gt;
+&#123;% endif %&#125;
+</pre>
+
+<p id="98">
+استفاده از یک تگ &#123;% else %&#125; اختیاری می باشد:
+</p>
+
+<pre class="brush: html">
+&#123;% if today_is_weekend %&#125;
+    &lt;p&gt;Welcome to the weekend!&lt;/p&gt;
+&#123;% else %&#125;
+    &lt;p&gt;Get back to work.&lt;/p&gt;
+&#123;% endif %&#125;
+</pre>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+مقدار True و False در پایتون
+</h4>
+<p id="99">
+در پایتون و template system جنگو آبجکت های زیر به منزله ی False تلقی می شوند:
+</p>
+
+<ul >
+<li id="100">
+یک لیست خالی ([])
+</li>
+
+<li id="101">
+یک تاپل خالی (())
+</li>
+
+<li id="102">
+یک دیکشنری خالی (&#123;&#125;)
+</li>
+
+<li id="103">
+یک رشته ی خالی ('')
+</li>
+
+<li id="104">
+عدد صفر (0)
+</li>
+
+<li id="105">
+آبجکت ویژه ی None
+</li>
+
+<li id="106">
+آبجکت False
+</li>
+
+<li id="107">
+آبجکت های ساخته شده که رفتار داده ی Boolean خود را تعریف می کنند.
+</li>
+</ul>
+<p id="108">
+به غیر از موارد فوق همه چیز True ارزیابی می شود.
+</p>
+</td></tr></table>
+
+<p id="109">
+تگ &#123;% if %&#125; عبارات and، or و not را برای آزمودن چندین متغیر، یا منفی کردن متغیر داده شده قبول می کند. به عنوان مثال:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list and coach_list %&#125;
+    Both athletes and coaches are available.
+&#123;% endif %&#125;
+
+&#123;% if not athlete_list %&#125;
+    There are no athletes.
+&#123;% endif %&#125;
+
+&#123;% if athlete_list or coach_list %&#125;
+    There are some athletes or some coaches.
+&#123;% endif %&#125;
+
+&#123;% if not athlete_list or coach_list %&#125;
+    There are no athletes or there are some coaches.
+&#123;% endif %&#125;
+
+&#123;% if athlete_list and not coach_list %&#125;
+    There are some athletes and absolutely no coaches.
+&#123;% endif %&#125;
+</pre>
+
+<p id="110">
+تگ های &#123;% if %&#125; اجازه ی نمی دهند عبارات and و or در یک تگ همسان استفاده شوند، دلیل آن است که ترتیب محاسبه ی آن ها مبهم خواهد بود. برای عنوان مثال کد زیر نا معتبر است:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list and coach_list or cheerleader_list %&#125;
+</pre>
+
+<p id="111">
+استفاده از پرانتز برای کنترل کردن ترتیب عملکردها در سیستم template پشتیبانی نمی شود. در صورتیکه نیاز به استفاده از پرانتز بود، می توان اعمال منطقی را بیرون از template انجام داده و نتیجه را به عنوان متغیر template ارسال کرد، و یا آنکه از تگهای &#123;% if %&#125; به صورت تودرتو استفاده کرد. مانند:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list %&#125;
+    &#123;% if coach_list or cheerleader_list %&#125;
+        We have athletes, and either coaches or cheerleaders!
+    &#123;% endif %&#125;
+&#123;% endif %&#125;
+</pre>
+
+<p id="112">
+استفاده از چند عملگر یکسان در یک تگ مجاز می باشد، ولی نمی توان عملگرهای متفاوت را بدین شکل استفاده کرد، برای مثال کد زیر معتبر می باشد:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list or coach_list or parent_list or teacher_list %&#125;
+</pre>
+
+<p id="113">
+تگی با نام &#123;% elif %&#125; وجود ندارد. می توان از تگ های &#123;% if %&#125; تودرتو برای این کار استفاده کرد:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list %&#125;
+    &lt;p&gt;Here are the athletes: &#123;&#123; athlete_list &#125;&#125;.&lt;/p&gt;
+&#123;% else %&#125;
+    &lt;p&gt;No athletes are available.&lt;/p&gt;
+    &#123;% if coach_list %&#125;
+        &lt;p&gt;Here are the coaches: &#123;&#123; coach_list &#125;&#125;.&lt;/p&gt;
+    &#123;% endif %&#125;
+&#123;% endif %&#125;
+</pre>
+
+<p id="114">
+اطمینان حاصل کنید که هر تگ &#123;% if %&#125; با یک تگ &#123;% endif %&#125; بسته شده است. در غیر اینصورت خطای TemplateSyntaxError ایجاد خواهد شد.
+</p>
+
+<h4 id="115">
+تگ for
+</h4>
+
+<p id="116">
+تگ &#123;% for %&#125; اجازه می دهد تا به ترتیب در سراسر ایتم های یک لیست یا ... چرخ بزنید. همانند عبارت for در پایتون؛ for X in Y، Y لیست مورد نظر می باشد و X در هر نوبت از حلقه یکی از ایتم های Y می باشد. سیستم template در هر بار، هر چیزی که بین &#123;% for %&#125; و &#123;% endfor %&#125; باشد را اجرا می کند.
+</p>
+
+<p id="117">
+برای مثال، می توانید از کد زیر یک لیست از ورزشکاران را که به صورت متغیر athlete_list داده شده است را نمایش دهید:
+</p>
+
+<pre class="brush: html">
+&lt;ul&gt;
+&#123;% for athlete in athlete_list %&#125;
+    &lt;li&gt;&#123;&#123; athlete.name &#125;&#125;&lt;/li&gt;
+&#123;% endfor %&#125;
+&lt;/ul&gt;
+</pre>
+
+<p id="118">
+اضافه کردن کلمه ی reversed موجب می شود که حلقه به صورت بر عکس جریان پیدا کند:
+</p>
+
+<pre class="brush: html">
+&#123;% for athlete in athlete_list reversed %&#125;
+...
+&#123;% endfor %&#125;
+</pre>
+
+<p id="119">
+می توان از تگ های &#123;% for %&#125; به صورت تودرتو نیز استفاده کرد:
+</p>
+
+<pre class="brush: html">
+&#123;% for athlete in athlete_list %&#125;
+    &lt;h1&gt;&#123;&#123; athlete.name &#125;&#125;&lt;/h1&gt;
+    &lt;ul&gt;
+    &#123;% for sport in athlete.sports_played %&#125;
+        &lt;li&gt;&#123;&#123; sport &#125;&#125;&lt;/li&gt;
+    &#123;% endfor %&#125;
+    &lt;/ul&gt;
+&#123;% endfor %&#125;
+</pre>
+
+<p id="120">
+می توان از الگوی کد زیر برای بررسی کردن اندازه ی لیست استفاده کرد، همچنین در صورت خالی بودن لیست، می توان یک پیام را نمایش داد:
+</p>
+
+<pre class="brush: html">
+&#123;% if athlete_list %&#125;
+    &#123;% for athlete in athlete_list %&#125;
+        &lt;p&gt;&#123;&#123; athlete.name &#125;&#125;&lt;/p&gt;
+    &#123;% endfor %&#125;
+&#123;% else %&#125;
+    &lt;p&gt;There are no athletes. Only computer programmers.&lt;/p&gt;
+&#123;% endif %&#125;
+</pre>
+
+<p id="121">
+به دلیل آنکه الگوی فوق بسیار رایج می باشد، تگ for از یک تگ &#123;% empty %&#125; پشتیبانی می کند که به شما اجازه می دهد در صورت خالی بود لیست آنچرا که می خواهید تعریف کنید. مثال زیر معادل کد قبلی می باشد:
+</p>
+
+<pre class="brush: html">
+&#123;% for athlete in athlete_list %&#125;
+    &lt;p&gt;&#123;&#123; athlete.name &#125;&#125;&lt;/p&gt;
+&#123;% empty %&#125;
+    &lt;p&gt;There are no athletes. Only computer programmers.&lt;/p&gt;
+&#123;% endfor %&#125;
+</pre>
+
+<p id="122">
+در سیستم template از عبارت break پشتیبانی نمی شود، بدین معنی که عبارتی برای شکستن روال عادی حلقه وجود ندارد. برای انجام چنین کاری می توان متغیر لیست را طوری تغییر داد که تنها حاوی مقادیری باشد که می خواهیم حلقه در آن بچرخد. به طور مشابه از عبارت continue نیز پشتیبانی نمی شود (از عبارت continue در پایتون برای انتقال حرکت حلقه به طور ناگهانی به ابتدای حلقه استفاده می شود.) (در همین فصل، در بخش فلسفه ی محدودیت ها دلیل محدودیت های فوق را درخواهید یافت.)
+</p>
+
+<p id="123">
+داخل هر حلقه ی &#123;% for %&#125;، می توانید به یک متغیر template با نام forloop دسترسی پیدا کنید. این متغیر  دارای attribute هایی می باشد که دارای اطلاعاتی در مورد حرکت حلقه می باشند.
+</p>
+
+<ul >
+<li id="124">
+forloop.counter همواره عددی را نمایش می دهد که حاکی از تعداد حرکت حلقه می باشد، همچنین مقدار آن در بار اول حرکت حلقه عدد یک (1) می باشد:
+</li>
+
+<pre class="brush: html">
+&#123;% for item in todo_list %&#125;
+    &lt;p&gt;&#123;&#123; forloop.counter &#125;&#125;: &#123;&#123; item &#125;&#125;&lt;/p&gt;
+&#123;% endfor %&#125;
+</pre>
+
+<li id="125">
+forloop.counter0 شبیه به forloop.counter می باشد، تنها فرق آن در این است که مقدار آن در اولین بار حرکت حلقه عدد صفر (0) می باشد.
+</li>
+
+<li id="126">
+forloop.revcounter همواره عددی را نمایش می دهد که حاکی از تعداد ایتم های باقی مانده ی حلقه می باشد. در اولین حرکت حلقه مقدار آن مجموع ایتم های موجود در لیست می باشد. در آخرین حرکت حلقه مقدار آن برابر با عدد یک (1) خواهد بود.
+</li>
+
+<li id="127">
+forloop.revcounter0 شبیه به forloop.revcounter می باشد، فرق آن در این است که در اولین حرکت حلقه مقدار آن به اندازه ی مجموع ایتم های لیست منهای یک می باشد و در آخرین حرکت حلقه مقدار آن برابر با عدد صفر (0) می باشد.
+</li>
+
+<li id="128">
+forloop.first یک مقدار Boolean می باشد. در صورتی که حلقه در حرکت اول خود باشد مقدار True بر می گرداند که برای موارد خاص مناسب می باشد:
+</li>
+
+<pre class="brush: html">
+&#123;% for object in objects %&#125;
+    &#123;% if forloop.first %&#125;&lt;li class="first"&gt;&#123;% else %&#125;&lt;li&gt;&#123;% endif %&#125;
+    &#123;&#123; object &#125;&#125;
+    &lt;/li&gt;
+&#123;% endfor %&#125;
+</pre>
+
+<li id="129">
+forloop.last یک مقدار Boolean می باشد. در صورتی که حلقه  در حرکت آخر خود باشد مقدار True بر می گرداند، بیشترین استفاده از این attribute برای گذاشتن علامت (|) مابین لیستی از لینک ها می باشد:
+</li>
+
+<pre class="brush: html">
+&#123;% for link in links %&#125;
+&#123;&#123; link &#125;&#125;
+&#123;% if not forloop.last %&#125; | &#123;% endif %&#125;
+&#123;% endfor %&#125;
+</pre>
+
+<p id="130">
+خروجی کد فوق چیزی شبیه به این خواهد بود:
+</p>
+
+<pre>
+Link1 | Link2 | Link3 | Link4
+</pre>
+
+<p id="131">
+کاربرد رایج دیگر آن در قرار دادن ویرگول بین لغات می باشد:
+</p>
+
+<pre class="brush: html">
+Favorite places:
+&#123;% for p in places %&#125;&#123;&#123; p &#125;&#125;&#123;% if not forloop.last %&#125;, &#123;% endif %&#125;&#123;% endfor %&#125;
+</pre>
+
+<li id="132">
+forloop.parentloop در حلقه های تودرتو استفاده می شود، بدین صورت که از طریق آن می توان درون حلقه ی داخلی به attribute های حلقه ی خارجی دسترسی پیدا کرد:
+</li>
+
+<pre class="brush: html">
+&#123;% for country in countries %&#125;
+    &lt;table&gt;
+    &#123;% for city in country.city_list %&#125;
+        &lt;tr&gt;
+        &lt;td&gt;Country #&#123;&#123; forloop.parentloop.counter &#125;&#125;&lt;/td&gt;
+        &lt;td&gt;City #&#123;&#123; forloop.counter &#125;&#125;&lt;/td&gt;
+        &lt;td&gt;&#123;&#123; city &#125;&#125;&lt;/td&gt;
+        &lt;/tr&gt;
+    &#123;% endfor %&#125;
+    &lt;/table&gt;
+&#123;% endfor %&#125;
+</pre>
+</ul>
+
+<p id="133">
+متغیر  forloop تنها در داخل حلقه ها در دسترس می باشد. بعد از آنکه template به تگ &#123;% endfor %&#125; می رسد، forloop از بین می رود.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+context و متغیر forloop</h4>
+<p id="134">
+هنگامی درون تگ &#123;% for %&#125; متغیری همنام با forloop داشته باشید، برای جلوگیری از overwrite شدن متغیر forloop جنگو فرض می کند که متغیر forloop شما forloop.parentloop می باشد. نیازی به نگرانی درباره ی این موضوع نمی باشد ولی توصیه می شود متغیری با نام forloop درون template استفاده نشود.
+</p>
+</td></tr></table>
+
+<h4 id="135">
+تگ ifequal/ifnotequal
+</h4>
+
+<p id="136">
+سیستم template جنگو به طور عمد یک زبان برنامه نویسی کامل نمی باشد، در نتیجه اجازه ی اجرای عبارت های دلخواه پایتون را نمی دهد. (برای اطلاعات بیشتر نسبت به این محدودیت به بخش فلسفه ی محدودیت ها در همین بخش مراجعه کنید.) با این وجود، سیستم template جنگو برای مقایسه ی دو مقدار و نمایش چیزی در صورت مساوی بودن آن ها امکانات کاملی را پشتیبانی می کند (برای این منظور تگ &#123;% ifequal %&#125; در جنگو پیش بینی شده است.)
+</p>
+
+<p id="137">
+تگ &#123;% ifequal %&#125; دو مقدار را با هم مقایسه می کند و در صورت مساوی بودن، هر آنچه که مابین &#123;% ifequal %&#125; و &#123;% endifequal %&#125; می باشد را نمایش می دهد.
+</p>
+
+<p id="138">
+مثال زیر دو متغیر user و currentuser را مقایسه می کند:
+</p>
+
+<pre class="brush: html">
+&#123;% ifequal user currentuser %&#125;
+    &lt;h1&gt;Welcome!&lt;/h1&gt;
+&#123;% endifequal %&#125;
+</pre>
+
+<p id="139">
+همچنین می توان برای مقایسه ی دو مقدار از رشته ی خام درون تک کوتیشن و یا دابل کوتیشن استفاده کرد:
+</p>
+
+<pre class="brush: html">
+&#123;% ifequal section 'sitenews' %&#125;
+    &lt;h1&gt;Site News&lt;/h1&gt;
+&#123;% endifequal %&#125;
+
+&#123;% ifequal section "community" %&#125;
+    &lt;h1&gt;Community&lt;/h1&gt;
+&#123;% endifequal %&#125;
+</pre>
+
+<p id="140">
+درست مثل &#123;% if %&#125;، تگ &#123;% ifequal %&#125; نیز به طور اختیاری از تگ &#123;% else %&#125; پشتیبانی می کند:
+</p>
+
+<pre class="brush: html">
+&#123;% ifequal section 'sitenews' %&#125;
+    &lt;h1&gt;Site News&lt;/h1&gt;
+&#123;% else %&#125;
+    &lt;h1&gt;No News Here&lt;/h1&gt;
+&#123;% endifequal %&#125;
+</pre>
+
+<p id="141">
+تنها متغیرهای template مانند؛ رشته ها، اعداد صحیح، و اعداد اعشاری می توانند به عنوان آرگومان &#123;% ifequal %&#125; قرار بگیرند. مثال های زیر معتبر می باشند:
+</p>
+
+<pre class="brush: html">
+&#123;% ifequal variable 1 %&#125;
+&#123;% ifequal variable 1.23 %&#125;
+&#123;% ifequal variable 'foo' %&#125;
+&#123;% ifequal variable "foo" %&#125;
+</pre>
+
+<p id="142">
+نوع داده های دیگر از قبیل دیکشنری ها، لیست ها، و Boolean، برای &#123;% ifequal %&#125; مجاز نمی باشند. مثال های زیر نامعتبر می باشند:
+</p>
+
+<pre class="brush: html">
+&#123;% ifequal variable True %&#125;
+&#123;% ifequal variable [1, 2, 3] %&#125;
+&#123;% ifequal variable &#123;'key': 'value'&#125; %&#125;
+</pre>
+
+<h4 id="143">
+کامنت ها
+</h4>
+
+<p id="144">
+تنها در HTML و پایتون، زبان template جنگو اجازه می دهد از  کامنت ها استفاده شود. برای طراحی یک کامنت از &#123;# #&#125; استفاده می شود:
+</p>
+
+<pre class="brush: html">
+&#123;# This is a comment #&#125;
+</pre>
+
+<p id="145">
+هنگامی که template اجرا می شود، کامنت ها هیچ خروجی ای نخواهند داشت.
+</p>
+
+<p id="146">
+از تگ فوق نمی توان برای کامنت های چند خطی استفاده کرد. مثال زیر به عنوان کامنت در نظر گرفته نمی شود و مانند دیگر عبارت template به حساب می اید:
+</p>
+
+<pre class="brush: html">
+This is a &#123;# this is not
+a comment #&#125;
+test.
+</pre>
+
+<p id="147">
+در صورتیکه می خواهید از کامنت های چند خطی استفاده کنید؛ بایستی از تگ &#123;% template comment %&#125; مانند زیر استفاده کرد:
+</p>
+
+<p id="148">
+&#123;% comment %&#125;This is amulti-line comment.&#123;% endcomment %&#125;
+</p>
+
+<h4 id="149">
+فیلتر ها
+</h4>
+
+<p id="150">
+همانطور پیش تر در این فصل توضیح داده شد، فیلترها روش های ساده ای برای تغییر مقدار متغیرها قبل از نمایش آن ها می باشند. فیلتر ها مانند زیر از علامت پایپ (|) استفاده می کنند:
+</p>
+
+<pre class="brush: html">
+&#123;&#123; name|lower &#125;&#125;
+</pre>
+
+<p id="151">
+کد فوق مقدار متغیر &#123;&#123; name &#125;&#125; را بعد از عبور از فیلتر lower به حروف کوچک انگلیسی تبدیل می کند.
+</p>
+
+<p id="152">
+فیلترها می توانند به صورت زنجیروار نیز استفاده شوند؛ بدین صورت که آن ها می توانند پشت سر هم قرار بگیرند. در این حالت خروجی فیلتر قبلی وارد فیلتر بعدی شود. در مثال زیر اولین المان (element) لیست دریافت شده و به حروف بزرگ انگلیسی تبدیل می شود:
+</p>
+
+<pre class="brush: html">
+&#123;&#123; my_list|first|upper &#125;&#125;
+</pre>
+
+<p id="153">
+بعضی فیلترها آرگومان نیز دریافت می کنند. آرگومان فیلتر بعد از علامت (:) و همواره داخل دابل کوتیشن مانند مثال زیر قرار می گیرد:
+</p>
+
+<pre class="brush: html">
+&#123;&#123; bio|truncatewords:"30" &#125;&#125;
+</pre>
+
+<p id="154">
+مثال فوق 30 لغت اول متغیر bio را نمایش می دهد.
+</p>
+
+<p id="155">
+در زیر تعداد از مهمترین فیلتر ها توضیح داده شده اند:
+</p>
+
+<ul >
+<li id="156">
+addslashes: فیلتر مذکور یک علامت (\) قبل از علامت های (\)، تک کتیشن، و دابل کوتیشن قرار می دهد. این فیلتر برای متن های تولید شده درون رشته های جاوا اسکریپت مفید می باشند.
+</li>
+
+<li id="157">
+date: تاریخ و یا زمان را بر طبق قالبی که به آن به عنوان پارامتر داده می شود، مانند مثال زیر قالب بندی می کند:
+</li>
+
+<pre class="brush: html">
+&#123;&#123; pub_date|date:"F j, Y" &#125;&#125;
+</pre>
+
+<li id="158">
+length: طول یک مقدار را بر می گرداند. برای یک لیست، تعداد المان های آن و برای یک رشته تعداد حروف آن را بر می گرداند. (توسعه دهندگان پایتون توجه داشته باشند که این فیلتر برای هر آبجکت پایتونی که تحوه تعیین طول آن مشخص شده باشد کار می کند؛ مانند هر آبجکتی که دارای متد <span dir='ltr'>__len__()</span> باشد.)
+</li>
+</ul>
+
+<h3 id="159">
+فلسفه ی محدودیت ها
+</h3>
+
+<p id="160">
+اکنون که تا حد زیادی با زبان template جنگو آشنا شده اید، وقت آن رسیده است که به برخی از محدودیت های عمدی موجود در این زبان، به همراه فلسفه ی این که چرا این زبان به این شکل کار می کند اشاره کنیم.
+</p>
+
+<p id="161">
+قواعد زبان template جنگو ،بیشتر از هر جزء دیگری از برنامه های وب، بسیار خصوصی بوده و انتخاب های برنامه نویس بسیار گسترده می باشد. حقیقتی است که پایتون دارای پشتیبانی از ده ها زبان template سورس باز می باشد. که احتمالا هر کدام به این دلیل ساخته شده اند که توسعه دهنده معتقد بر این بوده است که زبان های template موجود، کافی نمی باشند. (در حقیقت،  این فرمان عبور، برای یک توسعه دهنده پایتون، برای نوشتن زبان template خودش می باشد، اگر تاکنون همچین کاری نکرده اید، می توانید آن را امتحان، زیرا یک تمرین جالب می باشد.)
+</p>
+
+<p id="162">
+با در نظر گرفتن این موضوع، جالب است این را بدانید که جنگو نیازی به استفاده از زبان template آن ندارد؛ یعنی می توان از هر زبان template دیگر نیز استفاده کرد. زیرا جنگو برای این در نظر گرفته شده است که یک فریم ورک وب full-stack برای تهیه ی تمام قسمت های ضروری برای توسعه دهندگان باشد تا یک تولید کننده باشند، خیلی وقت ها استفاده از سیستم template جنگو مناسب تر از کتابخانه های templte دیگر پایتون می باشد، ولی این یک نیازمندی موکد نمی باشد. همانطور که در بخش اینده ی  این فصل "استفاده از template ها در view" مشاهده خواهید کرد، استفاده از زبان های template دیگر بسیار آسان می باشد.
+</p>
+
+<p id="163">
+واضح است که ترجیح می دهیم از خود زبان template جنگو استفاده کنیم. template system دارای اصولی نسبت به نحوه ی توسعه ی وب انجام شده در World Online و تجربیات متعدد سازندگان جنگو می باشد. در زیر به تعدادی از این فلسفه ها اشاره خواهیم کرد:
+</p>
+
+<ul >
+<li id="164">
+منطق برنامه (Business logic) باید از ارائه منطق (Presentation logic) جدا باشد. توسعه دهندگان جنگو، سیستم template جنگو را تنها به چشم ابزاری برای کنترل نمایش و نمایش منطق نگاه می کنند و نه بیشتر. سیستم template جنگو نباید از حالت تابع گرایی پشیتبانی کند که از این هدف اصلی خارج شود.
+</li>
+
+<p id="165">
+به همین دلیل، فراخوانی کد پایتون به طور مستقیم درون template های جنگو امکان پذیر نیست. تمام برنامه نویسی، اساسا محدود به محدوده ی تگ های template ها و آن چه که می توان در این محدوده انجام داد می باشد. می توان از تگ های سفارشی template برای انجام وظایف دلخواه استفاده کرد، ولی در صورتی که خارج از تگ های template جنگو باشد به طور عمدی اجازه داده نخواهد شد کد پایتون دلخواه اجرا شود.
+</p>
+
+<li id="166">
+کد template باید از HTML/XML جدا باشد. اگرچه سیستم template برای تولید HTML استفاده می شود، ولی سیستم template تنها باری قالب های غیر HTML ای، مانند متن ساده در نظر گرفته شده است. برخی از زبان های دیگر template ای که بر اساس XML می باشند، در آن ها تمام منطق template داخل تگ ها یا attribute ها XML قرار می گیرند، در صورتیکه جنگو به صورت عمدی از این محدودیت اجتناب کرده است. استفاده از XML می تواند موجب بوجود آمدن اشتباهات غیر قابل اجتناب شود که پیام های خطای آن نیز کمی غیر قابل فهم می باشند، همچنین استفاده از موتور XML برای parse کردن template ها باعث ایجاد یک سری وظایف اضافه ی غیر قابل قبول در پردازش template می شود.
+</li>
+
+<li id="167">
+راحتی طراحان برای کار با کد HTML در نظر گرفته شده است. سیستم template طوری طراحی نشده است که به زیبایی قابل نمایش درون editor هایی مانند Dreamweaver نمایش داده شود. جنگو از نویسندگان template انتظار دارد به طور مستقیم و راحت HTML را ویرایش کنند.
+</li>
+
+<li id="168">
+فرض بر این است که طراحات HTML برنامه نویسان پایتون نیستند. نسبت به این که اغلب template های صفحات وب به وسیله ی طراحان نوشته شده است نه برنامه نویسان، بنابراین در template system دانش پایتون فرض نشده است.
+</li>
+
+<li id="169">
+هدف اختراع یک زبان برنامه نویسی نیست. هدف تنها ارائه ی یک سبک برنامه نویسی مانند استفاده از حلقه و غیره می باشد، که برای ایجاد یک نمایش از تصمیمات ضروری می باشد.
+</li>
+</ul>
+
+<h3 id="170">
+استفاده از template ها در view
+</h3>
+
+<p id="171">
+اصول اولیه ی استفاده از template system را آموختیم؛ اجازه دهید از این دانش برای ساخت view استفاده کنیم.  تابع current_datetime را در ماژول mysite.views که در فصل گذشته ساخته شد را دوباره فراخوانی کنید:
+</p>
+
+<pre class="brush: py">
+from django.http import HttpResponse
+import datetime
+
+def current_datetime(request):
+    now = datetime.datetime.now()
+    html = "&lt;html&gt;&lt;body&gt;It is now %s.&lt;/body&gt;&lt;/html&gt;" % now
+    return HttpResponse(html)
+</pre>
+
+<p id="172">
+اجازه دهید view فوق را با استفاده از سیستم template جنگو تغییر دهیم. در ابتدا ممکن است فکر کنید، باید کاری شبیه به کد فوق را انجام دهید:
+</p>
+
+<pre class="brush: py">
+from django.template import Template, Context
+from django.http import HttpResponse
+import datetime
+
+def current_datetime(request):
+    now = datetime.datetime.now()
+    t = Template("&lt;html&gt;&lt;body&gt;It is now &#123;&#123; current_date &#125;&#125;.&lt;/body&gt;&lt;/html&gt;")
+    html = t.render(Context(&#123;'current_date': now&#125;))
+    return HttpResponse(html)
+</pre>
+
+<p id="173">
+مطمئنا از template system استفاده خواهیم کرد، ولی روش فوق مشکلات که در ابتدای فصل به آن اشاره کردیم را حل نمی کند. به عنوان مثال، template همچنان درون کد پایتون می باشد. می توان مشکل فوق را با جدا کردن template درون فایلی دیگر حل کرد، به طوری که فایل مذکور درون view بار گذاری شود.
+</p>
+
+<p id="174">
+ممکن است ابتدا اینطور به نظر برسد که template را درون جایی روی سیستم ذخیره کردن و با استفاده از توابع داخلی پایتون محتویات فایل مورد نظر را بخوانید. در مثال زیر فرض شده است که template درون فایل /home/djangouser/templates/mytemplate.html ذخیره شده است:
+</p>
+
+<pre class="brush: py">
+from django.template import Template, Context
+from django.http import HttpResponse
+import datetime
+
+def current_datetime(request):
+    now = datetime.datetime.now()
+    # Simple way of using templates from the filesystem.
+    # This is BAD because it doesn't account for missing files!
+    fp = open('/home/djangouser/templates/mytemplate.html')
+    t = Template(fp.read())
+    fp.close()
+    html = t.render(Context(&#123;'current_date': now&#125;))
+    return HttpResponse(html)
+</pre>
+
+<p id="175">
+روش فوق نیز با توجه به معایبی که در ادامه بیان می کنیم، روش مناسبی نمی باشد:
+</p>
+
+<ul >
+<li id="176">
+روش فوق در زمان نبود فایل به هیچ وجه کار نخواهد کرد. فراخوانی <span dir='ltr'>open()</span>، در صورتیکه فایل mytemplate.html وجود نداشته باشد و یا اینکه قابل خواندن نباشد باعث ایجاد خطای IOError خواهد شد.
+</li>
+
+<li id="177">
+مکان template در این روش داخل کد پایتون قرار خواهد گرفت. در صورت استفاده از این تکنیک برای هر تابع view، باید درون هر فایل به صورت تکراری آدرس فایل را قرار بدهیم.
+</li>
+
+<li id="178">
+روش فوق حاوی تعداد زیادی کدهای تکراری خسته کننده می باشد. در هر فایل شما باید <span dir='ltr'>fp.open()</span> ،<span dir='ltr'>fp.read()</span> و <span dir='ltr'>fp.close()</span> را قرار دهید و بدیهی است که در صورت فراموش کردن این کدها برنامه شما با مشکل روبرو می شود.
+</li>
+</ul>
+
+<p id="179">
+برای حل کردن موارد فوق، از بار گذاری template و دایرکتوری های آن استفاده می شود.
+</p>
+
+<h4 id="180">
+بار گذاری Template
+</h4>
+
+<p id="181">
+جنگو با هدف حذف کردن کدهای اضافه در برنامه هنگام فراخوانی و همچنین درون template، برای بارگذاری template ها یک API بسیار مناسب و قدرتمند تهیه کرده است.
+</p>
+
+<p id="182">
+به منظور استفاده از API بار گذاری template، ابتدا می بایست به فریم بگویید که template ها را در کجا ذخیره خواهید کرد. برای انجام چنین کاری نیازمند فایل settings می باشید. (در فصل گذشته هنگام معرفی تنظیم ROOT_URLCONF، در مورد فایل settings.py صحبت شد.)
+</p>
+
+<p id="183">
+اگر از ابتدا کتاب را دنبال کرده اید، فایل settings.py را باز کرده و تنظیم TEMPLATE_DIRS را پیدا کنید. تنظیم فوق، یک تاپل خالی که احتمالا حاوی برخی کامنت های پیشفرض که به صورت خودکار تولید شده است، می باشد:
+</p>
+
+<pre class="brush: py">
+TEMPLATE_DIRS = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+)
+</pre>
+
+<p id="184">
+تنظیم فوق به مکانیسم بار گذاری template جنگو می گوید که باید در کجا به دنبال template ها بگردد. مسیر و دایرکتوری را که می خواهید template های خود را ذخیره کنید مانند مثال زیر درون TEMPLATE_DIRS اضافه کنید:
+</p>
+
+<pre class="brush: py">
+TEMPLATE_DIRS = (
+    '/home/django/mysite/templates',
+)
+</pre>
+
+<p id="185">
+توجه به چند نکته ضروری است:
+</p>
+
+<ul >
+<li id="186">
+می توانید هر مسیری را که می خواهید تعیین کنید، البته تا زمانیکه مسیر و template ها برای کاربر قابل خواندن باشد. در صورتیکه جای مناسبی را برای template های خود به یاد نمی آورید، پیشنهاد می کنیم یک دایرکتوری داخل پروژه ی خود بسازید (داخل دایرکتوری mysite که در فصل دوم ساخته شد).
+</li>
+
+<li id="187">
+در صورتیکه حاوی تنها یک مسیر می باشد، فراموش نکنید که در پایان رشته ی آدرس یک علامت کاما (,) قرار دهید!
+</li>
+
+<p id="188">
+غلط:
+</p>
+
+<pre class="brush: py">
+# Missing comma!
+TEMPLATE_DIRS = (
+    '/home/django/mysite/templates'
+)
+</pre>
+
+<p id="189">
+صحیح:
+</p>
+
+<pre class="brush: py">
+# Comma correctly in place.
+TEMPLATE_DIRS = (
+    '/home/django/mysite/templates',
+)
+</pre>
+
+<p id="190">
+دلیل حرکت فوق این است که پایتون از طریق علامت کاما بتواند تشخیص دهد که عبارت فوق یک تاپل می باشد، نه یک عبارت ساده ی داخل پرانتز.
+</p>
+
+<li id="191">
+اگر شما با سیستم عامل ویندوز کار می کنید، درون آدرس مورد نظر می بایست نام حرف دیسک درایو را اضافه کرده و همچنین مانند مثال زیر بجای علامت (\) از علامت (/) استفاده کنید:
+</li>
+
+<pre class="brush: html">
+TEMPLATE_DIRS = (
+    'C:/www/django/templates',
+)
+</pre>
+
+<li id="192">
+ساده ترین راه این است که از آدرس های کامل (بدین معنی که مسیر دایرکتوری ها از ریشه ی سیستم آدرس دهی شود) استفاده کنید. همانطور که می دانید فایل settings تنها کد پایتون می باشد و با استفاده از این خصوصیت می توان کمی منعطف تر از قبل کار کرد، بدین صورت که می توان آدرس دهی درون تنظیم TEMPLATE_DIRS را به صورت پویا مانند زیر طراحی کرد:
+</li>
+
+<pre class="brush: py">
+import os.path
+
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates').replace('\\','/'),
+)
+</pre>
+
+<p id="193">
+مثال فوق از متغیر مجیک (magic) پایتون یعنی __file__ استفاده کرده است، بدین صورت که این متغیر به صورت خودکار حاوی نام فایل ای می باشد که در آن است. همچنین با استفاده از os.path.dirname نام دایرکتوری ای که حاوی فایل settings.py می باشد بدست می اید، سپس رشته ی template که در دومین پارامتر داده است به انتهای آن اضافه می شود و در پایان جای علامت های (\\) با علامت (/) جایگزین می باشد (اگر در سیستم عامل ویندوز باشید.)
+</p>
+
+<p id="194">
+هنگامی که درون فایل settings.py از کد پویای پایتون استفاده کنید، باید اشاره کنیم که درون فایل settings.py از هرگونه خطا و اشتباه کد پایتون جلوگیری کنید. در صورتیکه درون این فایل یک خطای نوشتاری و یا خطای runtime وجود داشته باشد، سایت ایجاد شده توسط جنگو معیوب خواهد شد.
+</p>
+</ul>
+
+<p id="195">
+بعد از تنظیم TEMPLATE_DIRS، گام بعدی تغییر کد view می باشد که باید از بار گذاری template به جای استفاده مستقیم template، استفاده کرد. باز می گردیم به تابع current_datetime، و آن را مانند زیر تغییر می دهیم:
+</p>
+
+<pre class="brush: py">
+from django.template.loader import get_template
+from django.template import Context
+from django.http import HttpResponse
+import datetime
+
+def current_datetime(request):
+    now = datetime.datetime.now()
+    t = get_template('current_datetime.html')
+    html = t.render(Context(&#123;'current_date': now&#125;))
+    return HttpResponse(html)
+</pre>
+
+<p id="196">
+در مثال فوق، از تابع <span dir='ltr'>django.template.loader.get_template()</span> بجای بارگذاری template از سیستم به صورت دستی استفاده شده است. تابع <span dir='ltr'>get_template()</span> نام template را به عنوان آرگومان دریافت کرده، و محلی را در سیستم template در آن وجود دارد را پیدا کرده، آن را باز کرده و و یک آبجکت template کامپایل شده را بر می گرداند.
+</p>
+
+<p id="197">
+template مورد نظر در مثال فوق current_datetime.html می باشد، ولی هیچ چیز خاصی درباره ی پسوند .html وجود ندارد. شما می توانید هر پسوندی که می خواهید برای آن قرار دهید، و یا حتی می توانید پسوند فایل را کلا حذف کنید.
+</p>
+
+<p id="198">
+برای تعیین مکان template در روی سیستم، تابع <span dir='ltr'>get_template()</span> مسیر فایل را که در TEMPLATE_DIRS وجود دارد را با نام template که به آن ارسال می کنید ترکیب می کند. به عنوان مثال اگر TEMPLATE_DIRS حاوی آدرس /home/django/mysite/templates باشد، تابع <span dir='ltr'>get_template()</span> مثال فوق فایل زیر را جستجو خواهد کرد.
+</p>
+
+<pre>
+/home/django/mysite/templates/current_datetime.html
+</pre>
+
+<p id="199">
+در صورتیکه تابع <span dir='ltr'>get_template()</span> موفق به یافتن template با نام داده شده نشود، خطای TemplateDoesNotExist ایجاد خواهد شد. برای دیدن خطای فوق سرور جنگو را با دستور python manage.py runserver درون دایرکتوری پروژه جنگو اجرا کنید. سپس مرورگر خود را باز کرده و به آدرس مورد نظر برای مثال http://127.0.0.1:8000/time/ بروید. با فرض اینکه تنظیم DEBUG به صورت True می باشد و هنوز template مورد نظر یعنی current_datetime.html ساخته نشده است، شما باید یک صفحه خطای جنگو را با نام TemplateDoesNotExist مشاهده کنید.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td>
+            <img src='images/pic.png' width='40' height='40' />
+        </td>
+        <td valign='middle' width='95%'><h4>
+شکل 1-4</h4></td></tr><tr><td colspan='2'>
+<img src='images/4-1.jpg' width='100%'</h4></td></tr><tr><td colspan='2'>
+</td></tr></table>
+
+<p id="200">
+صفحه ی خطای فوق همانند صفحه ای است که در فصل سوم توضیح داده شد، تنها با یک قسمت اطلاعات اضافه تر: بخش Template-loader postmortem. این بخش به شما می گوید که جنگو کدام template ها را بار گذاری کرده است، و همچنین دلیل رد کردن template ها را نیز در بر می گیرد (مانند File does not exist). این اطلاعات هنگامی که شما می خواهید خطاهای بارگذاری template را بر طرف کنید بسیار با ارزش می باشند.
+</p>
+
+<p id="201">
+در پایان می بایست current_datetime.html را درون دایرکتوری template خود ساخته و کد زیر را درون آن قرار دهید:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;&lt;body&gt;It is now &#123;&#123; current_date &#125;&#125;.&lt;/body&gt;&lt;/html&gt;
+</pre>
+
+<p id="202">
+صفحه را ذخیره کرده و صفحه ی مرورگر خود را به اصطلاح refresh کنید، شما می بایست صفحه تولید شده حاوی زمان و تاریخ فعلی خود را مشاهده کنید.
+</p>
+
+<h3 id="203">
+تابع <span dir='ltr'>render_to_response()</span>
+</h3>
+
+<p id="204">
+همانطور که قبلا اشاره کردیم، بارگذاری یک template شامل پر کردن یک Context و بر گرداندن نتیجه ی یک template توسط یک آبجکت HttpResponse، می باشد. همانطور که گفته شد در روش فوق با استفاده از <span dir='ltr'>get_template()</span> به جای template های مستقیم و یا آدرس درون کد، توانستیم کد خود را بهینه تر کنیم. ولی همچنان نیاز به یک حرکت زیبا برای بهینه تر کردن کد وجود دارد. جنگو یک میانبر (shortcut) ارائه می دهد که از طریق آن تنها می توان با یک خط کد template را بار گذاری کرده، آن را ارائه داده و یک HttpResponse را بر گردانید.
+</p>
+
+<p id="205">
+این میانبر یک تابع است که <span dir='ltr'>render_to_response()</span> نام دارد، که در ماژول django.shortcuts قرار دارد. اغلب اوقات شما بجای بارگذاری template ها و ساختن Context و آبجکت ها HttpResponse به صورت دستی از <span dir='ltr'>render_to_response()</span> استفاده خواهید کرد، مگر آنکه کارفرای شما بر اساس مجموع خط های موجود در کدی که نوشته اید نسبت به کار شما تصمیم گیری کند.
+</p>
+
+<p id="206">
+در زیر تابع بهینه شده ی current_datetime که با استفاده از <span dir='ltr'>render_to_response()</span> دوباره نویسی شده است را مشاهده می کنید:
+</p>
+
+<pre class="brush: py">
+from django.shortcuts import render_to_response
+import datetime
+
+def current_datetime(request):
+    now = datetime.datetime.now()
+    return render_to_response('current_datetime.html', &#123;'current_date': now&#125;)
+</pre>
+
+<p id="207">
+آن چه که تغییر پیدا کرده است:
+</p>
+
+<ul >
+<li id="208">
+در مثال فوق get_template، Template، Context و HttpResponse دیگر import نشده اند، و به جای آن ها تنها  django.shortcuts.render_to_response، import شده است.
+</li>
+
+<li id="209">
+داخل تابع current_datetime، همچنان متغیر now محاسبه شده است، ولی بارگذاری template، ساختن Context، ارائه ی template و ساختن HttpResponse تماما تنها با فراخوانی <span dir='ltr'>render_to_response()</span> انجام شده است. زیرا <span dir='ltr'>render_to_response()</span> یک آبجکت HttpResponse بر می گرداند، و تنها کافی است آن مقدار را در view بر گردانده شود.
+</li>
+</ul>
+
+<p id="210">
+اولین آرگومان تابع <span dir='ltr'>render_to_response()</span> نام template مورد استفاده می باشد. دومین آرگومان در صورت ارسال، باید یک دیکشنری باشد که جهت ساختن Context برای template استفاده می شود. در صورتیکه دومین آرگومان را ارسال نکنید، <span dir='ltr'>render_to_response()</span> از یک دیکشنری خالی استفاده می کند.
+</p>
+
+<h3 id="211">
+تکنیک <span dir='ltr'>locals()</span>
+</h3>
+
+<p id="212">
+آخرین تابع current_datetime نوشته شده ملاحظه کنید:
+</p>
+
+<pre class="brush: py">
+def current_datetime(request):
+    now = datetime.datetime.now()
+    return render_to_response('current_datetime.html', &#123;'current_date': now&#125;)
+</pre>
+
+<p id="213">
+درون یک برنامه شما چندین بار مانند مثال فوق، مقادیری را حساب کرده و درون متغیرهایی ذخیره می کنید (مانند متغیر now در کد قبلی)،  و متغیرها را به template مورد نظر ارسال می کنید. برنامه نویسان راحت طلب باید توجه داشته باشند که این کمی اضافه کاری است که باید متغیرها موقت ساخته و نام گذاری کنند و نام آن ها را برای template ارسال کنند. نه تنها این کار زائدی می باشد، بلکه تایپ اضافی درون برنامه نیز می باشد.
+</p>
+
+<p id="214">
+پس اگر شما جزء آن دسته از برنامه نویسان راحت طلب می باشید که مایلند کد خود را کوتاه و مختصر نگه دارند، می توانید از یک تابع داخلی پایتون به نام <span dir='ltr'>locals()</span> استفاده کنید. این تابع یک دیکشنری بر می گرداند که حاوی نام تمام متغیرهای محلی و ارزش هایشان می باشد، متغیرهای محلی به متغیرهایی گفته می شود که داخلی محدوده ی فعلی تعریف شده باشند. در نتیجه، view قبلی را می تواند به صورت زیر بازنویسی کرد:
+</p>
+
+<pre class="brush: py">
+def current_datetime(request):
+    current_date = datetime.datetime.now()
+    return render_to_response('current_datetime.html', locals())
+</pre>
+
+<p id="215">
+در مثال فوق، بجای تعیین کردن دیکشنری context به صورت دستی همانند قبل، مقدار <span dir='ltr'>locals()</span> ارسال شده است، که شامل تمام متغیرهای تعریف شده در آن نقطه از اجرای تابع می باشد. در نتیجه، متغیر now به current_date تغییر نام پیدا کرده است، زیرا درون template نیز نام current_date معرفی شده است. در مثال فوق، <span dir='ltr'>locals()</span> یک پیشرفت عظیم را ارائه نمی کند، ولی این تکنیک می تواند شما را از شر تایپ کردن زیاد خلاص می کند، البته اگر شما چندین متغیر template برای تعریف دارید و یا اینکه کمی تنبل هستید.
+</p>
+
+<p id="216">
+چیزی که باید در مورد استفاده از <span dir='ltr'>locals()</span> مراقب آن باشید این است که این تابع حاوی  تمام متغیرهای محیطی و شاید خیلی بیشتر از آنچه شما واقعا نیاز دارید می باشد، در مثال قبلی، <span dir='ltr'>locals()</span> همچنین حاولی request نیز می باشد. البته استفاده از <span dir='ltr'>locals()</span> به برنامه و نوع استفاده شما بستگی دارد.
+</p>
+
+<h4 id="217">
+دایرکتوری های زیر مجموعه در <span dir='ltr'>get_template()</span>
+</h4>
+
+<p id="218">
+ذخیره ی تمام template ها درون یک دایرکتوری می تواند کمی سنگین باشد. ممکن است بخواهید template ها را درون دایرکتوری های زیر مجموعه ی دایرکتوری template قرار داهید.
+</p>
+
+<p id="219">
+ذخیره ی template ها درون دایرکتوری های زیرمجموعه ی دایرکتوری template بسیار آسان می باشد. تنها کافیست درون <span dir='ltr'>get_template()</span>، نام دایرکتوری زیرمجموعه و بعد از آن یک علامت (/) و بعد نام template را قرار دهید:
+</p>
+
+<pre class="brush: py">
+t = get_template('dateapp/current_datetime.html')
+</pre>
+
+<p id="220">
+همچنین می توانید از این امکان در تابع <span dir='ltr'>render_to_response()</span> نیز استفاده کنید بدین صورت که اعمال فوق را درون اولین پارامتر این تابع قرار می دهید:
+</p>
+
+<pre class="brush: py">
+return render_to_response('dateapp/current_datetime.html', &#123;'current_date': now&#125;)
+</pre>
+
+<p id="221">
+هیچ محدودیتی نسبت به تعداد دایرکتوری های زیر مجموعه ی استفاده شده وجود ندارد و می توانید در صورت نیاز از هر تعداد از آن ها استفاده کنید.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+نکته
+</h4>
+<p id="222">
+کاربران ویندوز، مطمئن شوید که از علامت (/) به جای (\) استفاده می کنید. تابع <span dir='ltr'>get_template()</span> طراحی آدرس دهی را بر اساس Unix-style فرض می کند.
+</p>
+</td></tr></table>
+
+<h4 id="223">
+تگ include
+</h4>
+
+<p id="224">
+اکنون که مکانیزم بارگذاری template شرح داده شده است، می توان یک تگ داخلی template و مزایای آن را معرفی کرد: &#123;% include %&#125;. این تگ اجازه می دهد تا محتویات template های دیگر را درون template فعلی وارد کرد. آرگومان این تگ باید نام template ای باشد که می خواهید وارد template فعلی بکنید. همچنین این آرگومان می تواند یک متغیر و یا کد مستقیم HTML باشد که درون تک کتیشن یا دابل کتیشن قرار دارد. زمانی که یک کد همسان درون چندین template وجود دارد، می توان برای جلوگیری از تکرار کد نویسی از تگ include استفاده کرد.
+</p>
+
+<p id="225">
+هر دو مثال زیر برای include معتبر می باشند:
+</p>
+
+<pre class="brush: html">
+&#123;% include 'nav.html' %&#125;
+&#123;% include "nav.html" %&#125;
+</pre>
+
+<p id="226">
+مثال زیر محتویات template، includes/nav.html را وارد template خواهد کرد:
+</p>
+
+<pre class="brush: html">
+&#123;% include 'includes/nav.html' %&#125;
+</pre>
+
+<p id="227">
+مثال زیر محتویات template ای را که نامش درون متغیر template_name ذخیره شده است را وارد می کند:
+</p>
+
+<pre class="brush: html">
+&#123;% include template_name %&#125;
+</pre>
+
+<p id="228">
+همانند <span dir='ltr'>get_template()</span>، نام فایل template با اضافه شدن به مسیر دایرکتوری template که در تنظیم TEMPLATE_DIRS قرار دارد تعیین می شود.
+</p>
+
+<p id="229">
+template های وارد شده با context مربوط به template که آن ها را وارد کرده است ارزیابی می شوند. به عنوان مثال دو template زیر را ملاحظه کنید.
+</p>
+
+<pre class="brush: html">
+# mypage.html
+
+&lt;html&gt;
+&lt;body&gt;
+&#123;% include "includes/nav.html" %&#125;
+&lt;h1&gt;&#123;&#123; title &#125;&#125;&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+
+# includes/nav.html
+
+&lt;div id="nav"&gt;
+    You are in: &#123;&#123; current_section &#125;&#125;
+&lt;/div&gt;
+</pre>
+
+<p id="230">
+در صورتیکه که شما mypage.html را با یک context حاوی current_section ارائه (render) کنید، متغیر template وارد شده همانطور که انتظار خواهید داشت در دسترس خواهد بود.
+</p>
+
+<p id="231">
+در صورتیکه یک تگ <span dir='ltr'>&#123;% include %&#125;، template</span> ای را وارد کند که وجود نداشته باشد، یکی از حالت های زیر پیش می اید:
+</p>
+
+<ul >
+<li id="232">
+اگر تنظیم DEBUG به صورت True در نظر گرفته شده باشد، صفحه ی خطای جنگو با خطای TemplateDoesNotExist نمایش داده خواهد شد.
+</li>
+
+<li id="233">
+اگر تنظیم DEBUG به صورت False در نظر گرفته شده باشد، تگ مورد نظر بدون هیچ خطایی رد شده، و درون قسمت تگ include چیزی نمایش داده نخواهد شد.
+</li>
+</ul>
+
+<h3 id="234">
+ارث بری در Template
+</h3>
+
+<p id="235">
+مثال های template ای که تاکنون استفاده شده است از نظر محتوی خیلی مختصر و کم حجم بوده اند. ولی در دنیای واقعی، شما تز template system جنگو برای ساختن صفحات HTML با حجم و محتویات بسیار گسترده استفاده خواهید کرد. در این صورت با یک مشکل مشترک و عمومی توسعه ی وب رو به رو خواهید بود:  چگونه می توان از بوجود آمدن صفحات و کدها تکراری در ساخت صفحات وب که اجتناب ناپذیر است جلوگیری کرد؟
+</p>
+
+<p id="236">
+روش عمومی برای حل این مشکل استفاده از incude های سمت سرور می باشد، دستورالعمل هایی که شما می توانید داخل صفحه ی خود صفحات دیگر را نیز وارد کنید. در واقع، جنگو از این روش با استفاده از تگ template &#123;% include %&#125; پشتیبانی می کند که توضیح آن پیش تر داده شده است. ولی روش بهتری برای حل این مشکل وجود دارد که یکی از استراتژی های مطلوب جنگو به شمار می اید که "ارث بری template" نام دارد.
+</p>
+
+<p id="237">
+در واقع، ارث بری template، این اجازه را می دهد که یک اسکلت بندی پایه و اولیه از template بسازید که حاوی  تمام بخش های عمومی می باشد. این بخش ها به صورت block ها تعریف می شوند و template هایی که از آن template پدر، ارث بری می کنند می توانند آن بخش ها را دوباره نویسی و یا به اصطلاح overwrite کنند.
+</p>
+
+<p id="238">
+به مثال زیر توجه کنید، که همان بر روی template قبلی یعنی current_datetime.html موضوع فوق را توضیح داده است:
+</p>
+
+<pre class="brush: html">
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;The current time&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;My helpful timestamp site&lt;/h1&gt;
+    &lt;p&gt;It is now &#123;&#123; current_date &#125;&#125;.&lt;/p&gt;
+
+    &lt;hr&gt;
+    &lt;p&gt;Thanks for visiting my site.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="239">
+تا اینجا مشکلی وجود نخواهد داشت، ولی چه اتفاقی می افتد اگر بخواهید یک template برای یک view دیگر  مانند تابع hours_ahead که در فصل سوم وجود داشت ایجاد کنید؟ در صورتیکه بخواهید یک template کامل دیگر برای view دوم بسازید، چیزی شبیه به مثال  زیر خواهد بود:
+</p>
+
+<pre class="brush: html">
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;Future time&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;My helpful timestamp site&lt;/h1&gt;
+    &lt;p&gt;In &#123;&#123; hour_offset &#125;&#125; hour(s), it will be &#123;&#123; next_time &#125;&#125;.&lt;/p&gt;
+
+    &lt;hr&gt;
+    &lt;p&gt;Thanks for visiting my site.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="240">
+کاملا واضح هست که مقدار زیادی کد تکراری در دو مثال فوق وجود دارد. تصور کنید اگر بخواهید صفحات بیشتری داشته باشید مانند یک سایت بزرگ که حاوی style sheet ها و یا مقادیر زیادی کد Java Script می باشد چه خواهید کرد؟
+</p>
+
+<p id="241">
+راهکار include سمت سرور برای این مشکل راه حل مناسبی نمی باشد، چرا که به عنوان مثال برای قسمت بالایی کد شما یک template با نام header.html خواهید داشت:
+</p>
+
+<pre class="brush: html">
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+</pre>
+
+<p id="242">
+و برای قسمت پایین کد یک template با نام footer.html مانند مثال زیر:
+</p>
+
+<pre class="brush: html">
+    &lt;hr&gt;
+    &lt;p&gt;Thanks for visiting my site.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="243">
+با یک استراتژی مانند ارث بری هر دو قسمت بسیار آسان پیاده سازی خواهند شد. در مثال فوق هر دو صفحه تیتر صفحه را نشان می دهند (&lt;h1&gt;My helpful timestamp site&lt;/h1&gt;) و نمی توان آن را درون header.html قرار داد، چرا که &lt;title&gt; در هر صفحه متفاوت از صفحه ی دیگر خواهد بود. و اگر &lt;titile&gt;  درون header.html قرار داده می شد، دیگر امکان تغییر آن برای هر صفحه به طور جدا گانه امکان پذیر نبود و تمام صفحات می بایست یک &lt;title&gt; را نمایش بدهند.
+</p>
+
+<p id="244">
+ارث بری template جنگو این مشکلات را حل کرده است. نسخه ی insite-out از include های سمت سرور را بیاد می آورید. به جای تعریف تکه کد های مشترک، تکه کد هایی که تعریف می شوند متفاوت از یکدیگر هستند.
+</p>
+
+<p id="245">
+اولین گام برای تعریف یک template پدر، یک اسکلت بندی از صفحه ی شما که template های فرزند بعدا آن را پر خواهند کرد. در مثال زیر یک template پدر تعریف شده است:
+</p>
+
+<pre class="brush: html">
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;title&gt;&#123;% block title %&#125;&#123;% endblock %&#125;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;My helpful timestamp site&lt;/h1&gt;
+    &#123;% block content %&#125;&#123;% endblock %&#125;
+    &#123;% block footer %&#125;
+    &lt;hr&gt;
+    &lt;p&gt;Thanks for visiting my site.&lt;/p&gt;
+    &#123;% endblock %&#125;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="246">
+مثال فوق که base.html نام دارد، یک اسکلت بندی ساده ی HTML می باشد که برای تمام صفحات استفاده خواهد شد. صفحات درون سایت که از صفحه ی فوق ارث بری کرده اند و به عبارتی صفحات فرزند نامیده می شوند می توانند خصوصیات مشخص شده در کلاس پدر را بازنویسی و یا تغییر دهند، می توانند خصوصیاتی را اضافه کنند و حتی می توانند خصوصیتی را نیز حذف کنند و در خودشان از استفاده نکنند. (در صورتیکه با مثال های کتاب پیش میروید فایل فوق را با نام base.html درون دایرکتوری template ذخیره کنید.)
+</p>
+
+<p id="247">
+در اینجا از یک تگ template ای که آن را مشاهده کرده اید استفاده می کنید: تگ &#123;% block %&#125;. تمام تگ های &#123;% block %&#125; به موتور template این را می گویند که template فرزند ممکن است این قسمت از template را باز نویسی کند.
+</p>
+
+<p id="248">
+اکنون یک template پدر موجود می باشد، می توان از آن در فایل current_datetime.html به شکل زیر استفاده کرد:
+</p>
+
+<pre class="brush: html">
+&#123;% extends "base.html" %&#125;
+
+&#123;% block title %&#125;The current time&#123;% endblock %&#125;
+
+&#123;% block content %&#125;
+&lt;p&gt;It is now &#123;&#123; current_date &#125;&#125;.&lt;/p&gt;
+&#123;% endblock %&#125;
+</pre>
+
+<p id="249">
+همچنین فایل hours_ahead را نیز که در فصل سوم در مورد آن صحبت شده است را نیز در مثال زیر مشاهده خواهید کرد: (در صورتیکه همگام با مثال های کتاب پیش میروید hours_ahead را از حالت قبلی که به صورت کد مستقیم درون view نوشته شده است خارج کرده و مانند زیر به صورت یکی از template ها درون دایرکتوری template دخیره کنید.)
+</p>
+
+<pre class="brush: html">
+&#123;% extends "base.html" %&#125;
+
+&#123;% block title %&#125;Future time&#123;% endblock %&#125;
+
+&#123;% block content %&#125;
+&lt;p&gt;In &#123;&#123; hour_offset &#125;&#125; hour(s), it will be &#123;&#123; next_time &#125;&#125;.&lt;/p&gt;
+&#123;% endblock %&#125;
+</pre>
+
+<p id="250">
+آیا روش فوق روش زیبایی نیست؟ هر template حاوی کدهای منحصر به خود می باشد. هیچ کد زائدی وجود ندارد. در صورتیکه نیاز به تغییر طراحی در یک سایت عظیم دارید، تنها کافیست که درون template پدر تغییر ایجاد کنید، در اینصورت تمام template هایی که از کلاس پدر ارث بری کرده اند نیز به سرعت تغییر خواهند خواهند کرد.
+</p>
+
+<p id="251">
+در زیر نحوه ی کار روش فوق توضیح داده شده است. هنگامی که template، current_datetime.html بارگذاری می شود، موتور template به تگ &#123;% extends %&#125; نگاه می کند، که به این اشاره دارد که فایل مورد نظر یک template فرزند می باشد. در اینصورت موتور template به سرعت template پدر را بارگذاری می کند که در این مورد template پدر base.html می باشد.
+</p>
+
+<p id="252">
+توجه داشته باشید که template های فرزند بلاک footer را تعریف نکرده اند، template system از مقدار مشخص شده ی بلاک درون template پدر بجای آن استفاده کرده است. مقدار مشخص شده ی درون یک تگ &#123;% block %&#125; در یک template پدر همیشه به صورت یک مقدار یدکی استفاده می شود.
+</p>
+
+<p id="253">
+ارث بری تاثیری بر روی context template نخواهد داشت. به عبارت دیگر، هر template فرزند به هر یک از متغیر های template درون context دسترسی خواهد داشت.
+</p>
+
+<p id="254">
+می توان به صورت چندین سطح از ارث بری استفاده کرد. یکی از روش های عمومی استفاده از روش ارث بری در سه سطح می باشد:
+</p>
+
+<p id="255">
+یک template با نام base.html که بسازید که محتویات اصلی سایت را در بر بگیرد، محتویاتی که به ندرت تغییر خواهند کرد، البته اگر نگوییم هرگز تغییر نخواهند کرد.
+</p>
+
+<p id="256">
+یک template با نام base_SECTION.html برای هر بخش از سایت خود ایجاد کنید (مانند base_photos.html و base_forum.html). این template ها باید از base.html ارث بری کنند و باید حاوی طراحی مربوط به خود باشند.
+</p>
+
+<p id="257">
+template های هر نوع از صفحه را ایجاد کنید، مانند صفحه ی انجمن (forum) یا یک آلبوم عکس. این template ها از template مناسب مربوط به خود ارث بری کنند.
+</p>
+
+<p id="258">
+در زیر دستور العمل های کار با ارث بری template را مشاهده می کنید:
+</p>
+
+<ul >
+<li id="259">
+در صورتیکه درون یک template از &#123;% extends %&#125; اسفتاده می کنید، این تگ می بایست به عنوان اولین تگ template در نظر گرفته شود، در غیر اینصورت ارث بری template کار نخواهد کرد.
+</li>
+
+<li id="260">
+معمولاً، بهتر است از تگ های &#123;% block %&#125; بیشتری درون template پدر استفاده شود، بیاد داشته باشید که، template ها فرزند اجباری برای تعریف تمام block های template پدر ندارند، پس می توان هر تعداد block مناسب به صورت پیش فرض درون template پدر قرار داد، و سپس در صورت نیاز به هرکدام آن را درون template فرزند استفاده کرد.
+</li>
+
+<li id="261">
+در صورتیکه شما تکه کدی تکراری درون تعدادی از template ها پیدا کردید، این می تواند بدین معنا باشد که شما باید آن تکه کد را به درون یک &#123;% block %&#125; در template پدر انتقال دهید.
+</li>
+
+<li id="262">
+در صورتیکه نیاز به محتویات یک block درون template پدر دارید، می توانید از &#123;&#123; block.super &#125;&#125; استفاده کرد، که یک متغیر magic می باشد که یک متن ارائه شده از template پدر را تهیه می کند. این روش در صورتیکه می خواهید بجای بازنویسی کلی یک block محتویات آن را اضافه کنید مناسب می باشد.
+</li>
+
+<li id="263">
+نمی توان چند تگ &#123;% block %&#125; با نام یکسان درون یک template تعریف کرد. دلیل وجود همچین محدودیتی این است که یک block در هر دو جهت کار می کند. یک تگ block تنها یک حفره برای پر کردن، تهیه نمی کند، بلکه محتویاتی نیز برای این حفره در template پدر تعریف می کند. در صورتیکه دو block همنام درون یک template وجود داشته باشد، template پدر نخواهد دانست کدام محتویات block را استفاده کند.
+</li>
+
+<li id="264">
+نام template ای که به &#123;% extends %&#125; ارسال می شود مانند <span dir='ltr'>get_template()</span> بارگذاری می شود. نام template به تنظیم TEMPLATE_DIRS اضافه شده است.
+</li>
+</ul>
+
+<p id="265">
+در اغلب موارد،  آرگومانی که به &#123;% extends %&#125; ارسال می شود یک رشته خواهد بود، ولی این آرگومان می تواند یک متغیر نیز باشد، در صورتیکه شما نام template پدر را تا زمان اجرا نمی دانید. این خصوصیت اجازه می دهد یک حرکت پویا انجام دهید.
+</p>
+
+<h3 id="266">
+گام بعدی
+</h3>
+
+<p id="267">
+بسیاری از وب سایت های پیشرفته پایگاه داده محور می باشند: محتوای وب سایت درون یک پایگاه داده ی relational ذخیره شده است. این باعث یک جدا سازی تمیز بین داده و منطق برنامه خواهد شد (به همین صورت view ها و template ها باعث جداسازی منطق برنامه و نمایش برنامه می شوند.)
+</p>
+
+<p id="268">
+فصل بعدی ابزاری را که جنگو برای تعامل با یک پایگاه داده ارائه می کند را پوشش می دهد.
+</p>
+
+
+		</div>
+		
+
+			<div class="footer">
+This work is licensed under the GNU Free Document License
+                                <br />
+                                Copyright © 2011 - <a href="http://www.aminpy.com/" target="_blank">Amin Oruji</a>
+				
+    <div class='phn1'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter05.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter03.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+			</div>
+<!-- Begin WebGozar.com Counter code -->
+<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2602278&amp;t=counter" ></script>
+<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2602278" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
+<!-- End WebGozar.com Counter code -->
+		
+	</div>
+</body>
+</html>
+
