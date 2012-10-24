@@ -1,6 +1,6 @@
 @font-face {
 	font-family: "b titr";
-	src: url("/statics/fonts/BTitrBd.ttf") format("truetype");
+	src: url("../fonts/BTitrBd.ttf") format("truetype");
 }
 
 body {
