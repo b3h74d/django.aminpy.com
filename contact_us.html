@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}تماس با ما{% endblock %}
+{% block contactus %}تماس با ما{% endblock %}
+{% block body %}
+<style>
+input,textarea {
+	width: 100%;
+}
+
+input {
+	direction: ltr;
+}
+
+li {
+	color: red;
+}
+</style>
+
+<form method="post" action=".">{% csrf_token %}
+	<h3 style="margin-bottom: 12px; margin-top: 0;">تماس با نویسندگان</h3>
+	<table width="98%" align="center" style="color: black; font-size: 10pt">
+	<tr>
+		<td><b>نام شما</b></td>
+	</tr>
+	<tr>
+		<td>{{ form.name.errors }}{{ form.name }}</td>
+	</tr>
+	<tr>
+		<td><b> آدرس ایمیل شما </b></td>
+	</tr>
+	<tr>
+		<td>{{ form.email.errors }}{{ form.email }}</td>
+	</tr>
+	<tr>
+		<td><b> پیام شما </b></td>
+	</tr>
+	<tr>
+		<td>{{ form.content.errors }}{{ form.content }}</td>
+	</tr>
+	<tr>
+		<td align="left">
+			<input type="submit" value="ارسال" style="width: 100px; height: 30px;" />
+		</td>
+	</tr>
+	</table>
+</form>
+{% endblock %}

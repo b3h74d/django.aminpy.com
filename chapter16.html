@@ -1,0 +1,1238 @@
+
+<html>
+<head>
+<meta name="google-site-verification" content="4pN93apsdh0knxnQvjVcXz3FbZSJ3N1zZ2yRLeJZhsQ" />
+<meta name="msvalidate.01" content="1309BF972A6186CC2B633EA8127F134E" />
+<title>پکیج django.contrib جنگو</title>
+<meta name="keywords" content="جنگو, کتاب, فیلتر, محافظت, CSRF, django, book, contrib, redirect" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-language" content="fa" />
+
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link rel="stylesheet" href="stylesheets/djangobook.css"
+				type="text/css" />
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push([ '_setAccount', 'UA-24333256-1' ]);
+	_gaq.push([ '_trackPageview' ]);
+
+	(function() {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+				: 'http://www')
+				+ '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+
+
+
+</head>
+
+<body>
+	<div class='main'>
+		<div class="top">
+			
+				<a href="http://djangobook.ir" class="top">صفحه اصلی</a>
+			
+			 | 
+			
+				<a href="toc.html" class="top">فهرست مطالب</a>
+			
+			 | 
+
+			
+				<a href="about_book.html" class="top">درباره کتاب</a>
+			
+			 | 
+
+			
+				<a href="http://aminpy.com" class="top">تماس با ما</a>
+			
+			 | 
+			<a href="http://www.pythonbook.ir" title="جدید">
+				پایتون
+			</a>
+		</div>
+		
+		
+    <div class='phn'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter17.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter15.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+
+		<div style="padding-bottom: 20px; padding-top: 10px;">
+			<a href="http://www.djangobook.ir/">
+			<h1 style='color: white;'>کتاب جنگو</h1>
+		</a></div>
+
+		
+		<div class="aval">
+			
+<h2 >
+پکیج django.contrib جنگو 
+</h2>
+
+<p id="1">
+یکی از نقاط قدرت پایتون فلسفه ی "batteries included" پایتون می باشد: هنگامی که پایتون را نصب می کنید، پایتون درون خود دارای یک کتابخانه بزرگ از پکیج هایی می باشد که می توان بلافاصله از آن ها استفاده کرد می باشد، بدون نیاز به دانلود هیچ چیز دیگری. جنگو سعی می کند این فلسفه را دنبال کند، و حاوی کتابخانه ی استاندارد خودش می باشد از add-on های مفید برای وظایف مشترک توسعه ی وب می باشد. این فصل مجموعه ای از این add-on ها را پوشش می دهد.
+</p>
+
+<h3 id="2">
+کتابخانه ی استاندارد جنگو
+</h3>
+
+<p id="3">
+کتابخانه ی استاندارد جنگو، درون پکیج django.contrib قرار گرفته است. درون هر ساب پکیج یک قسمت جدا از عملکرد add-on می باشد. این قسمت ها لزوما وابسته نمی باشند، ولی برخی ساب پکیج های django.contrib نیازمند دیگر پکیج ها می باشند.
+</p>
+
+<p id="4">
+هیچ نیازمندی سختی برای انواع عمکردها در django.contrib وجود ندارد. برخی از پکیج ها شامل ماژول هایی می باشند (و از این رو نیازمند نصب جداول پایگاه داده ی آن ها درون پایگاه داده ی شما می باشد.)، ولی بقیه تنها عبارتند از middleware یا تگ های template.
+</p>
+
+<p id="5">
+تنها مشخصه ی مشترکی بین پکیج های django.contrib وجود دارد این است: در صورتی که پکیج django.contrib را به کلی حذف کنید، شما همچنان می توانید از خصوصیات اساسی جنگو بدون هیچ مشکلی استفاده کنید. هنگامی که توسعه دهندگان جنگو عملکرد جدیدی را به فریم ورک اضافه می کنند، آن ها از این قانون تجربی در تصمیم اینکه آیا عمکرد جدید باید درون django.contrib باشد یا جای دیگری استفاده می کند.
+</p>
+
+<p id="6">
+django.contrib عبارت است از این پکیج ها:
+</p>
+
+<ul >
+<li id="7">
+admin: سایت مدیر جنگو. توضیح داده شده در فصل ششم.
+</li>
+
+<li id="8">
+admindocs: مستندات خودکار برای سایت مدیر جنگو. این کتاب این خصوصیت را پوشش نمی دهد؛ مستندات رسمی جنگو را بررسی کنید.
+</li>
+
+<li id="9">
+auth: فریم ورک تصدیق جنگو. توضیح داده شده در فصل چهاردهم.
+</li>
+
+<li id="10">
+comments: یک برنامه ی نظرات. این کتاب این خصوصیت را پوشش نمی دهد. مستندات رسمی جنگو را بررسی کنید.
+</li>
+
+<li id="11">
+contenttypes: (در دست ترجمه ...). 
+</li>
+
+<li id="12">
+csrf: محافظت در برابر Crss-Site Request Forgery (CSRF). به بخش "CSRF Protection" در همین فصل مراجعه کنید.
+</li>
+
+<li id="13">
+databrowse: برنامه ی جنگو ای که اجازه می دهد داده ها را مرور کنید. این کتاب این خصوصیت را پوشش نمی دهد؛ مستندات رسمی جنگو را بررسی کنید.
+</li>
+
+<li id="14">
+flatpages: یک فریم ورک برای مدیریت ساده ی محتوای "flat" HTML در یک پایگاه داده. به بخش "Flatpages" در همین فصل مراجعه کنید.
+</li>
+
+<li id="15">
+formtools: تعدادی از کتابخانه های مفید سطح بالا برای سر و کار داشتن با الگوهای مشترک در فرم ها. این کتاب این خصوصیت را پوشش نمی دهد؛ مستندات رسمی جنگو را بررسی کنید.
+</li>
+
+<li id="16">
+gis: ضمیمه هایی برای جنگو که پشتیبانی از GIS (Geographic Information Systems) را پشتیبانی می کند. برای مثال، به مدل های جنگو جهت ذخیره ی داده ی جغرافیایی اجازه می دهد و کوئری های جغرافیایی را نمایش می دهد. این یک کتابخانه ی بزرگ و پیچیده می باشد که در این کتاب پوشش داده نمی شود. برای اطلاعات بیشتر در این مورد به http://geodjango.org/ مراجعه کنید.
+</li>
+
+<li id="17">
+humanize: مجموعه ای از فیلترهای مفید template جنگو برای اضافه کردن یک "human touch" به داده می باشد. به بخش "Humanizing Data" در همین فصل مراجعه کنید.
+</li>
+
+<li id="18">
+localflavor: قسمت های مناسبی از کد که برای کشور یا فرهنگ های خاص مفید می باشند. برای مثال، شامل روش هایی برای تایید اعتبار کدهای ZIP ایالات متحده یا شماره های شناسایی ایسلند.
+</li>
+
+<li id="19">
+marup: مجموعه ای از فیلترهای template جنگو که تعدادی از زبان های مشترک markup را اجرا می کنند. برای اطلاعات بیشتر به بخش "فیلترهای Marcup" مراجعه کنید.
+</li>
+
+<li id="20">
+redirects: فریم ورکی برای مدیریت تغییر مسیرها. به بخش "تغییر مسیرها" مراجعه کنید.
+</li>
+
+<li id="21">
+sessions: فریم session جنگو. توضیح داده شده در فصل چهاردهم.
+</li>
+
+<li id="22">
+sitemaps:  فریم ورکی برای تولید فیل XML نقشه ی سایت. توضیح داده شده در فصل چهاردهم.
+</li>
+
+<li id="23">
+sites: فریم ورکی که به شما اجازه می دهد چندین وب سایت را با یک پایگاه داده و یک نصب جنو اداره کنید. به بخش بعدی "sites" مراجعه کنید.
+</li>
+
+<li id="24">
+syndication: فریم ورکی برای تولید خوراک پیوند در RSS و Atom. توضیح داده شده در فصل سیزدهم.
+</li>
+
+<li id="25">
+webdesign: add-on های جنگو که به طور خاص برای طراحان وب (مخالف توسعه دهندگان) مفید می باشد. تا زمان نوشتن این کتاب، این آیتم تنها شامل یک تگ template با نام &#123;% lorem %&#125; می باشد. برای اطلاعات بیشتر مستندات جنگو را بررسی کنید.
+</li>
+</ul>
+
+<p id="26">
+باقی مانده ی این فصل به جزئیات تعدادی از پکیج های django.contrib خواهد پرداخت که تاکنون درباره ی آن ها در این کتاب بحث نشده است.
+</p>
+
+<h3 id="27">
+Sites
+</h3>
+
+<p id="28">
+سیستم sites جنگو یک فریم ورک جنریک می باشد که به شما اجازه می دهد چندین وب سایت را با پایگاه داده و پروژه ی جنگوی همسان اداره کنید. این یک مفهوم تصوری می باشد، و (در دست ترجمه ...)، بنابراین با چند سناریو شروع می کنیم که این مفهوم می تواند در آنجا مفید باشد.
+</p>
+
+<h4 id="29">
+سناریو 1: استفاده ی دوباره از داده در سایت های چندگانه
+</h4>
+
+<p id="30">
+همانطور که در فصل اول توضیح داده شد، سایت های LJWorld.com و Lawrence.com ساخته شده با جنگو توسط سازمان اخبار یکسان اداره شده است: روزنامه ی Lawrence Journal-World در Lawrence، Kansas. LJWorld.com بر روی اخبار تمرکز می کند، در حالی که Lawrence.com بر روی سرگرمی های محلی. ولی اغلب مقاله نویسان می خواهند یک مقاله را بر روی هر دو سایت منتشر کنند.
+</p>
+
+<p id="31">
+روش احمقانه برای حل مشکل، استفاده از پایگاه داده ی جدا برای هر سایت و نیاز داشتن تولید کنندگان سایت جهت دو مرتبه انتشار یک داستان همسان: یک مرتبه برای LJWorld.com و دوباره یک بار دیگر برای Lawrence.com. ولی این حرکت برای تولید کنندگان سایت نا کارآمد می باشد، و ذخیره ی چندین کپی از یک داستان در پایگاه داده کاری زائد و افزونه می باشد.
+</p>
+
+<p id="32">
+راهکار بهتر؟ هر دو سایت از یک پایگاه داده ی استفاده کنند، و یک مقاله از طریق یک رابطه ی چند به چند با یک یا چند سایت مشترک باشد. فریم ورک sites جنگو جدول پایگاه داده ای برای آن دسته از مقالاتی که می توانند مرتبط باشند ارائه می کند. این یک قلاب برای پیوستن داده با یک یا بیشتر سایت ها می باشد.
+</p>
+
+<h4 id="33">
+سناریو 2: ذخیره ی نام/دامنه ی سایت شما در یک مکان
+</h4>
+
+<p id="34">
+LJWorld.com و Lawrence.com هر دو دارای قابلیت هشدار پست الکترونیک می باشند، که به خوانندگان اجازه می دهد جهت دست یابی به اطلاعات در هنگام بروز اخبار عضو شوند. این بسیار اساسی است: یک خواننده در یک وب عضو می شود، و بلا فاصله یک پست الکترونیک با پیام "Thanks for you subscription" در یافت می کند.
+</p>
+
+<p id="35">
+اجرا شدن این پروسه ی عضویت به صورت دو مرتبه کد زدن یکسان نا کارآمد و زائد می باشد، بنابراین سایت ها از در پشت صحنه از یک کد همسان استفاده می کنند. ولی پیام "Thanks you for your subscription" برای هر سایت باید متفاوت باشد. با استفاده از آبجکت های Site، می توان پیام thank-you را با استفاده از مقادیر نام سایت فعلی (مانند 'LJWorld.com') و نام دامنه (مانند 'www.ljworld.com') جدا کرد.
+</p>
+
+<p id="36">
+فریم ورک sites جنگو مکانی برای شما جهت ذخیره name و domain برای هر سایت در پروژه ی جنگو ارائه می کند، که بدین معنی است که می توانید از مقدایر در یک روش جنریک دوباره استفاده کرد.
+</p>
+
+<h4 id="37">
+نحوه ی استفاده از فریم ورک Sites
+</h4>
+
+<p id="38">
+فریم ورک sites بیشتر یک سری از قرارداد ها می باشد تا یک فریم ورک. همه چیز بر اساس دو مفهوم ساده می باشد:
+</p>
+
+<ul >
+<li id="39">
+مدل Site، درون django.contrib.sites، دارای فیلدهای domain و name.
+</li>
+
+<li id="40">
+تنظیم SITE_ID که ID پایگاه داده را از آبجکت Site وابسته شده با آن تنظیمات خاص فایل تعیین می کند.
+</li>
+</ul>
+
+<p id="41">
+نحوه ی استفاده از این دو مفهوم به عهده ی خودتان می باشد، ولی جنگو از طریق قراردادهای ساده ای در چند روش به طور خودکار استفاده می کند.
+</p>
+
+<p id="42">
+جهت نصب برنامه ی sites، مراحل زیر را دنبال کنید:
+</p>
+
+<ol >
+<li id="43">
+'django.contrib.sites' را به تنظیم INSTALLD_APPS اضافه کنید.
+</li>
+
+<li id="44">
+دستور manage.py syncdb را جهت نصب جدول django_site داخل پایگاه داده ی خود اجرا کنید. همچنین این یک آبجکت site پیشفرض، با دامنه ی example.com ایجاد می کند.
+</li>
+
+<li id="45">
+سایت example.com را به دامنه ی خودتان تغییر داده، و هر آبجکت Site دیگری را اضافه کنید، هم از طریق سایت مدیر جنگو یا از طریق API پایتون. یک آبجکت Site برای هر سایت/دامنه ای که این پروژه ی جنگو ایجاد کرده بسازید.
+</li>
+
+<li id="46">
+تنظیم SITE_ID در هر یک از فایل های تنظیم خودتان تعریف کنید. این مقدار باید ID پایگاه داده برای آبجکت Site، جهت سایت ایجاد شده توسط آن فایل تنظیمات باشد.
+</li>
+</ol>
+
+<h4 id="47">
+قابلیت های فریم ورک Sites
+</h4>
+
+<p id="48">
+بخش های زیر کارهای مختلفی را که می توانید با فریم ورک sites انجام دهید را توضیح می دهد.
+</p>
+
+<h4 id="49">
+استفاده ی دوباره از داده در چندین سایت
+</h4>
+
+<p id="50">
+جهت استفاده ی دوباره از داده در چندین سایت، همانطور که در سناریو 1 توضیح داده شد، تنها کافیست یک ManyToManyField برای Site در مدل های خود ایجاد کنید، برای مثال:
+</p>
+
+<pre class="brush: py">
+from django.db import models
+from django.contrib.sites.models import Site
+
+class Article(models.Model):
+    headline = models.CharField(max_length=200)
+    # ...
+    sites = models.ManyToManyField(Site)
+</pre>
+
+<p id="51">
+این زیر ساختی است که برای مربوط ساختن مقالات با چندین سایت در پایگاه داده نیاز می باشد. با قرار گرفتن آن، می توان از کد view جنگوی همسان برای چندین سایت دوباره استفاده کرد. مثال مدل Article زیر، view مورد نظر یعنی article_detail به شکل زیر خواهد بود:
+</p>
+
+<pre class="brush: py">
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from mysite.articles.models import Article
+
+def article_detail(request, article_id):
+    a = get_object_or_404(Article, id=article_id, sites__id=settings.SITE_ID)
+    # ...
+</pre>
+
+<p id="52">
+تابع view فوق قابل استفاده ی دوباره می باشد چرا که سایت مقاله را به صورت پویا بررسی می کند، بر حسب مقدار تنظیم SITE_ID.
+</p>
+
+<p id="53">
+برای مثال، تصور کنید فایل تنظیمات LJWorld.com دارای یک تنظیم SITE_ID با مقدار 1 می باشد، و فایل تنظیمات Lawrence.com دارای یک SITE_ID با مقدار 2 می باشد. در صورتی که این view زمانی که فایل تنظیمات LJWorld.com فعال است فراخوانی شده است، سپس (در دست ترجمه ...).
+</p>
+
+<h4 id="54">
+مربوط ساختن محتوی با یک سایت تنها
+</h4>
+
+<p id="55">
+به طور همسان، می توان یک مدل را در یک رابطه ی چند به یک با استفاده از ForeignKey به مدل Site مرتبط کرد.
+</p>
+
+<p id="56">
+برای مثال، در صورتی که هر مقاله تنها با یک سایت تنها مرتبط باشد، می توانید از مدلی شبیه به مدل زیر استفاده کنید:
+</p>
+
+<pre class="brush: py">
+from django.db import models
+from django.contrib.sites.models import Site
+
+class Article(models.Model):
+    headline = models.CharField(max_length=200)
+    # ...
+    site = models.ForeignKey(Site)
+</pre>
+
+<p id="57">
+کد فوق دارای مزیت همسان با بخش قبلی می باشد که توضیح داده شد.
+</p>
+
+<h4 id="58">
+Hooking Into the Current Site from Views
+</h4>
+
+<p id="59">
+در یک سطح پایین، می توان کارهای خاصی را بر اساس سایت با استفاده از فریم ورک sites در view های جنگو در view ای که فراخوانی شده است انجام داد، برای مثال:
+</p>
+
+<pre class="brush: py">
+from django.conf import settings
+
+def my_view(request):
+    if settings.SITE_ID == 3:
+        # Do something.
+    else:
+        # Do something else.
+</pre>
+
+<p id="60">
+البته، قرار دادن ID های سایت مانند کد فوق کاری شلخته می باشد. روشی تمیزتر از انجام کاری یکسان برای بررسی دامنه ی سایت:
+</p>
+
+<pre class="brush: py">
+from django.conf import settings
+from django.contrib.sites.models import Site
+
+def my_view(request):
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    if current_site.domain == 'foo.com':
+        # Do something
+    else:
+        # Do something else.
+</pre>
+
+<p id="61">
+روش بازیابی آبجکت Site برای مقدار settings.SITE_ID بسیار رایج می باشد، بنابراین مدیر مدل Site (Site.objects) دارای یک متد get_current() می باشد. مثال زیر برابر با مثال قبلی می باشد:
+</p>
+
+<pre class="brush: py">
+from django.contrib.sites.models import Site
+
+def my_view(request):
+    current_site = Site.objects.get_current()
+    if current_site.domain == 'foo.com':
+        # Do something
+    else:
+        # Do something else.
+</pre>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+نکته</h4>
+<p id="62">
+در مثال آخر، نیاز به import کردن django.conf.settings نمی باشد.
+</p>
+</td></tr></table>
+
+<h4 id="63">
+بدست آوردن دامنه ی فعلی برای نمایش
+</h4>
+
+<p id="64">
+برای یک رویکرد DRY (Don't Repeat Yourself، حذف کد های تکراری) جهت ذخیره ی نام سایت و دامنه، همانطور که کمی قبل تر در "سناریو 2: ذخیره نام/دامنه سایت در یک مکان" توضیح داده شد، تنها کافیست به name و domain آبجکت Site فعلی مراجعه کنید. برای مثال:
+</p>
+
+<pre class="brush: py">
+from django.contrib.sites.models import Site
+from django.core.mail import send_mail
+
+def register_for_newsletter(request):
+    # Check form values, etc., and subscribe the user.
+    # ...
+    current_site = Site.objects.get_current()
+    send_mail('Thanks for subscribing to %s alerts' % current_site.name,
+        'Thanks for your subscription. We appreciate it.\n\n-The %s team.' % current_site.name,
+        'editor@%s' % current_site.domain,
+        [user_email])
+    # ...
+</pre>
+
+<p id="65">
+در ادامه مثال در حال پیشرفت LJWorld.com و Lawrence.com در Lawrence.com این آدرس پست الکترونیک دارای خط موضوع "Thanks for subscribing to Lawrence.com alerts" می باشد. در LJWorld.com، آدرس پست الکترونیکی دارای خط موضوع "Thanks … to LJworld.com alerts" می باشد. این رفتار همسان مختص سایت برای بدنه ی پیام آدرس پست الکترونیک بکار برده می شود.
+</p>
+
+<p id="66">
+یک روش حتی بیشتر انعطاف پذیر (ولی سنگین تر) برای انجام این استفاده از سیستم template جنگو می باشد. با فرض اینکه Lawrence.com و LJWorld.com دارای دایرکتوری های template متفاوت (TEMPLATE_DIRS)، می توان به سادگی به سیستم template محول کرد، مانند زیر:
+</p>
+
+<pre class="brush: py">
+from django.core.mail import send_mail
+from django.template import loader, Context
+
+def register_for_newsletter(request):
+    # Check form values, etc., and subscribe the user.
+    # ...
+    subject = loader.get_template('alerts/subject.txt').render(Context(&#123;&#125;))
+    message = loader.get_template('alerts/message.txt').render(Context(&#123;&#125;))
+    send_mail(subject, message, 'do-not-reply@example.com', [user_email])
+    # ...
+</pre>
+
+<p id="67">
+در این مورد، شما ملزم به ساخت template های subject.txt و message.txt در هر دو دایرکتوری template برای LJWorld.com و Lawrence.com می باشد. همانطور که قبلا ذکر شد، این روش منعطف تر از روش قبلی، ولی پیچیده تر نیز می باشد.
+</p>
+
+<p id="68">
+این ایده ی خوبی برای بکار بردن آبجکت های Site تا آنجا که ممکن است برای حذف پیچیدگی زائد و اضافه می باشد.
+</p>
+
+<h4 id="69">
+CurrentSiteManager
+</h4>
+
+<p id="70">
+در صورتی که آبجکت ها نقش کلیدی را در برنامه ی شما ایفا می کنند، استفاده از CurrentSiteManager را در مدل های خود مورد ملاحظه قرار دهید. CurrentSiteMannager یک مدیر مدل (به فصل دهم مراجعه کنید) است که به طور خودکار کوئری های خود را جهت بر داشتن تنها آبجکت های مرتبط شده با Site فعلی فیلتر می کند.
+</p>
+
+<p id="71">
+با اضافه کردن CurrentSiteManager به مدل خود از آن استفاده کنید. برای مثال:
+</p>
+
+<pre class="brush: py">
+from django.db import models
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
+
+class Photo(models.Model):
+    photo = models.FileField(upload_to='/home/photos')
+    photographer_name = models.CharField(max_length=100)
+    pub_date = models.DateField()
+    site = models.ForeignKey(Site)
+    objects = models.Manager()
+    on_site = CurrentSiteManager()
+</pre>
+
+<p id="72">
+با مدل فوق، Photo.objects.all() تمام آبجکت های Photo را در پایگاه داده بر می گرداند. ولی Photo.on_site.all() تنها آبجکت های Photo مرتبط شده با سایت فعلی را بر می گرداند، بر حسب تنظیم SITE_ID.
+</p>
+
+<p id="73">
+به عبارت دیگر، دو عبارت زیر با یکدیگر برابر می باشند:
+</p>
+
+<pre class="brush: py">
+Photo.objects.filter(site=settings.SITE_ID)
+Photo.on_site.all()
+</pre>
+
+<p id="74">
+چطور CurrentSiteManager می داند کدام فیلد از Photo، Site بوده است؟ به طور پیشفرض CurrentSiteMananger به دنبال یک فیلد با نام site می گردد. در صورتی که مدل شما دارای یک ForeignKey یا ManyToManyField فراخوانی شده ی چیزی به غیر از site باشد، نیاز خواهید داشت آن را به صورت پارامتر به CurrentSiteManager ارسال کنید. مدل زیر، که دارای یک فیلد با نام publish_on می باشد، این را توضیح می دهد:
+</p>
+
+<pre class="brush: py">
+from django.db import models
+from django.contrib.sites.models import Site
+from django.contrib.sites.managers import CurrentSiteManager
+
+class Photo(models.Model):
+    photo = models.FileField(upload_to='/home/photos')
+    photographer_name = models.CharField(max_length=100)
+    pub_date = models.DateField()
+    publish_on = models.ForeignKey(Site)
+    objects = models.Manager()
+    on_site = CurrentSiteManager('publish_on')
+</pre>
+
+<p id="75">
+در صورتی که در تلاش برای استفاده از CurrentSiteManager و ارسال یک نام فیلدی که وجود ندارد می باشد، جنگو یک خطای ValueError ایجاد خواهد کرد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+نکته</h4>
+<p id="76">
+احتمالا یک Manager معمولی (non-site-specific) در مدل خود نگه خواهید داشت، حتی اگر از CurrentSiteManager استفاهد کنید. همانطور که در Appendix B توضیح داده شده است، در صورتی که به صورت دستی یک مدیر تعریف کنید، جنگو مدیر خودکار objects = models.Manager() را برای شما ایجاد نخواهد کرد.
+</p>
+
+<p id="77">
+همچنین بعضی قسمت های جنگو – برای مثال، سایت مدیر جنگو و view های جنریک – از مدیر در ابتدا تعریف شده در مدل استفاده می کنند، بنابراین در صورتی که می خواهید سایت مدیر شما دارای دسترسی به تمام آبجکت ها باشد (نه فقط آن هایی که site-specific هستند)، objects = models.Manager() را در مدل خود قرار دهید، قبل از تعریف CurrentSiteManager.
+</p>
+</td></tr></table>
+
+<h4 id="78">
+طریقه ی استفاده ی جنگو از فریم ورک Sites
+</h4>
+
+<p id="79">
+اگر چه استفاده از فریم ورک sites الزامی نمی باشد، استفاده از آن تشویق شده است، چرا که جنگو از آن در چند جا سود می برد. حتی اگر نصب جنگو شما تنها یک سایت را پشتیبانی کند، شما باید چند ثانیه برای ساختن آبجکت site با domain و name خودتان و اشاره به ID آن در تنظیم SITE_ID وقت صرف کنید.
+</p>
+
+<p id="80">
+در زیر نحوه ی استفاده ی جنگو از فریم ورک sites وجود دارد:
+</p>
+
+<ul >
+<li id="81">
+در فریم ورک تغییر مسیرها (به بخش "تغییر مسیرها" مراجعه کنید)، هر آبجکت redirect با یک سایت خاص مرتبط می باشد. هنگامی که جنگو برای یک تغییر مسیر جستجو می کند، (در دست ترجمه ...).
+</li>
+
+<li id="82">
+در فریم ورک comments، هر comment با یک سایت خاص مرتبط شده است. هنگامی که یک comment ارسال می شود، site آن در SITE_ID فعلی قرار داده می شود، و هنگامی که comment ها از طریق تگ template مناسب لیست شده اند، comment ها تنها برای سایت فعلی نمایش داده می شوند.
+</li>
+
+<li id="83">
+در فریم ورک flatpages (بخش "Flatpages" را در همین فصل مشاهده کنید)، هر flatpage یا یک سایت خاص مرتبط شده است. هنگامی که یک flatpage ساخته شده است، شما site آن را تعیین می کند، و flatpage middleware، SITE_ID فعلی را در بازیابی flatpage ها برای نمایش بررسی می کند.
+</li>
+
+<li id="84">
+در فریم ورک syndication (فصل سیزدهم را مشاهده کنید) template ها برای title و description به طور خودکار دارای دسترسی به یک متغیر &#123;&#123; site &#125;&#125; می باشند که نمایش آبجکت Site، سایت فعلی می باشد. همچنین، hook برای تهیه ی URL های آیتم در صورتی که یک دامنه ی کاملا واجد شرایط تعیین نکنید از domain آبجکت Site فعلی استفاده خواهد کرد.
+</li>
+
+<li id="85">
+در فریم ورک تصدیق (فصل چهاردهم را مشاهده کنید)، django.contrib.auth.views.login نام Site فعلی برای template به صورت &#123;&#123; site_name &#125;&#125; و آبجکت Site فعلی را به صورت &#123;&#123; site &#125;&#125; ارسال می کند.
+</li>
+</ul>
+
+<h3 id="86">
+Flatpages
+</h3>
+
+<p id="87">
+اغلب شما یک برنامه ی وب پایگاه داده محور خواهید داشت، ولی به تعدادی از صفحات استاتیک نیز نیاز خواهید داشت، از قبیل یک صفحه ی About یا یک صفحه ی Privacy Policy. این امکان وجود دارد که برای این نوع صفحات از وب سرور های استانداردی مانند Apache به صورت فایل های flat HTML استفاده کرد، اما این سطح اضافه ای از پیچیدگی درون برنامه ی شما ایجاد می کند، چرا که شما باید نسبت به تنظیم Apache نیز نگرانی هایی داشته باشید. باید برای تیم خود جهت ویرایش آن فایل ها دسترسی بر پا کنید، و همچنین نمی توانید از سیستم template جنگو برای طراحی این صفحات استفاده کنید.
+</p>
+
+<p id="88">
+راهکار برای این مشکل، برنامه ی flatpages جنگو می باشد، که در پکیج django.contrib.flatpages وجود دارد. این برنامه به شما اجازه می دهد صفحات استاتیک را از طریق سایت مدیر جنگو مدیریت کنید، همچنین این برنامه به شما اجازه می دهد template هایی برای آن ها با استفاده از سیستم template جنگو تعیین کنید، درست مثل بقیه ی داده های شما، و شما می توانید با API استاندارد پایگاه داده ی جنگو به flatpages دسترسی پیدا کنید.
+</p>
+
+<p id="89">
+(در دست ترجمه ...).
+</p>
+
+<h4 id="90">
+استفاده از Flatpages
+</h4>
+
+<p id="91">
+جهت نصب برنامه ی flatpages، مراحل زیر را دنبال کنید:
+</p>
+
+<ol >
+<li id="92">
+'django.contrib.flatpages' را به تنظیم INSTALLED_APPS اضافه کنید. django.contrib.flatpages به django.contrib.sites وابسته است، بنابراین اطمینان حاصل کنید که هر دو پکیج درون INSTALLED_APPS وجود دارند.
+</li>
+
+<li id="93">
+'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware' را به تنظیم MIDDLEWARE_CLASSES اضافه کنید.
+</li>
+
+<li id="94">
+جهت نصب دو جدول الزامی درون پایگاه داده ی خود دستور manage.py sycndb را اجرا کنید.
+</li>
+</ol>
+
+<p id="95">
+برنامه ی flatpages دو جدول درون پایگاه داده ی شما ایجاد می کند: django_flatpage و django_flatpage_sites. django_flatpage به سادگی یک URL را به عنوان و دسته ای از متن محتوا مرتبط می کند. django_flatpage_sites یک جدول چند به چند می باشد که یک flatpage را با یک یا بیشتر سایت ها مرتبط می سازد.
+</p>
+
+<p id="96">
+برنامه دارای یک تنها یک مدل FlatPage می باشد، که در django/contrib./flatpages/models.py تعریف شده است. که چیزی شبیه به کد زیر می باشد:
+</p>
+
+<pre class="brush: py">
+from django.db import models
+from django.contrib.sites.models import Site
+
+class FlatPage(models.Model):
+    url = models.CharField(max_length=100, db_index=True)
+    title = models.CharField(max_length=200)
+    content = models.TextField(blank=True)
+    enable_comments = models.BooleanField()
+    template_name = models.CharField(max_length=70, blank=True)
+    registration_required = models.BooleanField()
+    sites = models.ManyToManyField(Site)
+</pre>
+
+<p id="97">
+اجازه دهید فیلدهای فوق را مورد بررسی قرار دهیم:
+</p>
+
+<ul >
+<li id="98">
+url: URL ای می باشد که درون flatpage قرار دارد، به استثنای نام دامنه ولی دارای علامت "/" ابتدا (/about/contact/).
+</li>
+
+<li id="99">
+title: عنوان flatpage. فریم ورک هیچ کار خاصی با این فیلد انجام می دهد. این مسئولیت با عهده ی شما می باشد که آن را درون temtplate خود نمایش دهید.
+</li>
+
+<li id="100">
+content: محتوای flatpage (مانند HTML صفحه). فریم ورک هیچ کار خاصی با این فیلد انجام نمی دهد. این به عهده ی شما می باشد که آن را درون template نمایش دهید.
+</li>
+
+<li id="101">
+enable_comments: فعال کردن یا نکردن comment ها در این flatpage می باشد. فریم ورک هیچ کار خاصی با این فیلد انجام نمی دهد. می توان این مقدار را درون template بررسی کرده و در صورت نیاز یک comment نمایش داد.
+</li>
+
+<li id="102">
+template_name: نام template جهت استفاده برای render کردن این flatpage. این فیلد اختیاری می باشد؛ در صورتی که داده نشده باشد یا در صورتی که این template وجود نداشته باشد، فریم ورک به template عقب نشینی خواهد کرد flatpages/default.html.
+</li>
+
+<li id="103">
+registration_required: عضویت برای نمایش این flatpage الزامی است یا خیر. این فیلد با فریم ورک authentication/user کامل می شود، که در فصل چهاردهم بیشتر درباره ی آن توضیح داده شده است.
+</li>
+
+<li id="104">
+sites: سایت هایی که این flatpage در آن ها وجود دارد. این فیلد با فریم sites جنگو متحد می شود ، که در بخش "Sites" همین فصل توضیح داده شده است.
+</li>
+</ul>
+
+<p id="105">
+می توان flatpages را از طریق رابط مدیر جنگو یا API پایگاه داده ی جنگو نیز ایجاد نمود. برای اطلاعات بیشتر در این مورد، بخش "اضافه کردن، تغییر دادن و حذف Flatpages" مشاهده کنید.
+</p>
+
+<p id="106">
+هنگامی که flatpages ساخته شد، FlatpageFallbackMiddleware تمام کار را انجام می دهد. هر بار که هر برنامه ی جنگو یک خطای 404 را ایجاد می کند، این middleware برای URL درخواست شده به صورت آخرین چاره middleware را بررسی می کند. به طور خاص، برای یک flatpage با URL داده شده یا یک ID سایت که با تنظیم SITE_ID مطابقت دارد بررسی می کند.
+</p>
+
+<p id="107">
+در صورتی که یک مطابق پدا کند، template مربوط به flatpage و یا در صورتی که flatpage دارای یک template سفارشی نباشد flatpages/default.html را بار گذاری می کند. این middleware آن template را تنها به یک متغیر context با نام flatpage ارسال می کند که آبجکت FlatPage می باشد، و در render کردن template از RequestContext استفاده می کند.
+</p>
+
+<p id="108">
+در صورتی که FlatpageFallbackMiddleware هیچ مطابقی پیدا نکند، درخواست برای پردازش به صورت معمول به کارش ادامه می دهد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+نکته</h4>
+<p id="109">
+این middleware تنها برای خطای 404 (page not found) فعال می شود – نه برای 500 (server error) یا خطاهای دیگر. همچنین به مسائل ترتیب MIDDLEWARE_CLASSES دقت داشته باشید که، به طور معمول FlatpageFallbackMiddleware در آنتها یا نزدیک به انتهای لیست قرار دهید، چرا که استفاده از آن چاره ی آخر می باشد.
+</p>
+</td></tr></table>
+
+<h3 id="110">
+اضافه کردن، تغییر دادن و حذف Flatpages
+</h3>
+
+<p id="111">
+می توان flatpages را به دو روش اضافه کرده، تغییر داده و یا حذف کرد:
+</p>
+
+<h4 id="112">
+از طریق رابط مدیر
+</h4>
+
+<p id="113">
+در صورتی که رابط خودکار مدیر جنگو فعال کرده اید، باید به قسمت "Flatpages" در صفحه ی index مدیر مشاهده کنید. flatpages را به همانطور که هر آبجکت دیگری را در سیستم ویرایش می کند ویرایش کنید.
+</p>
+
+<h4 id="114">
+از طریق API پایتون
+</h4>
+
+<p id="115">
+همانطور که قبلا ذکر شد، flatpages توسط یک مدل استاندارد جنگو که درون django/contrib./flatpages/models.py وجود دارد نشان داده می شود. از این رو، می توان به آبجکت های flatpage از طریق API پایگاه داده ی جنگو دسترسی پیدا کرد، برای مثال:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.contrib.flatpages.models import FlatPage
+&gt;&gt;&gt; from django.contrib.sites.models import Site
+&gt;&gt;&gt; fp = FlatPage.objects.create(
+...     url='/about/',
+...     title='About',
+...     content='&lt;p&gt;About this site...&lt;/p&gt;',
+...     enable_comments=False,
+...     template_name='',
+...     registration_required=False,
+... )
+&gt;&gt;&gt; fp.sites.add(Site.objects.get(id=1))
+&gt;&gt;&gt; FlatPage.objects.get(url='/about/')
+&lt;FlatPage: /about/ -- About&gt;
+</pre>
+
+<h3 id="116">
+استفاده از Template های Flatpage
+</h3>
+
+<p id="117">
+به طور پیشفرض، flatpages توسط template، flatpages/default.html، render می شود، ولی می توان آن را برای یک flatpage خاص، با فیلد template_name در آبجکت FlatPage، override کرد.
+</p>
+
+<p id="118">
+ساختن flatpages/default.html به عهده ی شما می باشد. درون دایرکتوری template خودتان، تنها کافیست یک دایرکتوری flatpages حاوی فایل default.html بسازید.
+</p>
+
+<p id="119">
+template های flatpage یک متغیر تنهای context با نام flatpage ارسال می کنند که آبجکت flatpage می باشد.
+</p>
+
+<p id="120">
+در زیر یک نمونه template، flatpages/default.html وجود دارد:
+</p>
+
+<pre class="brush: py">
+&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+    "http://www.w3.org/TR/REC-html40/loose.dtd"&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;&#123;&#123; flatpage.title &#125;&#125;&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&#123;&#123; flatpage.content|safe &#125;&#125;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="121">
+توجه داشته باشید که در کد فوق از فیلتر template، safe برای اجازه به flatpage.content جهت (در دست ترجمه ...) استفاده شده است.
+</p>
+
+<h3 id="122">
+Redirects
+</h3>
+
+<p id="123">
+فریم ورک redirects جنگو به شما اجازه می دهد تغییر مسیرها را به سادگی توسط ذخیره ی آن ها در یک پایگاه داده و رفتار کردن با آن ها همانند هر آبجکت مدل دیگری کنترل کنید. برای مثال، می توان از فریم ورک redirects جنگو برای گفتن "هر درخواست به /music/ را به /sections/arts/music/ تغییر مسیر بده" استفاده کرد. هنگامی که نیاز به حرکت دادن برخی لینک در سایت خود داشته باشید این فریم ورک بسیار سودمند می باشد؛ توسعه دهندگان وب باید جهت اجناب از لینک های شکسته شده در صورت لزوم هرکاری انجام دهند.
+</p>
+
+<h4 id="124">
+استفاده از فریم ورک Redirects
+</h3>
+
+<p id="125">
+جهت نصب برنامه ی redirects، مراحل زیر را دنبال کنید:
+</p>
+
+<ol >
+<li id="126">
+'django.contrib.redirects' را به تنظیم INSTALLED_APPS اضافه کنید.
+</li>
+
+<li id="127">
+'django.contrib.redirects.middleware.RedirectFallbackMiddleware' به تنظیم MIDDLEWARE_CLASSES اضافه کنید.
+</li>
+
+<li id="128">
+دستور manage.py sycdb را به نصب تنها جدول الزامی درون پایگاه داده اجرا کنید.
+</li>
+</ol>
+
+<p id="129">
+manage.py syncdb یک جدول django_redirect در پایگاه داده ی شما ایجاد می کند. این یک جدول جستجو با فیلدهای site_id، old_path و new_path می باشد.
+</p>
+
+<p id="130">
+می توان redirects را هم از طریق رابط مدیر جنگو و یا از API پایگاه داده ی جنگو ایجاد نمود. برای اطلاعات بیشتر بخش "اضافه کردن، تغییر دادن و حذف Redirects" مراجعه کنید.
+</p>
+
+<p id="131">
+هنگامی که redirects ایجاد شد، کلاس RedirectFallbackMiddleware تمام کار را انجام می دهد. هر زمان که هر برنامه ی جنگو یک خطای 404 ایجاد می کند، این middleware پایگاه داده ی redirects را برای URL درخواست شده به عنوان آخرین چاره بررسی می کند. به طور خاص، این middleware برای یک تغییر مسیر با old_path داده شده با یک ID سایت که مطابق با تنظیم SITE_ID می باشد بررسی می کند. (برای اطلاعات بیشتر در مورد SITE_ID و فریم ورک sites به بخش "Sites" در همین فصل مراجعه کنید.) سپس middleware مذکور مراحل زیر را دنبال می کند:
+</p>
+
+<ul >
+<li id="132">
+در صورتی که یک مطابق پیدا کند، و new_path خالی نباشد، به new_path تغییر مسیر می دهد.
+</li>
+
+<li id="133">
+در صورتی که یک مطابق پیدا کند، وی new_path خالی باشد، یک HTTP header، 410 ("Gone") و یک پاسخ خالی (بدون محتوی) ارسال می مکند.
+</li>
+
+<li id="134">
+در صورتی که یک مطابق پیدا نکند، درخواست برای پردازش معمولی به کارش ادامه می دهد.
+</li>
+</ul>
+
+<p id="135">
+middleware تنها برای خطاهای 404 فعال شده است – نه برای خطاها یا پاسخ های 500 از هر کد وضعیت دیگر.
+</p>
+
+<p id="136">
+به موضوع ترتیب قرار گیری MIDDLEWARE_CLASSES توجه کنید. به طور کلی، می توان RedirectFallbackMiddleware را تقریبا در انتهای لیست قرار داد، زیرا آخرین چاره می باشد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+نکته</h4>
+<p id="137">
+در صورتی که از هر دو middleware های redirect و flatpage استفاده می کند، توجه کنید که می خواهید کدام یک (redirect یا flatpage) در ابتدا بررسی شود. پیشنهاد می کنیم flatpages را قبل از redirects قرار دهید (از این رو flatpage را قبل از redirect قرار می دهید)، ولی ممکن است نظر شما چیز دیگری باشد.
+</p>
+</td></tr></table>
+
+<h3 id="138">
+اضافه کردن، تغییر دادن و حذف Redirects
+</h3>
+
+<p id="139">
+می توان redirects را به دو روش اضافه کرده، تغییر داده و حذف کرد:
+</p>
+
+<h4 id="140">
+از طریق رابط مدیر
+</h4>
+
+<p id="141">
+در صورتی که رابط مدیر جنگو را فعال کرده باشید، می بایست یک بخش "Redirects" در صفحه ی index مدیر مشاهده کنید. همانطور که هر آبجکت دیگری را در این سیستم ویرایش می کنید، redirects را نیز ویرایش کنید.
+</p>
+
+<h4 id="142">
+از طریق API پایتون
+</h4>
+
+<p id="143">
+redirects توسط یک مدل استاندارد جنگو که درون django/contrib./redirects/models.py قرار دارد نشان داده شده است. از این رو، می توان از طریق API پایگاه داده ی جنگو به آبجکت های redirect دسترسی پیدا کرد، برای مثال:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from django.contrib.redirects.models import Redirect
+&gt;&gt;&gt; from django.contrib.sites.models import Site
+&gt;&gt;&gt; red = Redirect.objects.create(
+...     site=Site.objects.get(id=1),
+...     old_path='/music/',
+...     new_path='/sections/arts/music/',
+... )
+&gt;&gt;&gt; Redirect.objects.get(old_path='/music/')
+&lt;Redirect: /music/ ---&gt; /sections/arts/music/&gt;
+</pre>
+
+<h3 id="144">
+محافظت CSRF
+</h3>
+
+<p id="145">
+پکیج django.contrib.csrf در مقابل Cross-Site Request Forgery (CSRF) حفاظت می کند.
+</p>
+
+<p id="146">
+CSRF، همچنین به صورت "session riding" نیز شناخته می شود، که یک سایت امنیت بهره برداری می باشد. CSRF زمانیکه یک وب سایت مخرب (در دست ترجمه ...).
+</p>
+
+<h4 id="147">
+یک مثال ساده ی CSRF
+</h4>
+
+<p id="148">
+فرض کنید درون یک حساب webmail در example.com وارد شده اید. این سایت webmail دارای یک دکمه ی log out می باشد که به آدرس example.com/logout اشاره می کند – این بدین معناست که، تنها عملی که برای خروج لازم است رفتن به آدرس example.com/logout می باشد.
+</p>
+
+<p id="149">
+یک می سایت مخرب می تواند توسط آن آدرس به صورت یک &lt;iframe&gt; پنهان در ون صفحه ی خود شما را ناگذیر به بازدید از آدرس example.com/logout کند. در نتیجه، در صورتی که درون حساب webmail در example.com باشید و از صفحه ی مخربی که دارای &lt;iframe&gt; به example.com/logout بازدید کنید، عمل بازدید از صفحه ی مخرب شما را از example.com خارج می کند.
+</p>
+
+<p id="150">
+واضح است، خروج از یک سایت webmail بر خلاف میل خود یک شکاف وحشتناک امنیتی نمی باشد، ولی این نوع از رفتار می تواند بر هر سایت که به کاربران اعتماد می کند اتفاق بیافتد، سایت هایی از قبیل یک سایت بانک آنلاین یا یک سایت تجارت الکترونیک، جایی که این رفتار می تواند یک سفارش یا پرداخت بدون خبر داشتن کاربر آغاز کند.
+</p>
+
+<h4 id="151">
+یک مثال پیچیده در از CSRF
+</h4>
+
+<p id="152">
+در مثال قبلی، example.com تا حدی مقصر می باشد، زیرا به یک تغییر وضعیت (مانند خرج کاربر) اجازه داده است تا از طریق روش GET درخواست شود. خیلی بهتر است برای هر درخواست از روش POST استفاده شود که وضعیت را در سرور تغییر می دهد. ولی حتی وب سایت هایی که روش POST را برای تغییر وضعیت لازم می دانند نیز برای CSRF آسیب پذیر می باشند.
+</p>
+
+<p id="153">
+فرض کنید example.com دارای عملکرد ارتقا پیدا کرده ی خروج می باشد، به طوری که یک دکمه ی &lt;form&gt; از طریق روش POST به آدرس example.com/logout ارسال می کند. بعلاوه، خروج &lt;form&gt; حاوی این فیلد hidden می باشد:
+</p>
+
+<pre class="brush: py">
+&lt;input type="hidden" name="confirm" value="true"&gt;
+</pre>
+
+<p id="154">
+این موضوع مطمئن می سازد که یک POST ساده به آدرس example.com/logout یک کاربر را خارج نمی سازد؛ به منظور خروج یک کاربر، کاربر باید example.com/logout را از طریق POST در خواست کرده و متغیر POST به نام confirm را با یک مقدار 'true'ارسال کند.
+</p>
+
+<p id="155">
+خوب، با وجود امنیت اضافه، این تنظیم می تواند همچنان توسط CSRF مورد سو استفاده قرار گیرد – صفحه ی مخرب تنها نیاز به یک مقدار کار بیشتر دارد. مهاجمان می توانند یک فرم کامل را به هدف سایت شما ساخته، آن را در یک &lt;iframe&gt; غیر قابل مشاهده مخفی کرده، سپس با استفاده از جاوا اسکریپت آن فرم را به طور خود کار ارسال کنند.
+</p>
+
+<h4 id="156">
+جلوگیری از CSRF
+</h4>
+
+<p id="157">
+بنابراین، چطور یک سایت می تواند خود را از این سو استفاده حفاظت کند؟ (در دست ترجمه ...).
+</p>
+
+<p id="158">
+این موضوع درخواست های POST را کنار می گذارد. دومین قدم دادن یک فیلد hidden به هر &lt;form&gt; از نوع POST می باشد که مقدار این فیلد باید محرمانه بوده و از session ID کاربر تولید شده باشد. سپس، هنگام پردازش فرم در سمت سرور، برای آن فیلد محرمانه بررسی به عمل آمده و در صورت معتبر نبودن یک خطا ایجاد می شود.
+</p>
+
+<p id="159">
+این دقیقا آن چیزی است که لایه ی جلوگیری CSRF جنگو انجام می دهد، همانطور که در بخش های زیر توضیح داده شده است.
+</p>
+
+<h4 id="160">
+استفاده از CSRF Middleware
+</h4>
+
+<p id="161">
+پکیج django.contrib.csrf حاوی تنها یک ماژول با نام middleware.py می باشد. این ماژول حاوی یک کلاس middleware جنگو  با نام CSRFMiddleware می باشد که حفاظت CSRF را انجام می دهد.
+</p>
+
+<p id="162">
+جهت فعال کردن حفاظت CSRF، 'django.contrib.csrf.middleware.CsrfMiddleware'به تنظیم MIDDLEWARE_CLASSES درون فایل تنظیمات خود اضافه کنید. این middleware نیاز است که بعد از SessionMiddleware پاسخ را پردازش کند، بنابراین CSRFMiddleware باید قبل از SessionMiddleware در لیست قرار گرفته باشد (زیرا middleware پاسخ از آخر به اول پردازش شده است). همچنین این middleware باید پاسخ را قبل از آن که پاسخ فشرده شده باشد یا مسائل دیگر پردازش شود، بنابراین CSRFMiddleware باید بعد از GZipMiddleware بیاید. هنگامی که آن را به تنظیم MIDDLEWARE_CLASSES خود اضافه کنید، کار را انجام داده اید. بخش "ترتیب MIDDLEWARE_CLASSES" در فصل پنجم را برای توضیحات بیشتر مشاهده کنید.
+</p>
+
+<p id="163">
+در صورتی که علاقمند می باشید، در زیر نحوه ی عملکرد CsrfMiddleware وجود دارد. دو کار زیر انجام می شود:
+</p>
+
+<ol >
+<li id="164">
+درخواست های خروجی را توسط اضافه کردن یک فیلد hidden به تمام فرم های POST، با نام csrfmiddlewaretoken و یک مقدار هش session ID به اضافه ی یک کلید امنیت می باشد، ویرایش می کند. middleware در صورتی که هیچ session ID ای وجود نداشته باشد هیچ ویرایشی انجام نمی دهد، بنابراین کاهش کارایی برای درخواست هایی که از session ها استفاده نمی کنند قابل اغماض است.
+</li>
+
+<li id="165">
+در تمام درخواست های ورودی POST که دارای کوکی session نیستند، بررسی می کند که csrfmiddlewaretoken حاضر و درست باشد. در صورتی که نباشد، کاربر یک خطای 403 HTTP دریافت می کند. محتوای صفحه ای  خطای 403 در آن نشان داده می شود پیام "Cross Site Request Forgery detected. Request aborted." می باشد.
+</li>
+</ol>
+
+<p id="166">
+این اطمینان حاصل می کند که تنها فرم هایی که از سایت شما سرچشمه گرفته اند می توانند از داده ها در برگشت استفاده کنند.
+</p>
+
+<p id="167">
+این middleware به طور عمد، تنها درخواست های HTTP POST را هدف گیری می کند (و فرم های POST متناظر). همانطور که توضیح داده شد، درخواست های GET هرگز نباید دارای تاثیرات غیر قابل انتظار باشند؛ این بر عهده ی شما می باشد که از این موضوع مطمئن شوید.
+</p>
+
+<p id="168">
+درخواست های POST با یک کوکی session محافظت نشده همراه نمی باشند، ولی آن ها نیاز به محافظت ندارند، زیرا یک وب سایت مخرب در هر صورت می تواند این نوع درخواست ها را بسازد.
+</p>
+
+<p id="169">
+جهت اجتناب از تغییر درخواست های غیر HTML ای، middleware نوع header محتویات پاسخ را قبل از ویرایش آن بررسی می کند. تنها صفحاتی که به صورت text/html یا application/xml+xhtml باشند ویرایش می شوند.
+</p>
+
+<h4 id="170">
+محدودیت های CSRF Middleware
+</h4>
+
+<p id="171">
+CsrfMiddleware نیازمند عملکرد فریم ورک session جنگو می باشد. (برای اطلاعات بیشتر به فصل چهاردهم مراجعه کنید.) در صورتی که از یک session سفارشی یا فریم ورک authentication ای استفاده می کنید که به صورت دستی کوکی های session را مدیریت می کند، این middleware به شما کمکی نخواهد کرد.
+</p>
+
+<p id="172">
+در صورتی که برنامه ی شما صفحات HTML و فرم ها را در برخی روش های غیر معمول ایجاد می کند (مثلا، در صورتی که قطعات HTML در عبارت های document.write جاوا اسکریپت ارسال می شوند)، ممکن است فیلتری که فیلد hidden به فرم اضافه می کند دور بزنید. در این مورد، ارسال فرم همواره شکست خواهد خورد. (این به این دلیل اتفاق می افتد که CsrfMiddleware برای اضافه کردن فیلد csrfmiddlewaretoken به HTML شما قبل از آن که صفحه به کلاینت ارسال شود از یک regular expression استفاده می کند. و regular expression گاهی اوقات این نوع HTML ها را نمی تواند کنترل کند.) در صورتی که شک دارید که این موضوع اتفاق می افتد یا خیر، تنها کافیست source را در مرورگر خود تماشا کنید که آیا csrfmiddlewaretoken درون &lt;form&gt; قرار گرفته است یا خیر.
+</p>
+
+<p id="173">
+برای اطلاعات و مثال های بیشتر درباره ی CSRF به http://en.wikipedia.org/wiki/csrf مراجعه کنید.
+</p>
+
+<h3 id="174">
+Humanizing Data
+</h3>
+
+<p id="175">
+پکیج django.contrib.humanize مجموعه ای از فیلترهای مفید template جنگو را برای اضافه کردن یک "human touch" به داده نگه می دارد. جهت فعال کردن این فیلترها، 'django.contrib.humanize' به تنظیم INSTALLED_APPS اضافه کنید. هنگامی که این کار را انجام داده شد، در یک template از &#123;% load humanize %&#125; استفاده کنید، تا به فیلترهای توضیح داده شده در بخش های بعدی دسترسی پیدا کنید.
+</p>
+
+<h4 id="176">
+apnumber
+</h4>
+
+<p id="177">
+برای شماره های 1 تا 9، این فیلتر شماره به حروف را بر می گرداند. در غیر اینصورت، عدد را بر می گرداند. 
+</p>
+
+<p id="178">
+Examples:
+</p>
+
+<ul >
+<li id="179">
+1 می شود "one".
+</li>
+
+<li id="180">
+2 می شود "two".
+</li>
+
+<li id="181">
+10 می شود "10".
+</li>
+</ul>
+
+<p id="182">
+می توان نمایش یک integer را در یک integer یا رشته ارسال کرد.
+</p>
+
+<h4 id="183">
+intcomma
+</h4>
+
+<p id="184">
+این فیلتر یک integer را به یک رشته ی حاوی کاما برای هر سه رفم تبدیل می کند.
+</p>
+
+<p id="185">
+مثال ها:
+</p>
+
+<ul >
+<li id="186">
+4500 می شود "4,500".
+</li>
+
+<li id="187">
+45000 می شود "45,000".
+</li>
+
+<li id="188">
+450000 می شود "450,000".
+</li>
+
+<li id="189">
+4500000 می شود "4,500,000".
+</li>
+</ul>
+
+<p id="190">
+می توان نمایش یک integer را در یک integer یا رشته ارسال کرد.
+</p>
+
+<h4 id="191">
+intword
+</h4>
+
+<p id="192">
+این فیلتر یک large integer را به یک نمایش متن مناسب تبدیل می کند.
+</p>
+
+<p id="193">
+مثال ها:
+</p>
+
+<ul >
+<li id="194">
+1000000 می شود "1.0 million".
+</li>
+
+<li id="195">
+1200000 می شود "1.2 million".
+</li>
+
+<li id="196">
+1200000000 می شود "1.2 milliard".
+</li>
+</ul>
+
+<p id="197">
+مقادیر تا یک کادریلیون (عدد 1 با پانزده عدد صفر 1000000000000000) پشتیبانی می شوند.
+</p>
+
+<p id="198">
+می توان نمایش یک integer را در یک integer یا رشته ارسال کرد.
+</p>
+
+<h4 id="199">
+ordinal
+</h4>
+
+<p id="200">
+این فیلتر یک integer را به ordinal آن به صورت رشته تبدیل می کند.
+</p>
+
+<p id="201">
+مثال ها:
+</p>
+
+<ul >
+<li id="202">
+1 می شود "1st".
+</li>
+
+<li id="203">
+2 می شود "2nd".
+</li>
+
+<li id="204">
+3 می شود "3rd".
+</li>
+
+<li id="205">
+254 می شود "254th".
+</li>
+</ul>
+
+<p id="206">
+می توان نمایش یک integer را در یک integer یا رشته ارسال کرد.
+</p>
+
+<h3 id="207">
+فیلترهای Markup
+</h3>
+
+<p id="208">
+پکیج django.contrib.markup شامل چند فیلتر template جنگو می باشند که هرکدام یک زبان markup رایج را اجرا می کنند.
+</p>
+
+<ul >
+<li id="209">
+textile: Textile را اجرا می کند که برای اطلاعات بیشتر در مورد آن می توانید به http://en.wikipedia.org/wiki/Textile_%28markup_language%29 مراجعه کنید.
+</li>
+
+<li id="210">
+markdown: Markdown را اجرا می کند که برای اطلاعات بیشتر در مورد آن می توانید به http://en.wikipedia.org/wiki/Markdown مراجعه کنید.
+</li>
+
+<li id="211">
+restructuredtext: Restructured Text را اجرا می کند که برای اطلاعات بیشتر در مورد آن می توانید به http://en.wikipedia.org/wiki/ReStructuredText مراجعه کنید.
+</li>
+</ul>
+
+<p id="212">
+در هر مورد، فیلتر انتظار قالب بندی markup را به صورت یک رشته را داشته و یک نمایش متن markup شده را بر می گرداند. برای مثال، فیلتر textile متنی را که در قالب بندی Textile، mark up شده است را به HTML تبدیل می کند:
+</p>
+
+<pre class="brush: html">
+&#123;% load markup %&#125;
+&#123;&#123; object.content|textile &#125;&#125;
+</pre>
+
+<p id="213">
+جهت فعال کردن این فیلترها، 'django.contrib.markup'را به تنظیم INSTALLED_APPS اضافه کنید. هنگامی که این کار را انجام داده شد، از &#123;% load markup %&#125; در یک template استفاده کنید تا به این فیلترها دسترسی پیدا کنید. برای مستندات بیشتر، کد منبع django/contrib./markup/templatetags/markup.py را بخوانید.
+</p>
+
+<h3 id="214">
+گام بعدی
+</h3>
+
+<p id="215">
+بسیاری از این فریم ورک های توزیع شده (CSRF، سیستم auth و غیره ...) توسط تهیه ی یک تکه از middleware کار جادویی خود را انجام می دهند. middleware کدی است که قبل و/یا بعد از هر درخواستی اجرا می شود و می تواند برای گسترش فریم ورک درخواست ها و پاسخ ها را در صورت تمایل ویرایش کند. در فصل بعدی، middleware داخلی جنگو مورد بحث و توضیح داده شده و نحوه ی نوشتن middleware مختص خودتان نیز بیان می شود.
+</p>
+
+
+		</div>
+		
+
+			<div class="footer">
+This work is licensed under the GNU Free Document License
+                                <br />
+                                Copyright © 2011 - <a href="http://www.aminpy.com/" target="_blank">Amin Oruji</a>
+				
+    <div class='phn1'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter17.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter15.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+			</div>
+<!-- Begin WebGozar.com Counter code -->
+<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2602278&amp;t=counter" ></script>
+<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2602278" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
+<!-- End WebGozar.com Counter code -->
+		
+	</div>
+</body>
+</html>
+

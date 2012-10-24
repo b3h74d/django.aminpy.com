@@ -1,0 +1,1466 @@
+
+<html>
+<head>
+<meta name="google-site-verification" content="4pN93apsdh0knxnQvjVcXz3FbZSJ3N1zZ2yRLeJZhsQ" />
+<meta name="msvalidate.01" content="1309BF972A6186CC2B633EA8127F134E" />
+<title>فرم ها در جنگو</title>
+<meta name="keywords" content="جنگو, کتاب, فرم, کنترل, تایید, اعتبار, django, book, form, query, string, request" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-language" content="fa" />
+
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link rel="stylesheet" href="stylesheets/djangobook.css"
+				type="text/css" />
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push([ '_setAccount', 'UA-24333256-1' ]);
+	_gaq.push([ '_trackPageview' ]);
+
+	(function() {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+				: 'http://www')
+				+ '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+
+
+
+</head>
+
+<body>
+	<div class='main'>
+		<div class="top">
+			
+				<a href="http://djangobook.ir" class="top">صفحه اصلی</a>
+			
+			 | 
+			
+				<a href="toc.html" class="top">فهرست مطالب</a>
+			
+			 | 
+
+			
+				<a href="about_book.html" class="top">درباره کتاب</a>
+			
+			 | 
+
+			
+				<a href="http://aminpy.com" class="top">تماس با ما</a>
+			
+			 | 
+			<a href="http://www.pythonbook.ir" title="جدید">
+				پایتون
+			</a>
+		</div>
+		
+		
+    <div class='phn'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter08.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter06.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+
+		<div style="padding-bottom: 20px; padding-top: 10px;">
+			<a href="http://www.djangobook.ir/">
+			<h1 style='color: white;'>کتاب جنگو</h1>
+		</a></div>
+
+		
+		<div class="aval">
+			
+<h2 >
+فرم ها در جنگو 
+</h2>
+
+<p id="1">
+فرم های HTML ستون فقرات تعامل وب سایت ها می باشند، برای فرم های ساده می توان جعبه ی جستجوی گوگل را مثال زد و برای فرم های پیچیده می توان رابط های ثبت نام برای سایت های بزرگ را مثال زد. در این فصل نحوه ی دسترسی به داده های فرم که توسط کاربر ارائه می شود، تایید کردن آن و انجام برخی کارها به روی آن ها خواهیم پرداخت. در طول فصل، HttpRequest و آبجکت های Form را توضیح خواهیم داد.
+</p>
+
+<h3 id="2">
+دریافت داده از آبجکت Request
+</h3>
+
+<p id="3">
+آبجکت های HttpRequest در فصل سوم هنگامی که اولین توابع view را ایجاد کردیم معرفی شده است، ولی صحبت زیادی درباره ی آن ها در آن زمان صورت نگرفت. یادآوری می کنیم که هر تابع view یک آبجکت HttpRequest به عنوان اولین پارامتر دریافت می کند، همانطور که در تابع hello() مشاهده می کنید:
+</p>
+
+<pre class="brush: py">
+from django.http import HttpResponse
+
+def hello(request):
+    return HttpResponse("Hello world")
+</pre>
+
+<p id="4">
+آبجکت های HttpRequest مانند متغیر request فوق، دارای attribute های و متدهای جالبی می باشند که می بایست با آن ها آشنا شوید. می توان از این attribute ها برای به دست آوردن اطلاعات درباره ی درخواست فعلی استفاده کرد (مانند مرورگری که در حال بارگذاری صفحه ی فعلی می باشد)، در زمانی که تابع view اجرا شده است.
+</p>
+
+<h4 id="5">
+اطلاعات درباره ی آدرس
+</h4>
+
+<p id="6">
+آبجکت های HttpRequest حاوی چندین بخش از اطلاعات درباره ی آدرس فعلی درخواست شده می باشد:
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td>
+            <img src='images/table.png' width='45' height='40' />
+        </td>
+        <td valign='middle' width='95%'><h4>جدول ۱-۷</h4></td></tr><tr><td colspan='2'><table class='puzzle'>
+<tr >
+<th width="15%">
+متد/Attribute
+</th>
+
+<th width="65%">
+توضیح
+</th>
+
+<th width="20%">
+مثال
+</th>
+</tr>
+
+<tr >
+<td 
+request.path
+</td>
+
+<td >
+مسیر کامل، بدون شامل بودن دامین ولی با علامت (/) پیشین
+</td>
+
+<td >
+"/hello/"
+</td>
+</tr>
+
+<tr >
+<td >
+Request.get_host()
+</td>
+<td >
+میزبان (مانند دامین در گفتگوی رایج)
+</td>
+
+<td >
+"127.0.0.1:8000" یا "www.example.com"
+</td>
+</tr>
+
+<tr >
+<td >
+Request.get_full_path()
+</td>
+
+<td >
+مسیر به همراه query string (اگر در دسترس باشد)
+</td>
+
+<td >
+"/hello/?print=true"
+</td>
+</tr>
+
+<tr >
+<td >
+Request.is_secure()
+</td>
+
+<td >
+در صورتیکه درخواست از طریق HTTPS ساخته شده باشد True و در غیر اینصورت False بر می گرداند.
+</td>
+
+<td >
+True یا False
+</td>
+</tr>
+</table></td></tr></table>
+
+<p id="7">
+همواره از attribute ها/متدها به جای کد مستقیم آدرس درون view ها استفاده کنید. حرکت مذکور انعطاف پذیری کد را جهت استفاده در مکان های دیگر بیشتر می کند. یک مثال ساده:
+</p>
+
+<pre class="brush: py">
+# BAD!
+def current_url_view_bad(request):
+    return HttpResponse("Welcome to the page at /current/")
+
+# GOOD
+def current_url_view_good(request):
+    return HttpResponse("Welcome to the page at %s" % request.path)
+</pre>
+
+<h4 id="8">
+اطلاعات دیگر درباره ی Request
+</h4>
+
+<p id="9">
+request.META یک دیکشنری پایتون است که تمام HTTP header های درخواست داده شده را شامل شده است – مانند آدرس IP و همچنین نام و نسخه ی مرورگر کاربر. توجه داشته باشید که لیست header های در دسترس به آن header هایی بستگی دارد که کاربر فرستاده و وب سرور قرار داده است. برخی از کلید های در دسترس رایج در این دیکشنری:
+</p>
+
+<ul >
+<li id="10">
+HTTP_REFERER - اشاره کردن به آدرس، در صورت وجود.
+</li>
+
+<li id="11">
+HTTP_USER_AGENT – رشته ی مرورگر کاربر، در صورت وجود. که چیزی شبیه به این می باشد:
+&lt;br&gt;
+"Mozilla/5.0 (X11; U; Linux i686; fr-FR; rv:1.8.1.17) Gecko/20080829 Firefox/2.0.0.17".
+</li>
+
+<li id="12">
+REMOTE_ADDR – آدرس IP کلاینت مانند "12.345.67.89". (در صورتیکه درخواست از میان پروکسی ارسال شده باشد، ممکن است با یک جدا کننده ی کاما نشان داده شود مانند "12.345.67.89,23.456.78.90")
+</li>
+</ul>
+
+<p id="13">
+توجه داشته باشید، چراکه request.META یک دیکشنری پایتون می باشد، در صورتیکه بخواهید به کلیدی که وجود ندارد دسترسی پیدا کنیدخطای KeyError رخ خواهد داد. (زیرا HTTP header داده ی خارجی می باشد – که توسط مرورگر کاربر شما تایید شده است – نباید به آن ها اعتماد شود، و باید همواره برنامه ی خود را طوری طراحی کنید که در صورت خالی بودن یک header خاص یا عدم وجود به شکل درستی آن را رد کند.) می بایست از یک عبارت try/except یا متد get() برای مواردی که یک کلید تعریف نشده است استفاده کرد:
+</p>
+
+<pre class="brush: py">
+# BAD!
+def ua_display_bad(request):
+    ua = request.META['HTTP_USER_AGENT']  # Might raise KeyError!
+    return HttpResponse("Your browser is %s" % ua)
+
+# GOOD (VERSION 1)
+def ua_display_good1(request):
+    try:
+        ua = request.META['HTTP_USER_AGENT']
+    except KeyError:
+        ua = 'unknown'
+    return HttpResponse("Your browser is %s" % ua)
+
+# GOOD (VERSION 2)
+def ua_display_good2(request):
+    ua = request.META.get('HTTP_USER_AGENT', 'unknown')
+    return HttpResponse("Your browser is %s" % ua)
+</pre>
+
+<p id="14">
+شما را تشویق می کنیم تا یک view کوچک بنویسید که تمام داده های request.META را نمایش دهد بنابراین می توانید با دلیل وجود آن ها را آشنا شوید:
+</p>
+
+<pre class="brush: py">
+def display_meta(request):
+    values = request.META.items()
+    values.sort()
+    html = []
+    for k, v in values:
+        html.append('&lt;tr&gt;&lt;td&gt;%s&lt;/td&gt;&lt;td&gt;%s&lt;/td&gt;&lt;/tr&gt;' % (k, v))
+    return HttpResponse('&lt;table&gt;%s&lt;/table&gt;' % '\n'.join(html))
+</pre>
+
+<p id="15">
+همچنین می توان view فوق را با استفاده از سیستم template جنگو به جای نوشتن کد مستقیم HTML تبدیل کنید. همچنین سعی کنید request.path و دیگر متدهای HttpRequest را از فصل قبل اضافه کنید.
+</p>
+
+<h4 id="16">
+اطلاعات درباره ی داده ی تایید (submit) شده
+</h4>
+
+<p id="17">
+خارج از ابر داده های پایه درباره ی درخواست، آبجکت های HttpRequest دارای دو attribute هستند که حاوی اطلاعات تایید شده توسط کاربر می باشند: request.GET و request.POST. هر دوی این ها آبجکت های دیکشنری مانند می باشند که از طریق آن ها می توان به داده های نوع GET و POST دسترسی پیدا کرد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+آبجکت های دیکشنری مانند
+</h4>
+
+<p id="18">
+هنگامی که گفته می شود request.GET و request.POST آبجکت های دیکشنری مانند می باشند، منظور این است که آن ها مانند دیکشنری های استاندارد پایتون رفتار می کنند ولی از نظر فنی دیکشنری پایتون نمی باشند. به عنوان مثال، request.GET و request.POST دارای متدهای get()، keys() و value() هستند، می توان درون کلیدها با for key in request.GET به جستجو پرداخت.
+</p>
+
+<p id="19">
+بنابراین چرا با یکدیگر فرق می کنند؟ زیرا هر دوی request.GET و request.POST دارای متدهای اضافی ای می باشند که دیکشنری های معمولی فاقد آن متدها می باشند. 
+</p>
+
+<p id="20">
+شما ممکن است با اصطلاح شبیه به اصطلاح قبلی یعنی آبجکت های فایل مانند مواجه شده باشید – آبجکت های پایتون دارای تعدادی متد اولیه می باشند، مانند read() که اجازه می دهد به صورت جانشین برای آبجکت های واقعی فایل ایفای نقش کنند.
+</p>
+</td></tr></table>
+
+<p id="21">
+داده ی POST عموما تایید شده از &lt;form&gt; HTML می باشد، در حالی که داده ی GET می تواند از یک &lt;form&gt; یا query string در آدرس صفحه آمده باشد.
+</p>
+
+<h3 id="22">
+یک مثال ساده ی کنترل فرم
+</h3>
+
+<p id="23">
+مثال books کتاب را با کتاب ها، نویسندگان و ناشران دنبال می کنیم، اجازه دهید یک view ساده را که به کاربران اجازه ی جستجو کتاب ها را بر اساس عنوان می دهد، بسازیم.
+</p>
+
+<p id="24">
+معمولا، دو بخش برای توسعه ی یک فرم وجود دارد: رابط کاربر HTML و کد view که در بطن کار قرار دارد و داده ی تایید شده توسط کاربر را پردازش می کند. بخش اول ساده می باشد؛ اجازه دهید یک view را که فرم جستجو را نمایش می دهد راه اندازی کنیم:
+</p>
+
+<pre class="brush: py">
+from django.shortcuts import render_to_response
+
+def search_form(request):
+    return render_to_response('search_form.html')
+</pre>
+
+<p id="25">
+همانطور که در فصل سوم یاد گرفتیم، view فوق را می تواند هر جایی در مسیر پایتون قرار دهیم. در اینجا آن را درون books/views.py قرار می دهیم.
+</p>
+
+<p id="26">
+template همراه، search_form.html چیزی شبیه به کد زیر خواهد بود:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+	&lt;head&gt;
+	    &lt;title&gt;Search&lt;/title&gt;
+	&lt;/head&gt;
+	&lt;body&gt;
+	    &lt;form action="/search/" method="get"&gt;
+	        &lt;input type="text" name="q"&gt;
+	        &lt;input type="submit" value="Search"&gt;
+	    &lt;/form&gt;
+	&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="27">
+URLpattern در urls.py نیز می تواند چیزی شبیه به کد زیر باشد:
+</p>
+
+<pre class="brush: py">
+from mysite.books import views
+
+urlpatterns = patterns('',
+    # ...
+    (r'^search-form/$', views.search_form),
+    # ...
+)
+</pre>
+
+<p id="28">
+(توجه داشته باشید که ماژول views به جای آنکه به این شکل from mysite.views imort search_form به درون برنامه import شود، به طور مستقیم import شده است، زیرا این روش کوتاه تر می باشد، این روش import در فصل هشتم با جزئیات بیشتری بحث خواهد شد.)
+</p>
+
+<p id="29">
+حالا، در صورتیکه دستور runserver را اجرا کنید و آدرس http://127.0.0.1:8000/search‑form/ درون مرورگر ملاحظه کنید، رابط جستجو را ملاحظه خواهید کرد که به اندازه ی کافی ساده می باشد.
+</p>
+
+<p id="30">
+سعی کنید که فرم را تایید کنید، که در اینصورت خطای 404 جنگو را مشاهده خواهید کرد. فرم به آدرس /search/ اشاره می کند، که هنوز اجرا نشده است. اجازه دهید این مشکل را با view دوم حل کنیم:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+urlpatterns = patterns('',
+    # ...
+    (r'^search-form/$', views.search_form),
+    (r'^search/$', views.search),
+    # ...
+)
+
+# views.py
+
+def search(request):
+    if 'q' in request.GET:
+        message = 'You searched for: %r' % request.GET['q']
+    else:
+        message = 'You submitted an empty form.'
+    return HttpResponse(message)
+</pre>
+
+<p id="31">
+در حال حاضر، کد فوق تنها یک صفحه ی جستجو را نمایش می دهد، ولی می توان مطمئن شد که داده برای جنگو ارسال شده است، و می توان نحوه ی جریان جستجو را در سیستم متوجه شد. به طور خلاصه:
+</p>
+
+<ol >
+<li id="32">
+&lt;form&gt; یک متغیر q تعریف می کند. هنگامی که فرم تایید می شود، ارزش q از طریق GET (method="get") به آدرس /search/ فرستاده می شود.
+</li>
+
+<li id="33">
+view جنگو که آدرس /search/ (search()) را کنترل می کند به ارزش q در request.GET دسترسی دارد.
+</li>
+</ol>
+
+<p id="34">
+نکته مهم برای اشاره در اینجا این است که، به طور صریح بررسی شده است که 'q'درون request.GET وجود دارد یا خیر. همانطور که در بخش گذشته به request.META اشاره شد، شما نباید به هرچیزی که توسط کاربر فرستاده می شود اعتماد کنید و یا حتی فرض کنید که در وهله ی اول چیزی ارسال نمی شود. در صورتیکه این بررسی صورت نگیرد، هر ارسالی از فرم خالی باعث بروز خطای KeyError خواهد شد:
+</p>
+
+<pre class="brush: py">
+# BAD!
+def bad_search(request):
+    # The following line will raise KeyError if 'q' hasn't
+    # been submitted!
+    message = 'You searched for: %r' % request.GET['q']
+    return HttpResponse(message)
+</pre>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+پارامترهای query string</h4>
+<p id="35">
+داده ی GET در query string ارسال می شود (مانند /search/?q=django)، می توان برای دسترسی به متغیرهای query string از request.GET استفاده کرد. در فصل سوم در بخش معرفی سیستم URLconf جنگو، آدرس های زیبای جنگو با آدرس های قدیمی PHP/Java مانند /time/plus?hours=3 مقایسه شد و همچنین گفته شد که در فصل هفتم نحوه ی دسترسی به به این آدرس های قدیمی نشان داده خواهد شد. حالا نحوه ی دسترسی به پارامترهای query string در view (مانند hours=3 در مثال فوق) را می دانید – با استفاده از request.GET.
+</p>
+</td></tr></table>
+
+<p id="36">
+داده ی پست نیر مانند داده ی GET عمل می کند – تنها از request.POST به جای request.GET استفاده می کند. تفاوت بین GET و POST در چیست؟ از روش GET هنگامی که تنها یک درخواست برای بدست آوردن داده می باشد استفاده می شود. از داده ی پست هر زمان که ارسال درخواست دارای برخی تاثیرات زیان بار باشد استفاده می شود – تغییر دادن داده، اراسل یک پست الکترونیک، و یا چیز دیگر که ورای نمایش ساده ی داده باشد. در مثال جستجوی ما، از روش GET استفاده شده است که زیرا هیچ داده ای قرار نیست درون سرور تغییر کند. (در صورتیکه می خواهید اطلاعات بیشتری در رابطه با روش های GET و POST به دست آورید می توانید به این آدرس مراجعه کنید: http://www.w3.org/2001/tag/doc/whenToUseGet.html).
+</p>
+
+<p id="37">
+اکنون که از روش GET استفاده شده است، اجازه دهید درون پایگاه داده به جستجوی کتاب مورد نظر بگردیم:
+</p>
+
+<pre class="brush: py">
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from mysite.books.models import Book
+
+def search(request):
+    if 'q' in request.GET and request.GET['q']:
+        q = request.GET['q']
+        books = Book.objects.filter(title__icontains=q)
+        return render_to_response('search_results.html',
+            &#123;'books': books, 'query': q&#125;)
+    else:
+        return HttpResponse('Please submit a search term.')
+</pre>
+
+<p id="38">
+نکاتی که در کد فوق وجود دارد:
+</p>
+
+<ul >
+<li id="39">
+گذشته از بررسی اینکه 'q' درون request.GET وجود دارد یا خیر، همچنین در کد فوق قبل از اینکه مقادی به پایگاه داده ارسال شود اطمینان حاصل شده است که request.GET['q'] مقدار خالی نداشته باشد.
+</li>
+
+<li id="40">
+درون کد فوق از Book.objects.filter(title__icontains=q) جهت پرسیدن اینکه آیا عنوانی شامل 'q' درون جدول کتاب ها وجود دارد یا خیر استفاده شده است. icontains یک نوع جستجو (که در فصل پنجم توضیح داده شده است) می باشد، عبارت می تواند تقریبا به این حالت ترجمه شود که "کتاب هایی که حاوی q بدون حساسیت به حروف بزرگ و کوچک می باشند را جستجو کن".
+</li>
+
+<p id="41">
+این یک روش بسیار ساده برای جستجوی کتاب می باشد. البته پیشنهاد نمی شود که از icontains در پایگاه داده های بزرگ محصولات استفاده شود زیرا در این حالت می تواند بسیار کند عمل کند.
+</p>
+
+<li id="42">
+books (یک لیست از آبجکت های کتاب) به template ارسال شده است. کد template برای search_results.html ممکن است شامل چیزی شبیه به این باشد:
+</li>
+
+<pre class="brush: html">
+&lt;p&gt;You searched for: &lt;strong&gt;&#123;&#123; query &#125;&#125;&lt;/strong&gt;&lt;/p&gt;
+
+&#123;% if books %&#125;
+    &lt;p&gt;Found &#123;&#123; books|length &#125;&#125; book&#123;&#123; books|pluralize &#125;&#125;.&lt;/p&gt;
+    &lt;ul&gt;
+        &#123;% for book in books %&#125;
+        &lt;li&gt;&#123;&#123; book.title &#125;&#125;&lt;/li&gt;
+        &#123;% endfor %&#125;
+    &lt;/ul&gt;
+&#123;% else %&#125;
+    &lt;p&gt;No books matched your search criteria.&lt;/p&gt;
+&#123;% endif %&#125;
+</pre>
+
+<p id="43">
+به کاربرد فیلتر template فوق یعنی pluralize توجه کنید، در صورتیکه مقدار لیست books بیشتر از یکی باشد حرف "s" را بر می گرداند.
+</p>
+</ul>
+
+<h3 id="44">
+اصلاح نمودن مثال ساده ی کنترل فرم
+</h3>
+
+<p id="45">
+همانند فصل گذشته، یک فرم ساده از موضوع مورد بحث را نشان دادیم، حالا به برخی از مشکلات اشاره کرده و نحوه ی اصلاح آن را نشان خواهیم داد.
+</p>
+
+<p id="46">
+ابتدا، کنترل کردن یک ورودی خالی توسط تابعsearch() بسیار ضعیف می باشد – تنها نمایش داده یک پیام "Please submit a search term."، نیازمند این است که کاربر دکمه ی برگشت مرورگر را برای بازگشت به صفحه فشار دهد. این یک حالت نامطلوب و غیر حرفه ای می باشد، و در صورتیکه همیشه به این شکل کار می کنید، شما از امتیازات ویژه ی جنگو خود را محروم خواهید کرد.
+</p>
+
+<p id="47">
+اینکه در هنگام بروز خطا فرم نیز دوباره نمایش داده شود خیلی روش بهتری می باشد، به طوری که خطا در همان صفحه و در بالای فرم نمایش داده شود و کاربر بتواند به سرعت دوباره فرم را پر کرده و ارسال کند، چیزی مانند کد زیر:
+</p>
+
+<pre class="brush: py">
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from mysite.books.models import Book
+
+def search_form(request):
+    return render_to_response('search_form.html')
+
+def search(request):
+    if 'q' in request.GET and request.GET['q']:
+        q = request.GET['q']
+        books = Book.objects.filter(title__icontains=q)
+        return render_to_response('search_results.html',
+            &#123;'books': books, 'query': q&#125;)
+    else:
+        return render_to_response('search_form.html', &#123;'error': True&#125;)
+</pre>
+
+<p id="48">
+(توجه داشته باشید که تابع search_form() در کد فوق ایجاد شده است، بنابراین شما می توانید هر دوی view را در یک مکان مشاهده کنید.)
+</p>
+
+<p id="49">
+در مثال فوق تابع search() در صورتیکه فرم ارسالی خالی باشد، برای ارائه ی دوباره ی template مورد نظر یعنی search_form.html اصلاح شده است. و بدلیل نمایش یک پیام خطا در آن template، یک متغیر template ارسال شده است. حالا می توان search_form.html را جهت بررسی متغیر error بدین شکل ویرایش کرد:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Search&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &#123;% if error %&#125;
+        &lt;p style="color: red;"&gt;Please submit a search term.&lt;/p&gt;
+    &#123;% endif %&#125;
+    &lt;form action="/search/" method="get"&gt;
+        &lt;input type="text" name="q"&gt;
+        &lt;input type="submit" value="Search"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="50">
+می توان همچنان از این template برای view اصلی یعنی search_form() استفاده کرد، زیرا search_form() هیچ متغیر error ای به template ارسال نمی کند – بنابراین پیام خطا در این مورد نشان داده نخواهد شد.
+</p>
+
+<p id="51">
+با تغییر فوق در اینجا، برنامه ی فعلی بهتر شده است، ولی این سوال پیش می آید: آیا وجود تابع search_form() واقعا ضروری است؟ یک درخواست به آدرس /search/ (بدون هیچ پارامتری از نوع GET) یک فرم خالی را نمایش خواهد داد (ولی با یک خطا). می توان تابع search_form() را به همراه URLpattern های همراه آن، تا زمانیکه کسی با هیچ پارامتر GET ای از /search/ بازدید می کند حذف نمود:
+</p>
+
+<pre class="brush: py">
+def search(request):
+    error = False
+    if 'q' in request.GET:
+        q = request.GET['q']
+        if not q:
+            error = True
+        else:
+            books = Book.objects.filter(title__icontains=q)
+            return render_to_response('search_results.html',
+                &#123;'books': books, 'query': q&#125;)
+    return render_to_response('search_form.html',
+        &#123;'error': error&#125;)
+</pre>
+
+<p id="52">
+با تغییر فوق، در صورتیکه یک کاربر آدرس /search/ را با هیچ پارامتر GET ای بازدید کند، فرم جستجو را با هیچ پیام خطایی مشاهده خواهد کرد. در صورتیکه یک کاربر فرم را با یک مقدار خالی برای 'q' ارسال کند، صفحه ی جستجو را با یک پیام خطا مشاهده خواهد کرد. و در پایان، در صورتیکه یک کاربر فرم را به یک مقدار پر برای 'q' اراسل کند، نتایج جستجو در پایگاه داده را مشاده خواهد کرد.
+</p>
+
+<p id="53">
+می توان یک اصلاح پایانی جهت حذف یک قسمت زائد برای برنامه ی فوق ایجاد نمود. اکنون که دو view و آدرس را یکی شد و /search/ هر دوی نمایش فرم جستجو و نمایش نتیجه را کنترل می کند، فرم HTML در search_form.html نباید یک آدرس مستقیم داشته باشد. بجای کد زیر:
+</p>
+
+<pre class="brush: html">
+&lt;form action="/search/" method="get"&gt;
+</pre>
+
+<p id="54">
+می توان بدین شکل عمل کرد:
+</p>
+
+<pre class="brush: py">
+&lt;form action="" method="get"&gt;
+</pre>
+
+<p id="55">
+action="" یعنی "فرم را به آدرس همین صفحه ی فعلی ارسال کن." با تغییر فوق در اینجا، در صورتیکه همیشه تابع search() را به آدرس دیگر ارسال می کرده اید، دیگر لازم نیست تغییر دادن action را بیاد بیاورید.
+</p>
+
+<h3 id="56">
+تایید اعتبار آسان
+</h3>
+
+<p id="57">
+مثال جستجوی بخش قبلی از نظر منطقی هنوز هم ساده است، مخصوصا در مورد تایید اعتبار داده؛ تنها اطمینان حاصل شد که مقدار ارسالی خالی نباشد. بسیاری از فرم های HTML حاوی یک سطح تایید اعتبار می باشند که پیچیده تر از اطمینان حاصل کردن از مقدار غیر خالی است. همه ی پیام های خطایی به این شکل درون وب دیده ایم:
+</p>
+
+<ul >
+<li id="58">
+"لطفا یک آدرس الکترونیکی معتبر وارد کنید. 'foo' یک آدرس پست الکترونیکی نیست."
+</li>
+
+<li id="59">
+"لطفا یک کد پستی پنج رقمی معتبر وارد کنید. '123' پست الکترونیکی نیست."
+</li>
+
+<li id="60">
+"لطفا یک تاریخ معتبر با قالب بندی YYYY-MM-DD وارد کنید."
+</li>
+
+<li id="61">
+لطفا رمز عبوری وارد کنید که حداقل هشت حرف داشته و حاوی حداقل یک عدد باشد.
+</li>
+</ul>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+یک نکته در تایید اعتبار جاوا اسکریپت</h4>
+<p id="62">
+این موضوع خارج از حوصله ی این کتاب می باشد، ولی می توان از جاوا اسکریپت برای تایید اعتبار داده در سمت کلاینت به طور مستقیم در مرورگر استفاده کرد. اما آگاه باشید: حتی اگر این کار انجام دهید، باید در سمت سرور نیز داده را تایید اعتبار کنید. برخی افراد جاوا اسکریپت را خاموش می کنند، و برخی کاربران مخرب ممکن است برخی داده های غیر معتبر را برای مشاهده ی اینکه آیا می توانند تخریبی ایجاد کنند یا خیر درون کنترل کننده ی فرم ارسال می کنند.
+</p>
+
+<p id="63">
+هیچ کاری نمی توانید انجام دهید، غیر از اینکه همواره داده های ارسالی از سمت کاربر را در سمت سرور (مانند view های جنگو) تایید اعتبار کنید. باید اینگونه تصور کرد که تایید اعتبار جاوا اسکریپت نوعی ویژگی قابل استفاده اضافی می باشد، نه تنها به معنی یک تایید اعتبار.
+</p>
+</td></tr></table>
+
+<p id="64">
+اجازه دهید view قبلی یعنی search() را کمی پیچیده کنیم، به طوری که کاربر تنها بتواند داده ی ورودی برای جستجو را کمتر یا مساوی با بیست حرف وارد کند. (برای مثال، می توان این چنین گفت که هر چیزی طولانی تر مقدار گفته شده می تواند باعث کندی جستجو شود.) چه طور می توان آن را انجام داد؟ ساده ترین روش ممکن است قرار دادن منطق مورد نظر به طور مستقیم درون view می باشد، مانند زیر:
+</p>
+
+<pre class="brush: py">
+def search(request):
+    error = False
+    if 'q' in request.GET:
+        q = request.GET['q']
+        if not q:
+            error = True
+        elif len(q) &gt; 20:
+            error = True
+        else:
+            books = Book.objects.filter(title__icontains=q)
+            return render_to_response('search_results.html',
+                &#123;'books': books, 'query': q&#125;)
+    return render_to_response('search_form.html',
+        &#123;'error': error&#125;)
+</pre>
+
+<p id="65">
+حالا، در صورتیکه سعی کنید یک داده را برای جستجو با بیشتر از بیست حرف ارسال کنید، اجازه ی جستجو داده نخواهد شد؛ یک پیام خطا دریافت خواهید کرد. ولی پیام خطا در search_form.html در حال حاضر "Please submit a search term." می باشد. – بنابراین باید طوری آن را تغییر داد که برای هر دو مورد صحیح باشد:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Search&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &#123;% if error %&#125;
+        &lt;p style="color: red;"&gt;Please submit a search term 20 characters or shorter.&lt;/p&gt;
+    &#123;% endif %&#125;
+    &lt;form action="/search/" method="get"&gt;
+        &lt;input type="text" name="q"&gt;
+        &lt;input type="submit" value="Search"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="66">
+در کد فوق نکته ای غیر زیبا وجود دارد. پیام خطای واحد برای همه کمی گیج کننده است. چرا باید پیام خطا برای یک فرم خالی ارسالی محدودیت بیست حرف را بیان کند؟ پیام خطا باید خاص، غیر مبهم بوده و گیج کننده نباشد.
+</p>
+
+<p id="67">
+در واقع مشکل آن است که از یک مقدار Boolean سایده برای خطا استفاده شده است، در حالیکه باید از یک لیست رشته های پیام خطا استفاده شود، در زیر نحوه ی حل این مشکل نشان داده شده است:
+</p>
+
+<pre class="brush: py">
+def search(request):
+    errors = []
+    if 'q' in request.GET:
+        q = request.GET['q']
+        if not q:
+            errors.append('Enter a search term.')
+        elif len(q) &gt; 20:
+            errors.append('Please enter at most 20 characters.')
+        else:
+            books = Book.objects.filter(title__icontains=q)
+            return render_to_response('search_results.html',
+                &#123;'books': books, 'query': q&#125;)
+    return render_to_response('search_form.html',
+        &#123;'errors': errors&#125;)
+</pre>
+
+<p id="68">
+سپس نیاز به ایجاد یک پیچیدگی کوچک درون فایل search_form.html برای بیان اینکه بجای یک مقدار Boolean یک لیست از error ها ارسال شده است.
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Search&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &#123;% if errors %&#125;
+        &lt;ul&gt;
+            &#123;% for error in errors %&#125;
+            &lt;li&gt;&#123;&#123; error &#125;&#125;&lt;/li&gt;
+            &#123;% endfor %&#125;
+        &lt;/ul&gt;
+    &#123;% endif %&#125;
+    &lt;form action="/search/" method="get"&gt;
+        &lt;input type="text" name="q"&gt;
+        &lt;input type="submit" value="Search"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<h3 id="69">
+ساخت یک فرم تماس
+</h3>
+
+<p id="70">
+اگرچه در سرتاسر مثال فرم جستجوی کتاب بررسی کرده و به طور ظریف آن را اصلاح نمودیم، ولی اساسا هنوز این مثال ساده می باشد: زیرا تنها دارای یک فیلد 'q' می باشد. به دلیل سادگی بیش از حد مثال مذکور حتی از کتابخانه ی فرم جنگو برای آن استفاده ای نشد. ولی فرم های پیچیده تر برای رفتار پیچیده تر فراخوانی می شوند – و حالا، چیزی پیچده تر را توسعه خواهیم داد: یک سایت فرم تماس.
+</p>
+
+<p id="71">
+این مثال یک فرم خواهد بود که به کاربران سایت اجازه اصلاح و وارد کردن اطلاعات را به همراه یک فیلد اختیاری آدرس پست الکترونیکی می دهد. بعد از آنکه فرم ارسال و داده تایید اعتبار شد، به طور خودکار یک پیام از طریق آدرس پست الکترونیک به کارمندان سایت ارسال خواهد شد.
+</p>
+
+<p id="72">
+با template مورد نظر contact_form.html شروع می کنیم:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Contact us&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Contact us&lt;/h1&gt;
+
+    &#123;% if errors %&#125;
+        &lt;ul&gt;
+            &#123;% for error in errors %&#125;
+            &lt;li&gt;&#123;&#123; error &#125;&#125;&lt;/li&gt;
+            &#123;% endfor %&#125;
+        &lt;/ul&gt;
+    &#123;% endif %&#125;
+
+    &lt;form action="/contact/" method="post"&gt;
+        &lt;p&gt;Subject: &lt;input type="text" name="subject"&gt;&lt;/p&gt;
+        &lt;p&gt;Your e-mail (optional): &lt;input type="text" name="email"&gt;&lt;/p&gt;
+        &lt;p&gt;Message: &lt;textarea name="message" rows="10" cols="50"&gt;&lt;/textarea&gt;&lt;/p&gt;
+        &lt;input type="submit" value="Submit"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="73">
+سه فیلد تعریف شده است: موضوع، آدرس پست الکترونیک و پیام. دومین فیلد اختیاری می باشد، ولی دو فیلد دیگر الزاما باید پر شوند. توجه داشته باشید که به جای method="get" در اینجا از method="POST" استفاده شده است، زیرا ارسال فرم ممکن است دارای یک اثر زیان بار باشد – فرستادن یک پست الکترونیکی. همچنین، کد نمایش خطا از template قبلی search_form.html کپی شده است.
+</p>
+
+<p id="74">
+در صورتیکه کار را با view بخش قبلی search() ادامه دهیم، یک نسخه ی خام از contact() ممکن است چیزی شبیه به کد زیر باشد:
+</p>
+
+<pre class="brush: py">
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+def contact(request):
+    errors = []
+    if request.method == 'POST':
+        if not request.POST.get('subject', ''):
+            errors.append('Enter a subject.')
+        if not request.POST.get('message', ''):
+            errors.append('Enter a message.')
+        if request.POST.get('email') and '@' not in request.POST['email']:
+            errors.append('Enter a valid e-mail address.')
+        if not errors:
+            send_mail(
+                request.POST['subject'],
+                request.POST['message'],
+                request.POST.get('email', 'noreply@example.com'),
+                ['siteowner@example.com'],
+            )
+            return HttpResponseRedirect('/contact/thanks/')
+    return render_to_response('contact_form.html',
+        &#123;'errors': errors&#125;)
+</pre>
+
+<p id="75">
+(در صورتیکه مثال های کتاب را دنبال می کنید، ممکن است مردد باشید که آیا view فوق را درون فایل books/views.py قرار دهید یا خیر. کد فوق هیچ کاری با برنامه ی books انجام نمی دهد، بنابراین آیا می توان جای دیگری آن را قرار داد؟ این کاملا به تصمیم شما بستگی دارد؛ جنگو هیچ توجهی به این موضوع ندارد، البته تا زمانیکه شما درون URLconf به درستی به view مورد نظر اشاره کنید. ترجیح شخصی ما بر این است که یک دایرکتوری جدا به نام contact هم سطح با دایرکتوری books بسازید. این دایرکتوری یک __init__.py و views.py خواهد داشت.)
+</p>
+
+<p id="76">
+چند نکته ی جدید که در مثال فوق اتفاق افتاده است:
+</p>
+
+<ul >
+<li id="77">
+بررسی شده است که request.method مقدار 'POST' باشد. تنها در صورتیکه فرم ارسال شده باشد مقدار آن True خواهد بود؛ در صورتیکه شخصی تنها فرم تماس را مشاهده کند مقدار آن True نخواهد بود. (در مورد مشاهده ی فرم تماس request.method مقدار 'GET' خواهد داشت، زیرا در حالت عادی جستجو در وب، مرورگرها از GET استفاده می کنند نه از POST. این حالت روش زیبایی را برای مجزا کردن مورد نمایش فرم از مورد پردازش فرم ایجاد می کند.)
+</li>
+
+<li id="78">
+بجای request.GET، برای دسترسی به داده های ارسال شده ی فرم از request.POST استفاده شده است. این حرکت بسیار ضروری می باشد، زیرا تگ &lt;form&gt; در contact_form.html از method="post" استفاده کرده است. در صورتیکه view از طریق POST قابل دسترسی باشد، بنابراین request.GET خالی خواهد بود.
+</li>
+
+<li id="79">
+در مثال فوق، دو فیلد subject و message به صورت الزامی وجود دارد، بنابراین باید هر دوی آن ها تایید اعتبار شوند، توجه داشته باشید که به جای request.POST[] از request.POST.get() استفاده شده است، هنگام استفاده از request.POST[] در صورتیکه کلید مورد نظر وجود نداشته باشد موجب بروز خطای MultiValueDictKeyError خواهد شد، برای جلوگیری از بروز خطا در صورت نبود کلید از request.POST.get() استفاده شده است که آرگومان دوم مقدار پیشفرضی می باشد که در صورت نبود کلید این مقدار برگردانده می شود.
+</li>
+
+<li id="80">
+اگرچه فیلد email یک فیلد الزامی نمی باشد، ولی در صورت وارد کردن مقداری برای این فیلد تایید اعتبار شده است. الگوریم تایید اعتبار در اینجا بسیار شکننده است، زیرا تنها بررسی شده است که رشته ی مورد نظر حاوی علامت (@) باشد. در دنیای واقعی، شما تایید اعتبارهایی قویتر نیاز دارید (جنگو همچنین تایید اعتباری را ارائه کرده است، که کمی بعد توضیح داده خواهد شد.)
+</li>
+
+<li id="81">
+از تابع django.core.mail.send_mail برای فرستادن یک پست الکترونیکی استفاده شده است. این تابع دارای چهار آرگومان الزامی می باشد: موضوع پست الکترونیکی، بدنه ی پست الکترونیکی، آدرس فرستنده و یک لیستی از آدرس های گیرندگان. send_mail یک wrapper مناسب در اطراف کلاس EmailMessage می باشد، که ویژگی های پیشرفته ای مانند ضمیمه ها (attachments)، پست های الکترونیک چند قسمتی و کنترل کامل سرتاسر header های پست الکترونیک را ارائه می دهد.
+</li>
+
+<p id="82">
+توجه داشته باشید که به منظور فرستاند پست الکترونیک با استفاده از send_mail()، سرور شما باید برای فرستاده mail، پیکربندی شده باشد و همچنین تنظیمات خاصی برای این منظور نیز لازم می باشد که برای اطلاعات بیشتر در این باره می توانید به آدرس http://docs.djangoproject.com/en/dev/topics/email مراجعه کنید.
+</p>
+
+<li id="83">
+بعد از فرستادن پست الکترونیک، با برگرداند یک آبجکت HttpResponseRedirect به یک صفحه ی "success" تغییر مسیر داده شده است. ولی باید دلیل استفاده از redirect را به جای برای مثال render_to_response() را توضیح دهیم.
+</li>
+
+<p id="84">
+دلیل: در صورتیکه یک کاربر دکمه ی "Refresh" را در آن صفحه ای که از طریق روش POST بارگذاری شده است فشار دهد، آن درخواست تکرار خواهد شد. این می تواند اغلب باعث بروز رفتاری ناخواسته شود، مانند اضافه شدن چندین بار یک رکورد تکراری در پایگاه داده – یا در مثال فوق، پست الکترونیکی دوباره فرستاده می شود. در صورتیکه کاربر بعد از POST به صفحه ی دیگری redirect شود، بنابراین هیچ شانسی برای تکرار شدن درخواست وجود ندارد.
+</p>
+
+<p id="85">
+شما باید همواره یک redirect برای نتایج POST موفقیت آمیز ایجاد کنید.
+</p>
+</ul>
+
+<p id="86">
+view فوق کار می کند، ولی توابع تایید اعتبار از توع ضعیفی می باشند. پردازش کردن یک فرم با ده ها فیلد را تصور کنید؛ آیا واقعا می خواهید برای همه ی آن ها عبارت های if بنویسید؟
+</p>
+
+<p id="87">
+مشکل دیگر نمایش دوباره ی فرم می باشد. در زمان ایجاد خطاهای اعتبار، بهترین تمرین نمایش دوباره ی فرم با داده های قبلی ارسال شده می باشد، به طوری که کاربر بتواند چیزی را که به طور اشتباه پر کرده است را مشاهده کند (و همچنین کاربر نیازی به دوباره پر کردن فیلدهایی که درست بوده اند پیدا نکند). می توان به صورت دستی داده های POST را به به سمت template پس فرستاد، ولی لازم است هر فیلد HTML را برای درج کردن مقدار مناسب در مکان مناسب ویرایش کرد:
+</p>
+
+<pre class="brush: py">
+# views.py
+
+def contact(request):
+    errors = []
+    if request.method == 'POST':
+        if not request.POST.get('subject', ''):
+            errors.append('Enter a subject.')
+        if not request.POST.get('message', ''):
+            errors.append('Enter a message.')
+        if request.POST.get('email') and '@' not in request.POST['email']:
+            errors.append('Enter a valid e-mail address.')
+        if not errors:
+            send_mail(
+                request.POST['subject'],
+                request.POST['message'],
+                request.POST.get('email', 'noreply@example.com'),
+                ['siteowner@example.com'],
+            )
+            return HttpResponseRedirect('/contact/thanks/')
+    return render_to_response('contact_form.html', &#123;
+        'errors': errors,
+        'subject': request.POST.get('subject', ''),
+        'message': request.POST.get('message', ''),
+        'email': request.POST.get('email', ''),
+    &#125;)
+
+# contact_form.html
+
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Contact us&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Contact us&lt;/h1&gt;
+
+    &#123;% if errors %&#125;
+        &lt;ul&gt;
+            &#123;% for error in errors %&#125;
+            &lt;li&gt;&#123;&#123; error &#125;&#125;&lt;/li&gt;
+            &#123;% endfor %&#125;
+        &lt;/ul&gt;
+    &#123;% endif %&#125;
+
+    &lt;form action="/contact/" method="post"&gt;
+        &lt;p&gt;Subject: &lt;input type="text" name="subject" value="&#123;&#123; subject &#125;&#125;"&gt;&lt;/p&gt;
+        &lt;p&gt;Your e-mail (optional): &lt;input type="text" name="email" value="&#123;&#123; email &#125;&#125;"&gt;&lt;/p&gt;
+        &lt;p&gt;Message: &lt;textarea name="message" rows="10" cols="50"&gt;**&#123;&#123; message &#125;&#125;**&lt;/textarea&gt;&lt;/p&gt;
+        &lt;input type="submit" value="Submit"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="88">
+کد فوق بسیار ضعیف و غیر ضروری می باشد، و فرصت های زیادی را برای خطاهای فردی را ایجاد می کند. 
+</p>
+
+<h3 id="89">
+اولین کلاس Form
+</h3>
+
+<p id="90">
+جنگو دارای یک کتابخانه ی فرم با نام django.forms می باشد، که بسیاری از مسائل بررسی شده در این فصل را کنترل می کند – از نمایش فرم تا تایید اعتبار. اجازه دهید برنامه ی فرم تماس را با استفاده از فرم فریم ورک جنگو دوباره بنویسیم.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+کتابخانه ی "newforms" جنگو
+</h4>
+
+<p id="91">
+ممکن است تاکنون چیزی درباره ی django.newforms شنیده باشید. هنگامی که درباره ی django.newforms صحبت می شود، صحبت درباره ی چیزی است که حالا django.forms نام دارد – که در این فصل به پرداخته شده است.
+</p>
+
+<p id="92">
+دلیل تغییر نام این کتابخانه تاریخی می باشد. هنگامی که جنگو برای عموم منتشر شد، دارای سیستم فرم های پیچیده و گیج کننده به نام django.forms بود. این کتابخانه دوباره به صورت کامل بازنویسی شد، و نسخه ی جدید django.newforms نامیده شد به طوری که افراد هنوز می توانستند از نسخه ی قدیمی استفاده کنند. هنگامی که جنگو 1.0 منتشر شد، django.forms کنار گذاشته شد، و django.newforms به django.forms تغییر نام داد.
+</p>
+</td></tr></table>
+
+<p id="93">
+روش اصلی برای استفاده از فریم ورک فرم ها تعریف یک کلاس Form برای هر &lt;form&gt; HTML می باشد که با آن سرکار دارید. در مثال ما، تنها یک &lt;form&gt; داریم، بنابراین یک کلاس Form هم خواهیم داشت. این کلاس می تواند در هرجایی که می خواهید قرار بگیرد – حتی به طور مستقیم درون فایل views.py – ولی مانند یک قرارداد کلاس های Form درون یک فایل جدا به نام forms.py قرار می گیرند. این فایل را در مسیر فایل views.py بسازید، و کد زیر را درون آن وارد کنید:
+</p>
+
+<pre class="brush: py">
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField()
+    email = forms.EmailField(required=False)
+    message = forms.CharField()
+</pre>
+
+<p id="94">
+کد فوق همانند مدل های جنگو می باشد. هر فیلد در فرم با یک نوع از کلاس فیلد – CharField و EmailField نوع هایی هستند که در کد فوق استفاده شده اند – به صورت attribute های کلاس Form نشان داده می شود. هر فیلد به صورت پیشفرض الزامی (required) می باشد، بنابراین برای اختیاری کردن فیلد email، required=False تعیین شده است.
+</p>
+
+<p id="95">
+اجازه دهید از طریق interactive interpreter پایتون کاری را که این کلاس انجام می دهد را با هم مشاهده کنیم، اولین کاری که می تواند انجام دهد نمایش خودش به صورت HTML می باشد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; from contact.forms import ContactForm
+&gt;&gt;&gt; f = ContactForm()
+&gt;&gt;&gt; print f
+&lt;tr&gt;&lt;th&gt;&lt;label for="id_subject"&gt;Subject:&lt;/label&gt;&lt;/th&gt;&lt;td&gt;&lt;input type="text" name="subject" id="id_subject" /&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;&lt;label for="id_email"&gt;Email:&lt;/label&gt;&lt;/th&gt;&lt;td&gt;&lt;input type="text" name="email" id="id_email" /&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;tr&gt;&lt;th&gt;&lt;label for="id_message"&gt;Message:&lt;/label&gt;&lt;/th&gt;&lt;td&gt;&lt;input type="text" name="message" id="id_message" /&gt;&lt;/td&gt;&lt;/tr&gt;
+</pre>
+
+<p id="96">
+جنگو یک label برای هر فیلد اضافه کرده است. هدف ایجاد رفتار تا حد ممکن بهینه به طور پیشفرض می باشد. 
+</p>
+
+<p id="97">
+کد فوق خروجی پیشفرض در قالب بندی &lt;table&gt; HTML می باشد، ولی خروجی های داخلی دیگری نیز وجود دارند:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; print f.as_ul()
+&lt;li&gt;&lt;label for="id_subject"&gt;Subject:&lt;/label&gt; &lt;input type="text" name="subject" id="id_subject" /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label for="id_email"&gt;Email:&lt;/label&gt; &lt;input type="text" name="email" id="id_email" /&gt;&lt;/li&gt;
+&lt;li&gt;&lt;label for="id_message"&gt;Message:&lt;/label&gt; &lt;input type="text" name="message" id="id_message" /&gt;&lt;/li&gt;
+&gt;&gt;&gt; print f.as_p()
+&lt;p&gt;&lt;label for="id_subject"&gt;Subject:&lt;/label&gt; &lt;input type="text" name="subject" id="id_subject" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label for="id_email"&gt;Email:&lt;/label&gt; &lt;input type="text" name="email" id="id_email" /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;label for="id_message"&gt;Message:&lt;/label&gt; &lt;input type="text" name="message" id="id_message" /&gt;&lt;/
+</pre>
+
+<p id="98">
+توجه داشته باشید که تگ های باز و بسته ی &lt;table&gt;، <ul > و &lt;form&gt; درون خروجی وجود ندارند، به طوری که می توان هر ردیف اضافه ای را در صورت نیاز اضافه کرد.
+</p>
+
+<p id="99">
+این متدها تنها میانبرهای برای موارد رایج نمایش تمام فرم می باشند. همچنین می توان برای هر فیلد خاص نیز فرم را نمایش داد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; print f['subject']
+&lt;input type="text" name="subject" id="id_subject" /&gt;
+&gt;&gt;&gt; print f['message']
+&lt;input type="text" name="message" id="id_message" /&gt;
+</pre>
+
+<p id="100">
+دومین کاری که آبجکت های Form می توانند انجام دهند تایید اعتبار داده می باشد. برای تایید اعتبار داده، یک آبجکت Form جدید ایجاد کرده و یک دیکشنری از داده هایی که نام فیلد را به داده ی مورد نظر مربوط می کند به آن ارسال کنید.
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'email': 'adrian@example.com', 'message': 'Nice site!'&#125;)
+</pre>
+
+<p id="101">
+هنگامی که داده ها را با نمونه ی Form مربوط ساختید، شما یک "bound" فرم ساخته اید:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f.is_bound
+True
+</pre>
+
+<p id="102">
+متد is_valid() را روی هر bound Form برای یافتن اینکه داده معتبر است یا خیر فراخوانی کنید. ما برای هر فیلد یک مثدار معتبر ارسال کردیم، بنابراین Form به کلی معتبر می باشد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f.is_valid()
+True
+</pre>
+
+<p id="103">
+در صورتیکه فیلد email را ارسال نکنیم، همچنان معتبر خواهد ماند، زیرا این فیلد را به صورت required=False تعیین کرده ایم:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'message': 'Nice site!'&#125;)
+&gt;&gt;&gt; f.is_valid()
+True
+</pre>
+
+<p id="104">
+ولی، در صورتیکه subject یا message را در نظر نگیریم، فرم دیگر معتبر نخواهد بود:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello'&#125;)
+&gt;&gt;&gt; f.is_valid()
+False
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'message': ''&#125;)
+&gt;&gt;&gt; f.is_valid()
+False
+</pre>
+
+<p id="105">
+می توان اطلاعات بیشتری را از طریق پیام های خطا بدست آورد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'message': ''&#125;)
+&gt;&gt;&gt; f['message'].errors
+[u'This field is required.']
+&gt;&gt;&gt; f['subject'].errors
+[]
+&gt;&gt;&gt; f['email'].errors
+[]
+</pre>
+
+<p id="106">
+هر نمونه ی bound Form دارای attribute های خطا می باشد که یک دیکشنری با نام فیلد های مرتبط شده با لیست های پیام خطا ارائه می دهد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'message': ''&#125;)
+&gt;&gt;&gt; f.errors
+&#123;'message': [u'This field is required.']&#125;
+</pre>
+
+<p id="107">
+در پایان، برای نمونه هایی Form ای که دارای داده های معتبر می باشند، یک attribute با نام cleaned_data در دسترس می باشد. این attribute یک دشکنری از داده های ارسال (submit) شده می باشد. فریم ورک فرم جنگو نه تنها داده را تایید اعتبار می کند، بلکه آن را به یک نوع مناسب پایتون تبدیل می کند.
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; f = ContactForm(&#123;'subject': 'Hello', 'email': 'adrian@example.com', 'message': 'Nice site!'&#125;)
+&gt;&gt;&gt; f.is_valid()
+True
+&gt;&gt;&gt; f.cleaned_data
+&#123;'message': u'Nice site!', 'email': u'adrian@example.com', 'subject': u'Hello'&#125;
+</pre>
+
+<p id="108">
+فرم تماس ما تنها با رشته ها سر کار دارد که به آبجکت های یونیکد تبدیل شده اند – ولی در صورتیکه از یک IntegerField یا dateField استفاده کنیم، فریم ورک فرم از آبجکت های مناسب integer یا datetime.date برای فیلد داده شده استفاده خواهد کرد.
+</p>
+
+<h3 id="109">
+استفاده کردن از آبجکت های فرم درون view
+</h3>
+
+<p id="110">
+در زیر نحوه ی استفاده از کلاس های فرم به جای روش قبلی را مشاهده خواهید کرد:
+</p>
+
+<pre class="brush: py">
+# views.py
+
+from django.shortcuts import render_to_response
+from mysite.contact.forms import ContactForm
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            send_mail(
+                cd['subject'],
+                cd['message'],
+                cd.get('email', 'noreply@example.com'),
+                ['siteowner@example.com'],
+            )
+            return HttpResponseRedirect('/contact/thanks/')
+    else:
+        form = ContactForm()
+    return render_to_response('contact_form.html', &#123;'form': form&#125;)
+
+# contact_form.html
+
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Contact us&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Contact us&lt;/h1&gt;
+
+    &#123;% if form.errors %&#125;
+        &lt;p style="color: red;"&gt;
+            Please correct the error&#123;&#123; form.errors|pluralize &#125;&#125; below.
+        &lt;/p&gt;
+    &#123;% endif %&#125;
+
+    &lt;form action="" method="post"&gt;
+        &lt;table&gt;
+            &#123;&#123; form.as_table &#125;&#125;
+        &lt;/table&gt;
+        &lt;input type="submit" value="Submit"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="111">
+نگاه کنید که تا چه مقدار قادر به حذف کردن کدهای اضافه ی قبلی می باشیم! فریم ورک فرم جنگو نمایش HTML، تایید اعتبار، تبدیل داده ها و نمایش دوباره ی فرم با خطاها را کنترل می کند.
+</p>
+
+<p id="112">
+سعی کنید به صورت محلی روش فوق را امتحان کنید، با فیلدها خالی فرم را ارسال کنید، با فیلد نا معتبر برای email فرم را ارسال کنید، و در پایان فرم را با داده ی معتبر ارسال کنید. (البته بسته پیکربندی mail-server، ممکن است هنگام فراخوانی send_mail() دریافت کنید، که بحث آن جدا می باشد.)
+</p>
+
+<h3 id="113">
+تغییر نحوه ی ارائه ی فیلدها
+</h3>
+
+<p id="114">
+ممکن است اولین چیزی که مورد توجه شما قرار گیرد این باشد که فیلد message به صورت &lt;input type="text"&gt; نمایش داده شده است، و باید یک &lt;textarea&gt; باشد. می توان این مشکل را به شکل زیر حل کرد:
+</p>
+
+<pre class="brush: py">
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField()
+    email = forms.EmailField(required=False)
+    message = forms.CharField(widget=forms.Textarea)
+</pre>
+
+<p id="115">
+هر نوع فیلد دارای حالت پیشفرض خود می باشد، ولی می توان به سادگی این پیشفرض را تغییر داد، یا یک حالت مورد دلخواه را ایجاد نمود.
+</p>
+
+<p id="116">
+Think of the Field classes as representing validation logic, while widgets represent presentation logic.
+</p>
+
+<h4 id="117">
+تنظیم حداکثر طول
+</h4>
+
+<p id="118">
+یک از رایج ترین نیازهای تایید اعتبار بررسی اندازه ی قطعی یک فیلد می باشد. برای اندازه گیری خوب، باید کلاس ContactForm را محدود به subject ای با صد حرف کرد. برای انجام چنین کاری، تنها یک max_length برای CharField قرار می دهیم:
+</p>
+
+<pre class="brush: py">
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    email = forms.EmailField(required=False)
+    message = forms.CharField(widget=forms.Textarea)
+</pre>
+
+<p id="119">
+همچنین یک آرگومان اختیاری min_length نیز در دسترس می باشد.
+</p>
+
+<h4 id="120">
+تنظیم مقدار اولیه
+</h4>
+
+<p id="121">
+به منظور بهبود این فرم، اجازه دهید یک مقدار اولیه برای فیلد subject اضافه کنیم: "I love your site". برای انجام چنین کاری می توان از آرگومان initial هنگامی که یک نمونه Form را می سازیم استفاده کرد.
+</p>
+
+<pre class="brush: py">
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            send_mail(
+                cd['subject'],
+                cd['message'],
+                cd.get('email', 'noreply@example.com'),
+                ['siteowner@example.com'],
+            )
+            return HttpResponseRedirect('/contact/thanks/')
+    else:
+        form = ContactForm(
+            initial=&#123;'subject': 'I love your site!'&#125;
+        )
+    return render_to_response('contact_form.html', &#123;'form': form&#125;)
+</pre>
+
+<p id="122">
+حالا، فیلد subject با مقدار از پیش پر شده ی مورد نظر نمایش داده خواهد شد.
+</p>
+
+<h3 id="123">
+سفارشی کردن قوانین تایید اعتبار
+</h3>
+
+<p id="124">
+تصور کنید یک فرم را برای پست الکترونیک راه اندازی کرده اید. ولی یک مشکلی وجود دارد: برخی از پیام های ارسال شده دارای تنها یک یا دو کلمه می باشند، که برای فهمیدن موضوع کافی نمی باشد. در این مورد تصمیم می گیرید یک روش تایید اعتبار جدید را برگزینید: لطفا چهار کلمه یا بیشتر.
+</p>
+
+<p id="125">
+تعدادی روش برای سفارشی ساختن تایید اعتبار فرم جنگو وجود دارد. در صورتیکه قانون جدید چیزی باشد که از آن همواره استفاده می کنیم، می توان یک نوع فیلد سفارشی ساخت. 
+</p>
+
+<p id="126">
+می خواهیم یک تایید اعتبار اضافه در فیلد message ایجاد کنیم، بنابراین یک متد clean_message() به کلاس فرم خود اضافه می کنیم:
+</p>
+
+<pre class="brush: py">
+from django import forms
+
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    email = forms.EmailField(required=False)
+    message = forms.CharField(widget=forms.Textarea)
+
+    def clean_message(self):
+        message = self.cleaned_data['message']
+        num_words = len(message.split())
+        if num_words &lt; 4:
+            raise forms.ValidationError("Not enough words!")
+        return message
+</pre>
+
+<p id="127">
+سیستم فرم جنگو به طور خودکار هر متدی را که با clean_ شروع و با نام یک فیلد تمام شود جستجو می کند. در صورتیکه همچین متدی وجود داشته باشد، در مدت تایید اعتبار فراخوانی خواهد شد.
+</p>
+
+<p id="128">
+به طور خاص، متد clean_message() بعد از تایید اعتبار منطقی پیشفرض برای فیلد داده شده فراخوانی می شود (در این مورد، تایید اعتبار منطقی برای یک CharField الزامی، می باشد.) زیرا داده ی فیلد در اینصورت تا حدی پردازش شده خواهد بود، این داده ی پردازش شده را از self.cleaned_data بدست می آوریم. همچنین، در این صورت لازم نیست درباره ی بررسی کردن اینکه مقدار وجود دارد و خالی نمی باشد نگران باشیم؛ این کار با تایید کننده ی اعتبار پیشفرض انجام شده است.
+</p>
+
+<p id="129">
+بسادگی از ترکیب len() و split() برای شمارش کلمات استفاده کرده ایم. در صورتیکه کاربر کلمات کمی وارد کند، خطای forms.ValidationError ایجاد خواهد شد. رشته ی اضافه شده به این خطا به صورت یک آیتم اضافه شده به لیست خطاها به کاربر نمایش داده خواهد شد.
+</p>
+
+<p id="130">
+مهم است که به طور صریح یک مقدار تمیز شده (cleaned) برای فیلد در پایان متد برگردانده شده است. این کار به ما اجازه می دهد مقدار را درون متد تایید اعتبار سفارشی خودمان تغییر دهیم (یا به نوع های دیگر پایتون تبدیل کنیم).
+</p>
+
+<h4 id="131">
+تعیین label ها
+</h4>
+
+<p id="132">
+به طور پیشفرض، label ها در در جنگو به طور خودکار از طریق جا به جا کردن خط تیره با فاصله و همچنین تبدیل حرف اول به حرف بزرگ ساخته می شوند – بنابراین label برای فیلد email به این شکل خواهد بود: "Email". (این روش آشنا نیست؟ این الگوریتم همان الگوریتمی می باشد که مدل های جنگو از آن برای محاسبه ی مقدار پیشفرض verbose_name برای فیلدها از آن استفاده می کردند که در فصل پنجم توضیح داده شده است.)
+</p>
+
+<p id="133">
+ولی، همانند مدل های جنگو، می توان label فیلد داده شده را سفارشی کرد. تنها کافیست مانند زیر از label استفاده شود:
+</p>
+
+<pre class="brush: py">
+class ContactForm(forms.Form):
+    subject = forms.CharField(max_length=100)
+    email = forms.EmailField(required=False, label='Your e-mail address')
+    message = forms.CharField(widget=forms.Textarea)
+</pre>
+
+<h3 id="134">
+سفارشی کردن طرح فرم
+</h3>
+
+<p id="135">
+template ما یعنی contact_form.html از &#123;&#123; form.as_table &#125;&#125; برای نمایش فرم استفاده کرده است، ولی می توان فرم را به روش های دیگری نیز برای کنترل ذره به ذره نمایش داد.
+</p>
+
+<p id="136">
+سریع ترین روش برای سفارشی کردن نمایش فرم ها استفاده از CSS می باشد. تولید کننده ی خودکار لیست های خطا دقیقا از &lt;ul class="errorlist"&gt; استفاده می کنند به طوری که می توان با استفاده از CSS آن ها را علامت گذاری کرد:
+</p>
+
+<pre class="brush: html">
+&lt;style type="text/css"&gt;
+    ul.errorlist &#123;
+        margin: 0;
+        padding: 0;
+    &#125;
+    .errorlist li &#123;
+        background-color: red;
+        color: white;
+        display: block;
+        font-size: 10px;
+        margin: 0 0 3px;
+        padding: 4px 5px;
+    &#125;
+&lt;/style&gt;
+</pre>
+
+<p id="137">
+زمانی این روش مناسب می باشد که بخواهیم حالت پیشفرض ارائه شده را تغییر دهیم. &#123;&#123; form.as_table &#125;&#125; و ... میانبرهای مفیدی برای توسعه ی برنامه می باشند، ولی هرچیزی درباره ی روش نمایش یک فرم می تواند غالبا درون خود template دوباره نویسی شده و تغییر کند، و شما احتمالا انجام اینکار را برای خودتان خواهید یافت. 
+</p>
+
+<p id="138">
+هر فیلدی (&lt;input type="text"&gt;، &lt;select&gt;، &lt;textarea&gt; و ...) می تواند به صورت جداگانه با دسترسی داشتن به &#123;&#123; form.fieldname &#125;&#125; در template ارائه شده باشد، و هر خطای مربوط به آن با یک فیلد به صورت &#123;&#123; form.fieldname.errors &#125;&#125; قابل دسترسی می باشد. با در نظر گرفتن نکات فوق، می توان یک template سفارشی برای فرم تماس با کد زیر ایجاد نمود:
+</p>
+
+<pre class="brush: html">
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;Contact us&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Contact us&lt;/h1&gt;
+
+    &#123;% if form.errors %&#125;
+        &lt;p style="color: red;"&gt;
+            Please correct the error&#123;&#123; form.errors|pluralize &#125;&#125; below.
+        &lt;/p&gt;
+    &#123;% endif %&#125;
+
+    &lt;form action="" method="post"&gt;
+        &lt;div class="field"&gt;
+            &#123;&#123; form.subject.errors &#125;&#125;
+            &lt;label for="id_subject"&gt;Subject:&lt;/label&gt;
+            &#123;&#123; form.subject &#125;&#125;
+        &lt;/div&gt;
+        &lt;div class="field"&gt;
+            &#123;&#123; form.email.errors &#125;&#125;
+            &lt;label for="id_email"&gt;Your e-mail address:&lt;/label&gt;
+            &#123;&#123; form.email &#125;&#125;
+        &lt;/div&gt;
+        &lt;div class="field"&gt;
+            &#123;&#123; form.message.errors &#125;&#125;
+            &lt;label for="id_message"&gt;Message:&lt;/label&gt;
+            &#123;&#123; form.message &#125;&#125;
+        &lt;/div&gt;
+        &lt;input type="submit" value="Submit"&gt;
+    &lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+
+<p id="139">
+&#123;&#123; form.message.errors &#125;&#125; در صورتیکه خطاها موجود باشند رشته ی خالی در صورتیکه فیلد معتبر باشد یک &lt;ul class="errorlist"&gt; را نمایش می دهد. همچنین می توان با form.message.errors به صورت یک Boolean رفتار کنید و یا حتی درون آن مثل یک لیست جستجو کنید. برای مثال:
+</p>
+
+<pre class="brush: html">
+&lt;div class="field&#123;% if form.message.errors %&#125; errors&#123;% endif %&#125;"&gt;
+    &#123;% if form.message.errors %&#125;
+        &lt;ul&gt;
+        &#123;% for error in form.message.errors %&#125;
+            &lt;li&gt;&lt;strong&gt;&#123;&#123; error &#125;&#125;&lt;/strong&gt;&lt;/li&gt;
+        &#123;% endfor %&#125;
+        &lt;/ul&gt;
+    &#123;% endif %&#125;
+    &lt;label for="id_message"&gt;Message:&lt;/label&gt;
+    &#123;&#123; form.message &#125;&#125;
+&lt;/div&gt;
+
+</pre>
+
+<h3 id="140">
+گام بعدی
+</h3>
+
+<p id="141">
+این فصل مسائل مقدماتی در این کتاب را به اتمام رساند که به اصطلاح "core curriculum" نامیده می شود. قسمت بعدی از کتاب، فصل های 8 تا 12، به سمت جزئیات بیشتر در مورد کاربردهای پیشرفته ی جنگو خواهد رفت، مانند  نوحه ی گسترش یک برنامه ی جنگو (فصل دوازدهم).
+</p>
+
+<p id="142">
+بعد از این هفت فصل، شما باید به اندازه ی کافی برای شروع نوشتن پروژه های جنگو خود بدانید. باقی کتاب قسمت هایی را که نیاز دارید را پوشش خواهد داد.
+</p>
+
+<p id="143">
+فصل هشتم را با برگشت به عقب یعنی کامل کردن مباحث گفته شده درباره ی view ها و URLconf ها شروع خواهیم کرد (که در فصل سوم معرفی شده اند.)
+</p>
+
+		</div>
+		
+
+			<div class="footer">
+This work is licensed under the GNU Free Document License
+                                <br />
+                                Copyright © 2011 - <a href="http://www.aminpy.com/" target="_blank">Amin Oruji</a>
+				
+    <div class='phn1'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter08.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter06.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+			</div>
+<!-- Begin WebGozar.com Counter code -->
+<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2602278&amp;t=counter" ></script>
+<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2602278" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
+<!-- End WebGozar.com Counter code -->
+		
+	</div>
+</body>
+</html>
+
