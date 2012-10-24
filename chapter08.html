@@ -1,0 +1,1371 @@
+
+<html>
+<head>
+<meta name="google-site-verification" content="4pN93apsdh0knxnQvjVcXz3FbZSJ3N1zZ2yRLeJZhsQ" />
+<meta name="msvalidate.01" content="1309BF972A6186CC2B633EA8127F134E" />
+<title>View ها و URLconf های پیشرفته در جنگو</title>
+<meta name="keywords" content="جنگو, کتاب, آدرس, پیشرفته, django, book, urlconf, advance, view, generic" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="content-language" content="fa" />
+
+<link rel="shortcut icon" href="images/favicon.ico" />
+<link rel="stylesheet" href="stylesheets/djangobook.css"
+				type="text/css" />
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push([ '_setAccount', 'UA-24333256-1' ]);
+	_gaq.push([ '_trackPageview' ]);
+
+	(function() {
+		var ga = document.createElement('script');
+		ga.type = 'text/javascript';
+		ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
+				: 'http://www')
+				+ '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0];
+		s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+
+
+
+</head>
+
+<body>
+	<div class='main'>
+		<div class="top">
+			
+				<a href="index.html" class="top">صفحه اصلی</a>
+			
+			 | 
+			
+				<a href="toc.html" class="top">فهرست مطالب</a>
+			
+			 | 
+
+			
+				<a href="about_book.html" class="top">درباره کتاب</a>
+			
+			 | 
+
+			
+				<a href="http://aminpy.com" class="top">تماس با ما</a>
+			
+			 | 
+			<a href="http://www.pythonbook.ir" title="جدید">
+				پایتون
+			</a>
+		</div>
+		
+		
+    <div class='phn'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter09.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter07.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+
+		<div style="padding-bottom: 20px; padding-top: 10px;">
+			<a href="index.html">
+			<h1 style='color: white;'>کتاب جنگو</h1>
+		</a></div>
+
+		
+		<div class="aval">
+			
+<h2 >
+View ها و URLconf های پیشرفته در جنگو 
+</h2>
+
+<p id="1">
+در فصل سوم، اصول اولیه توابع view و URLconf ها توضیح داده شد. این فصل به جزئیان بیشتری درباره ی عمکرد پیشرفته ی این دو مبحث درون فریم ورک خواهد پرداخت.
+</p>
+
+<h3 id="2">
+فوت و فن URLconf
+</h3>
+
+<p id="3">
+نکته ی ویژه ای درباره ی URLconf ها وجود ندارد – همانند جنگو، همه چیز فقط کد پایتون می باشد. می توان از این موضوع در روش های مختلفی بهره جست، همانطور که در بخش های این فصل توضیح داده شده است.
+</p>
+
+<h4 id="4">
+ساده کردن import توابع
+</h4>
+
+<p id="5">
+URLconf زیر را مشاهده کنید، که در فصل سوم ساخته شده است:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite.views import hello, current_datetime, hours_ahead
+
+urlpatterns = patterns('',
+    (r'^hello/$', hello),
+    (r'^time/$', current_datetime),
+    (r'^time/plus/(\d&#123;1,2&#125;)/$', hours_ahead),
+)
+</pre>
+
+<p id="6">
+همانطور که در فصل سوم توضیح داده شده است، هر آیتم در URLconf شامل تابع view همراه خود می باشد، که به طور مستقیم به صورت آبجکت تابع، ارسال شده است. این بدین معناست که import کردن توابع view در بالای ماژول امری ضروری می باشد.
+</p>
+
+<p id="7">
+ولی همانطور که یک برنامه ی جنگو به سمت پیچیدگی رشد می کند، URLconf آن نیز رشد می کند، از این رو استفاده از روش import قبلی می تواند کمی خسته کننده باشد. (برای هر تابع view جدید، باید import کردن آن را نیز فراموش نکرد، و عبارت import در صورتیکه از این روش استفاده کنید بیش از حد بلند می باشد.) این امکان وجود دارد که روش قبلی را با import کردن خود ماژول views دُر بزنید. مثال URLconf زیر برابر با مثال قبلی می باشد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^hello/$', views.hello),
+    (r'^time/$', views.current_datetime),
+    (r'^time/plus/(d&#123;1,2&#125;)/$', views.hours_ahead),
+)
+</pre>
+
+<p id="8">
+جنگو روش دیگری را نیز جهت تعیین تابع view برای یک الگوی خاص در URLconf ارائه می کند: می توان یک رشته حاوی نام ماژول و نام تابع به جای خود آبجکت تابع ارسال کرد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^hello/$', 'mysite.views.hello'),
+    (r'^time/$', 'mysite.views.current_datetime'),
+    (r'^time/plus/(d&#123;1,2&#125;)/$', 'mysite.views.hours_ahead'),
+)
+</pre>
+
+<p id="9">
+(به علامت تک کتیشن دور نام view ها توجه کنید. در کد فوق از 'mysite.views.current_datetime' با علامت کتیشن به جای mysite.views.current_datetime استفاده شده است.)
+</p>
+
+<p id="10">
+با استفاده از این تکنیک، import کردن توابع view دیگر ضروری نمی باشد؛ جنگو به طور خودکار با استفاده از رشته ی مشخص شده با نام و مسیر تابع view، تابع view مناسب را import می کند.
+</p>
+
+<p id="11">
+یک میانبر دیگر که می توان هنگام استفاده از تکنیک رشته از آن استفاده کرد، از قلم انداختن پیشوند view می باشد. در مثال URLconf، هر رشته ی view با 'mysite.views' شروع شده است، که یک حالت اضافی می باشد. می توان پیشوند مشترک این رشته را حذف کرده و آن را به عنوان اولین آرگومان <span dir='ltr'>patterns()</span> مانند زیر استفاده کرد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('mysite.views',
+    (r'^hello/$', 'hello'),
+    (r'^time/$', 'current_datetime'),
+    (r'^time/plus/(d&#123;1,2&#125;)/$', 'hours_ahead'),
+)
+</pre>
+
+<p id="12">
+توجه داشته باشید که نقطه ی عقبی را در پیشوند و رشته های view قرار ندهید. جنگو این نقطه ها را به صورت خودکار قرار خواهد داد.
+</p>
+
+<p id="13">
+با در نظر گرفتن دو روش فوق، کدام روش بهتر است؟ این بستگی به نحوه ی کد زدن شما و نیازهای کد دارد.
+</p>
+
+<p id="14">
+مزایای روش رشته:
+</p>
+
+<ul >
+<li id="15">
+این روش بسیار جمع و جور می باشد، زیرا در این روش دیگر نیازی به import کردن توابع view نمی باشد.
+</li>
+
+<li id="16">
+این روش خواناتر بوده و قابلیت مدیریت URLconf ها در صورتیکه توابع view درون چندین ماژول مختلف پخش شده باشد آسان تر خواهد بود.
+</li>
+</ul>
+
+<p id="17">
+مزایای روش آبجکت تابع:
+</p>
+
+<ul >
+<li id="18">
+در این روش دسته بندی توابع view آسان می باشد. بخش "دسته بندی توابع view" که در این فصل می باشد را مطالعه کنید.
+</li>
+
+<li id="19">
+این روش پایتونی تر می باشد – چرا که این روش بیشتر در راستای سنت های پایتون می باشد، مانند ارسال توابع به صورت آبجکت.
+</li>
+</ul>
+
+<p id="20">
+هر دو روش معتبر می باشند، و می توان حتی این دو روش را درون یک URLconf یکسان با یکدیگر ترکیب کرد. انتخاب با خود شماست.
+</p>
+
+<h4 id="21">
+استفاده از پیشوند چندگانه ی view
+</h4>
+
+<p id="22">
+در عمل، در صورتیکه از تکنیک رشته استفاده می کنید، ممکن است هنگامی که URLconf دارای پیشوند مشترک نیست ترکیب view ها را پایان دهید. البته در این حالت نیز می توان هنوز از میانبر پیشوند view برای حذف موارد تکراری سود برد. تنها کافیست از آبجکت های چندگانه ی <span dir='ltr'>patterns()</span> به صورت زیر استفاده کنیم:
+</p>
+
+<p id="23">
+کد قدیمی:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^hello/$', 'mysite.views.hello'),
+    (r'^time/$', 'mysite.views.current_datetime'),
+    (r'^time/plus/(\d&#123;1,2&#125;)/$', 'mysite.views.hours_ahead'),
+    (r'^tag/(\w+)/$', 'weblog.views.tag'),
+)
+</pre>
+
+<p id="24">
+کد جدید:
+</p>
+
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('mysite.views',
+    (r'^hello/$', 'hello'),
+    (r'^time/$', 'current_datetime'),
+    (r'^time/plus/(\d&#123;1,2&#125;)/$', 'hours_ahead'),
+)
+
+urlpatterns += patterns('weblog.views',
+    (r'^tag/(\w+)/$', 'tag'),
+)
+</pre>
+
+<p id="25">
+تمام چهارچوب کار این است که یک متغیر در سطح ماژول با نام urlpatterns وجود داشته باشد. این متغیر می تواند به صورت پویا ساخته شده باشد، همانطور که در مثال فوق انجام داده شده است. به طور خاص باید اشاره کرد که آبجکت های برگردانده شده با <span dir='ltr'>patterns()</span> می توانند به یکدیگر اضافه شده باشند، که این موضوعی است که امکان دارد انتظار آن را نداشته باشید.
+</p>
+
+<h4 id="26">
+پوشش خاص URL ها در حالت Debug
+</h4>
+
+<p id="27">
+بعد از صحبت درباره ی ساختن urlpatterns به طور پویا، ممکن است بخواهید از این تکنیک برای تغییر رفتار URLconf ها در حالت debug جنگو استفاده کنید. برای انجام این کار، تنها کافیست مقدار تنظیم DEBUG را در زمان اجرا بررسی کنید، مانند زیر:
+</p>
+
+<pre class="brush: py">
+from django.conf import settings
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^$', views.homepage),
+    (r'^(\d&#123;4&#125;)/([a-z]&#123;3&#125;)/$', views.archive_month),
+)
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+        (r'^debuginfo/$', views.debug),
+    )
+</pre>
+
+<p id="28">
+در این مثال، آدرس /debuginfo/ تنها در صورتیکه مقدار تنظیم DEBUG، True باشد در دسترس خواهد بود.
+</p>
+
+<h4 id="29">
+استفاده از Named Groups
+</h4>
+
+<p id="30">
+در تمام مثال های URLconf ای که تاکنون در این کتاب آورده شده است، از regular expression های ساده ی بدون نام استفاده شده است – یعنی اینکه، تنها آن قسمت از URL مورد نظر درون پرانتز قرار داده شده است، و جنگو آن متن داخل پرانتز را به تابع view به صورت یک آرگومان موضعی (positional argument) ارسال می کرد. برای کاربرد پیشرفته تر، این امکان وجود دارد که از گروه های regular expression نام گذاری شده، برای ارسال قسمت هایی از URL، به صورت آرگومان های کیورد به view استفاده کرد.
+</p>
+
+
+<table class='note'>
+    <tr>
+        <td valign='top'>
+            <img src='images/note.png' width='40' height='35' />
+        </td>
+        <td width='95%'><h4>
+
+آرگومان های کیورد در مقابل آرگومان های موضعی
+</h4>
+
+<p id="31">
+یک تابع پایتون می تواند با استفاده از آرگومان های کیورد یا آرگومان های موضعی فراخوانی شود – و در برخی موارد، با استفاده از هردوی آن ها در یک زمان. در یک فراخوانی با استفاده از آرگومان کیورد، شما نام هایی را، برای آرگومان های به همراه مقدارهایی که ارسال خواهد شد، تعیین می کنید. در یک فراخوانی با استفاده آرگومان موضعی، شما به سادگی آرگومان هایی را بدون تعیین صریح مقدار برای آن ارسال می کنید؛ مقدار آن آرگومان به ترتیب قرار گیری آرگومان ها بستگی دارد.
+</p>
+
+<p id="32">
+برای مثال تابع ساده ی زیر را ملاحظه کنید:
+</p>
+
+<pre class="brush: py">
+def sell(item, price, quantity):
+    print "Selling %s unit(s) of %s at %s" % (quantity, item, price)
+</pre>
+
+<p id="33">
+جهت فراخوانی تابع فوق با آرگومان های موضعی، شما آرگومان ها را به ترتیبی که در تعریف تابع چیده شده اند قرار می دهید:
+</p>
+
+<pre class="brush: py">
+sell('Socks', '$2.50', 6)
+</pre>
+
+<p id="34">
+جهت فراخوانی آن با آرگومان های کیورد، شما نام های آرگومان ها را به همراه مقادیر برای آنها تعیین می کنید. عبارات زیر با هم برابر می باشند:
+</p>
+
+<pre class="brush: py">
+sell(item='Socks', price='$2.50', quantity=6)
+sell(item='Socks', quantity=6, price='$2.50')
+sell(price='$2.50', item='Socks', quantity=6)
+sell(price='$2.50', quantity=6, item='Socks')
+sell(quantity=6, item='Socks', price='$2.50')
+sell(quantity=6, price='$2.50', item='Socks')
+</pre>
+
+<p id="35">
+در پایان، تا زمانی که تمام آرگومان های موضعی قبل از آرگومان های کیورد قرار بگیرند می توان آرگومان های کیورد و موضعی را ترکیب کرد،:
+</p>
+
+<pre class="brush: py">
+sell('Socks', '$2.50', quantity=6)
+sell('Socks', price='$2.50', quantity=6)
+sell('Socks', quantity=6, price='$2.50')
+</pre>
+
+</td></tr></table>
+
+<p id="36">
+در regular expression های پایتون، نحوه ی کد نویسی برای گروه های نام گذاری شده ی regular expression به این شکل می باشد: (?P&lt;name&gt;pattern)، که name نام گروه و pattern الگوی تطبیق داده شده می باشد.
+</p>
+
+<p id="37">
+مثال زیر URLconf ای می باشد که از گروه های بدون نام استفاده کرده است:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^articles/(\d&#123;4&#125;)/$', views.year_archive),
+    (r'^articles/(\d&#123;4&#125;)/(\d&#123;2&#125;)/$', views.month_archive),
+)
+</pre>
+
+<p id="38">
+مثال زیر URLconf همسان با مثال قبلی می باشد که با استفاده از گروه های نام گذاری شده باز نویسی شده است:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^articles/(?P&lt;year&gt;\d&#123;4&#125;)/$', views.year_archive),
+    (r'^articles/(?P&lt;year&gt;\d&#123;4&#125;)/(?P&lt;month&gt;\d&#123;2&#125;)/$', views.month_archive),
+)
+</pre>
+
+<p id="39">
+کد فوق دقیقا همان کاری را که در مثال قبلی آمد انجام می دهد، تنها با یک تفاوت: مقادیر داخل پرانتز به جای آرگومان های موضعی به صورت آرگومان های کیورد به توابع view ارسال می شوند.
+</p>
+
+<p id="40">
+به عنوان مثال، برای گروه های بدون نام، یک درخواست به /articles/2006/03/ در یک فراخوانی تابع برابر با کد زیر خواهد بود:
+</p>
+
+<pre class="brush: py">
+month_archive(request, '2006', '03')
+</pre>
+
+<p id="41">
+برای گروه های نام گذاری شده، فراخوانی تابع به صورت زیر خواهد بود:
+</p>
+
+<pre class="brush: py">
+month_archive(request, year='2006', month='03')
+</pre>
+
+<p id="42">
+در عمل، استفاده از گروه های نام گذاری شده، URLconf ها را کمی واضح تر می کند و آن ها را کمتر در معرض خطاهای ترتیب آرگومان قرار می دهد – و می توان با استفاده از گروه های نام گذاری شده ترتیب آرگومان ها را در تعریف توابع view تغییر داد. در مثال قبلی، در صورت استفاده از گروه های بدون نام اگر می خواستیم آدرس ها را طوری تغییر دهیم که ماه قبل از سال قرار بگیرد، باید این تغییرات را درون تابع month_archive نیز اعمال می کردیم. ولی در صورت استفاده از گروه های نام گذاری شده، تغییر دادن ترتیب پارامتر های داخل پرانتز در regular expression درون URL هیچ تاثیری در view نخواهد داشت.
+</p>
+
+<p id="43">
+البته،در کنار مزایای گفته شده برای گروه های نام گذاری شده، این روش با هزینه هایی در اختصار همراه است، برخی توسعه دهندگان، گروه های نام گذاری شده را، کد اضافه و بد منظر تشخیص می دهند. ولی همچنان مزیت دیگر گروه های نامگذاری شده خوانایی آن ها می باشد، به ویژه برای کسانی که با regular expression آشنایی نزدیکی در برنامه های جنگو دارند. با یک نگاه در یک URLconf ای که از گروه های نامگذاری شده استفاده کرده است به سادگی می توان آنچه را که اتفاق افتاده است را تشخیص داد.
+</p>
+
+<h4 id="44">
+فهمیدن الگوریتم Matchin/Grouping
+</h4>
+
+<p id="45">
+نکته ی مهمی که در استفاده از گروه های نامگذاری شده قابل اهمیت می باشد این است که، یک الگوی URLconf به تنهایی، نمی تواند حاوی گروه های بدون نام و گروه های نام گذاری شده به طور همزمان باشد. در صورتیکه همچین حالتی پیش آید، جنگو هیچ خطایی ایجاد نخواهد کرد، ولی ممکن است URL های شما را، آن طور که انتظار آن را دارید تشخیص ندهد. به طور خاص، در اینجا الگوریتم تجزیه کننده ی URLconf، با توجه به گروه های نام گذاری شده در مقابل گروه های بدون نام در یک regular expression ذکر شده است.
+</p>
+
+<ul >
+<li id="46">
+در صورتیکه هر آرگومان نام گذاری شده ای وجود داشته باشد، از آن ها استفاده خواهد شد و آرگومان های بدون نام نادیده گرفته می شوند.
+</li>
+
+<li id="47">
+در غیر اینصورت، تمام آرگومان های بدون نام به صورت آرگومان های  موضعی ارسال می شوند.
+</li>
+
+<li id="48">
+در هر دو مورد، option هایی اضافه به صورت آرگومان های کیورد ارسال می شود. برای اطلاعات بیشتر بخش بعدی را مطالعه کنید.
+</li>
+</ul>
+
+<h4 id="49">
+ارسال Option های اضافی به توابع view
+</h4>
+
+<p id="50">
+گاهی اوقات متوجه این موضوع می شوید که توابع view نوشته شده، با وجود اندکی تفاوت، کاملا مشابه با یکدیگر می باشند. برای مثال، فرض می کنیم دو تابع view وجود دارد که بجز template هایی که مورد استفاده قرار می دهند حاوی محتویات یکسان می باشند:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^foo/$', views.foo_view),
+    (r'^bar/$', views.bar_view),
+)
+
+# views.py
+
+from django.shortcuts import render_to_response
+from mysite.models import MyModel
+
+def foo_view(request):
+    m_list = MyModel.objects.filter(is_new=True)
+    return render_to_response('template1.html', &#123;'m_list': m_list&#125;)
+
+def bar_view(request):
+    m_list = MyModel.objects.filter(is_new=True)
+    return render_to_response('template2.html', &#123;'m_list': m_list&#125;)
+</pre>
+
+<p id="51">
+در کد فوق تقریبا همه چیز تکرار شده است و این نحوه ی کد زنی به هیچ وجه روش زیبایی به نظر نمی رسد. در ابتدا، ممکن است تصور کنید که با استفاده از یک view برای هر دو URL  می توان کدهای اضافه را حذف کرد، و URL ها را در URLconf داخل پرانتز قرار داد، و در آخر نیز آن ها را درون view گفته شده مانند زیر بررسی کنیم:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^(foo)/$', views.foobar_view),
+    (r'^(bar)/$', views.foobar_view),
+)
+
+# views.py
+
+from django.shortcuts import render_to_response
+from mysite.models import MyModel
+
+def foobar_view(request, url):
+    m_list = MyModel.objects.filter(is_new=True)
+    if url == 'foo':
+        template_name = 'template1.html'
+    elif url == 'bar':
+        template_name = 'template2.html'
+    return render_to_response(template_name, &#123;'m_list': m_list&#125;)
+</pre>
+
+<p id="52">
+مشکل راهکار فوق این است که، اگرچه URL های شما با کد شما جفت شده است، ولی در صورتیکه تصمیم بگیرید /foo/ را به /fooey/ تغییر نام دهید، شما نباید فراموش کنید که کد view را نیز تغییر دهید.
+</p>
+
+<p id="53">
+راهکار زیبا برای این مورد استفاده از یک پارامتر اختیاری برای URLconf می باشد. هر الگویی در یک URLconf ممکن است شامل یک آیتم سوم باشد: یک دیکشنری از آرگومان های کیورد برای ارسال به تابع view.
+</p>
+
+<p id="54">
+با در نظر گرفتن این، می توان مثال قبلی را به این شکل باز نویسی کرد:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^foo/$', views.foobar_view, &#123;'template_name': 'template1.html'&#125;),
+    (r'^bar/$', views.foobar_view, &#123;'template_name': 'template2.html'&#125;),
+)
+
+# views.py
+
+from django.shortcuts import render_to_response
+from mysite.models import MyModel
+
+def foobar_view(request, template_name):
+    m_list = MyModel.objects.filter(is_new=True)
+    return render_to_response(template_name, &#123;'m_list': m_list&#125;)
+</pre>
+
+<p id="55">
+همانطور که مشاهده می کنید، URLconf در مثال فوق، template_name را درون URLconf تعیین کرده است. تابع view مانند پارامترهای دیگر با template_name رفتار می کند.
+</p>
+
+<p id="56">
+تکنیک option های اضافه ی URLconf روش مناسبی برای ارسال اطلاعات اضافی برای توابع view با حداقل کد می باشد. به همین دلیل، در بسیاری از برنامه های جنگو از آن استفاده می شود، مهمترین خصوصیت این روش حالت generic داشتن view ها می باشد، که در فصل یازدهم درباره ی آن صحبت خواهد شد.
+</p>
+
+<p id="57">
+بخش های بعدی حاوی تعدادی از ایده ها، نسبت به نحوه ی استفاده از تکنیک option های اضافه ی URLconf در پروژه ها می باشد.
+</p>
+
+<h3 id="58">
+Faking Captured URLconf Values
+</h3>
+
+<p id="59">
+فرض را بر این بگیرید که مجموعه ای از view ها دارید که از یک الگو طبعیت می کنند، البته به همراه URL ای دیگر که با الگو سازگار نبوده ولی منطق view آن یکی است. در این مورد، می توان مقدار داخل پرانتز URL را، با استفاده از option های اضافه ی URLconf، برای کنترل URL اضافه با view همسان جا زد.
+</p>
+
+<p id="60">
+برای مثال، ممکن است برنامه ای داشته باشید که برخی داده ها برای یک روز خاص را نمایش دهند، با URL هایی مانند زیر:
+</p>
+
+<pre>
+/mydata/jan/01/
+/mydata/jan/02/
+/mydata/jan/03/
+# ...
+/mydata/dec/30/
+/mydata/dec/31/
+</pre>
+
+<p id="61">
+به کار بردن URL های فوق به اندازه ی کافی ساده می باشد – می توان آن ها را درون یک URLconf مانند زیر کنترل کرد (با استفاده از گروه نام گذاری شده):
+</p>
+
+<pre class="brush: py">
+urlpatterns = patterns('',
+    (r'^mydata/(?P&lt;month&gt;\w&#123;3&#125;)/(?P&lt;day&gt;\d\d)/$', views.my_view),
+)
+</pre>
+
+<p id="62">
+و یک تابع view مانند زیر:
+</p>
+
+<pre class="brush: py">
+def my_view(request, month, day):
+    # ....
+</pre>
+
+<p id="63">
+روش فوق بسیار ساده می باشد – چیزی وجود ندارد که قبلا گفته نشده باشد. تکنیک و فن خاص زمانی پیش می آید، که بخواهید URL دیگری اضافه کنید که از my_view استفاده می کند، ولی حاوی month و day نباشد.
+</p>
+
+<p id="64">
+برای مثال، ممکن است بخواهید URL دیگری مانند /mydata/birthday/ اضافه کنید، که برابر با /mydata/jan/06/ باشد. می توان از امکان option های اضافه URLconf مانند زیر استفاده کرد:
+</p>
+
+<pre class="brush: py">
+urlpatterns = patterns('',
+    (r'^mydata/birthday/$', views.my_view, &#123;'month': 'jan', 'day': '06'&#125;),
+    (r'^mydata/(?P&lt;month&gt;\w&#123;3&#125;)/(?P&lt;day&gt;\d\d)/$', views.my_view),
+)
+</pre>
+
+<p id="65">
+نکته ی جالب در کد فوق این است که شما هیچوقت مجبور به تغییر تابع view نمی باشد. تابع view تنها پارامترهای month و day سر و کار دارد – مشکلی نیست اگر این پارامترها به صورت URL داخل پرانتز و یا پارامترهای اضافه ارسال شوند.
+</p>
+
+<h3 id="66">
+ساختن یک View Generic
+</h3>
+
+<p id="67">
+حذف کد های تکراری یک تمرین مناسب برای برنامه نویسی می باشد. برای مثال، با این دو تابع پایتون:
+</p>
+
+<pre class="brush: py">
+def say_hello(person_name):
+    print 'Hello, %s' % person_name
+
+def say_goodbye(person_name):
+    print 'Goodbye, %s' % person_name
+</pre>
+
+<p id="68">
+می توان hello و goodbye را حذف کرده و آنرا به عنوان پارامتر یک تابع قرار داد:
+</p>
+
+<pre class="brush: py">
+def greet(person_name, greeting):
+    print '%s, %s' % (greeting, person_name)
+</pre>
+
+<p id="69">
+می توان این فلسفه را در view های جنگو نیز با استفاده از پارامترهای اضافه ی URLconf به کار برد.
+</p>
+
+<p id="70">
+با در نظر گرفتن این موضوع، می توان تصورات سطح بالایی را از view ها ایجاد نمود. بجای آنکه فرض کنیم "این view لیستی از آبجکت های Event را نمایش می دهد،" می توان در نظر گرفت که "آن view لیستی از آبجکت های BlogEntry را نمایش می دهد". البته به این موضوع دقت کنید که هر دوی آن ها مورد خاصی هستند "یک view لیستی از آبجکت ها را نمایش می دهد، که نوع آبجکت قابل تغییر می باشد."
+</p>
+
+<p id="71">
+به عنوان مثال نگاهی به کد زیر بیاندازید:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^events/$', views.event_list),
+    (r'^blog/entries/$', views.entry_list),
+)
+
+# views.py
+
+from django.shortcuts import render_to_response
+from mysite.models import Event, BlogEntry
+
+def event_list(request):
+    obj_list = Event.objects.all()
+    return render_to_response('mysite/event_list.html', &#123;'event_list': obj_list&#125;)
+
+def entry_list(request):
+    obj_list = BlogEntry.objects.all()
+    return render_to_response('mysite/blogentry_list.html', &#123;'entry_list': obj_list&#125;)
+</pre>
+
+<p id="72">
+هر دو view فوق اساسا یک کار انجام می دهند: آن ها لیستی از آبجکت ها را نمایش می دهند. بنابراین اجازه دهید نوع آبجکتی را که نمایش می دهند را حذف کنیم:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import models, views
+
+urlpatterns = patterns('',
+    (r'^events/$', views.object_list, &#123;'model': models.Event&#125;),
+    (r'^blog/entries/$', views.object_list, &#123;'model': models.BlogEntry&#125;),
+)
+
+# views.py
+
+from django.shortcuts import render_to_response
+
+def object_list(request, model):
+    obj_list = model.objects.all()
+    template_name = 'mysite/%s_list.html' % model.__name__.lower()
+    return render_to_response(template_name, &#123;'object_list': obj_list&#125;)
+</pre>
+
+<p id="73">
+با تغییرات کوچک فوق، ما به طور ناگهانی دارای یک view قابل استفاده ی مجدد و عمومی شده ایم! از حالا به بعد، در هر زمان که نیاز به یک view داشته باشیم که مجموعه ای از آبجکت ها را لیست کند، می توان به سادگی از object_list به جای نوشتن کد view استفاده کرد. در زیر توضیحاتی درباره ی کارهای انجام داده ی فوق  وجود دارد:
+</p>
+
+<ul >
+<li id="74">
+کلاس های مدل به طور مستقیم به صورت پارامتر model ارسال شده اند. پارامترهای ارسالی اضافه در URLconf می توانند نه تنها رشته ها، بلکه هر نوعی از آبجکت های پایتون را ارسال کنند.
+</li>
+
+<li id="75">
+خط <span dir='ltr'>model.objects.all()</span> یک مثال ساده از duck typing می باشد: "در صورتیکه چیزی مانند اردک راه برود و مانند اردک صحبت کند، می توان با آن مانند اردک رفتار کرد." دقت کنید که کد مورد نظر نمی داند، که نوع آبجکت model چه می باشد، تنها نکته ی لازم این است که model دارای یک attribute به نام objects باشد که آن نیز به نوبه ی خود دارای یک متد <span dir='ltr'>all()</span> باشد. 
+</li>
+
+<li id="76">
+در تعیین نام template از model.__name__.lower() استفاده شده است. هر کلاس پایتون دارای یک attribute با نام __name__ می باشد که نام کلاس را بر می گرداند. این ویژگی برای زمان هایی مانند مثال فوق مفید می باشد، هنگامی که نام کلاس را تا زمان اجرای برنامه نمی دانیم. برای مثال مقدار __name__ برای کلاس BlogEntry رشته ی 'BlogEntry' می باشد.
+</li>
+
+<li id="77">
+تفاوت جزئی بین این مثال و مثال قبلی این است که، متغیر generic ای با نام object_list به template ارسال شده است. می توان به سادگی نام این متغیر را به blogentry_list و یا even_list تغییر داد، ولی ما به عنوان تمرین برای خواننده آن را بدین صورت باقی گذاشته ایم.
+</li>
+</ul>
+
+<p id="78">
+به دلیل آن که وب سایت های پایگاه داده محور، دارای چندین الگوی مشترک می باشند، جنگو مجموعه ای از "generic view" ها را که دقیقا از تکنیک فوق برای صرفه جویی در زمان استفاده می کنند، ارائه می کند. view های داخلی generic در فصل یازدهم توضیح داده شده اند.
+</p>
+
+<h3 id="79">
+دادن Option های پیکربندی View
+</h3>
+
+<p id="80">
+در صورتیکه یک برنامه ی جنگو را توزیع (distribute) می کنید، این احتمال وجود دارد که کاربران شما برخی درجات پیکربندی را بخواهند. در این مورد، ایده ی خوبی است که برای هر انتخاب پیکربندی که فکر می کنید افراد ممکن است بخواهند آن را تغییر دهند، hook هایی را در view ها اضافه کنید.
+</p>
+
+<p id="81">
+یک قسمت مشترک از یک برنامه برای ایجاد قابلیت پیکربندی، نام template می باشد:
+</p>
+
+<pre class="brush: py">
+def my_view(request, template_name):
+    var = do_something()
+    return render_to_response(template_name, &#123;'var': var&#125;)
+</pre>
+
+<h3 id="82">
+فهمیدن اولویت مقدار داخل پرانتز در مقابل Option های اضافه
+</h3>
+
+<p id="83">
+هنگام وجود مغایرت، پارامترهای اضافه ی URLconf بر پارامترهای داخل پرانتز اولویت دارند. به عبارت دیگر، در صورتیکه URLconf شما، یک متغیر از نوع گروه نام گذاری شده درون پرانتز داشته باشد، و همچنین یک پارامتر اضافه ی URLconf را با متغیر همنام با آن، در این صورت مقدار پارامتر اضافه ی URLconf استفاده خواهد شد.
+</p>
+
+<p id="84">
+برای مثال URLconf زیر را مشاهده کنید:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^mydata/(?P&lt;id&gt;\d+)/$', views.my_view, &#123;'id': 3&#125;),
+)
+</pre>
+
+<p id="85">
+در کد فوق، هر دوی regular expression و دیکشنری اضافه، حاوی یک id می باشند که دیکشنری اضافه دارای اولویت می باشد. این بدین معناست که هر درخواستی (مانند /mydata/2/ یا /mydata/432432) بدین صورت رفتار خواهد کرد که مقدار id بدون در نظر گرفتن مقدار داخل پرانتز URLconf عدد 3 می باشد.
+</p>
+
+<p id="86">
+خوانندگان زیرک در این مورد توجه خواهند داشت، که قرار دادن id داخل پرانتز در regular expression اتلاف وقت می باشد، زیرا مقدار آن همواره توسط مقدار دیکشنری باز نویسی می شود. درست آن است که؛ در دست ترجمه ...
+</p>
+
+<h4 id="87">
+استفاده از آرگومان های پیشفرض View
+</h4>
+
+<p id="88">
+فوت و فن مناسب دیگر، تعیین پارامتر های پیشفرض برای آرگومان های view می باشد. با استفاده از این تکنیک در صورتیکه مقدار یک پارامتر اصلا تعیین نشود از مقدار پیشفرض تعیین شده استفاده می کند.
+</p>
+
+<p id="89">
+مثال:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^blog/$', views.page),
+    (r'^blog/page(?P&lt;num&gt;\d+)/$', views.page),
+)
+
+# views.py
+
+def page(request, num='1'):
+    # Output the appropriate page of blog entries, according to num.
+    # ...
+</pre>
+
+<p id="90">
+در کد فوق، هر دو الگوی URL به یک view اشاره می کنند – views.page – ولی اولین الگو درون URL هیچ مقداری داخل پرانتز قرار نداده است. در صورتیکه اولین الگو تطبیق پیدا کند، تابع page() از مقدار آرگومان پیشفرض num یعنی '1' استفاده خواهد کرد. همچنین در صورت تطبیق الگوی دوم، تابع page() از هر مقداری که توسط regular expression درون پرانتز حاصل می شود استفاده خواهد کرد.
+</p>
+
+<p id="91">
+(توحه داشته باشید که بایستی مقدار پیشفرض آرگومان را رشته ی '1' قرار دهیم، نه یک integer. زیرا هر مقداری که داخل پرانتز URLconf برای num قرار گرفته است همواره یک رشته خواهد بود.)
+</p>
+
+<p id="92">
+استفاده از این تکنیک، در رابطه با option های پیکربندی نیز متداول می باشد، همانطور که پیش تر توضیح داده شد. مثال زیر مثال بهبود پیدا کرده ی بخش "دادن option های پیکربندی view" با تهیه ی یک مقدار پیشفرض برای template_name می باشد:
+</p>
+
+<pre class="brush: py">
+def my_view(request, template_name='mysite/my_view.html'):
+    var = do_something()
+    return render_to_response(template_name, &#123;'var': var&#125;)
+</pre>
+
+<h4 id="93">
+موارد خاص View ها
+</h4>
+
+<p id="94">
+گاهی اوقات شما الگویی در URLconf خواهید داشت که مجموعه ی بزرگی از URL ها را کنترل می کند، ولی شما تنها به یک مورد خاص از آن ها نیاز خواهید داشت. در این موارد، از روش خطی یک URLconf ای که پردازش شده است می توانید استفاده کنید و مورد خاص را اول قرار دهید.
+</p>
+
+<p id="95">
+برای مثال، می توانید صفحات "add an object" در سایت مدیر جنگو را به صورت نمایش داده شده با یک URLpattern مانند زیر تصور کنید:
+</p>
+
+<pre class="brush: py">
+urlpatterns = patterns('',
+    # ...
+    ('^([^/]+)/([^/]+)/add/$', views.add_stage),
+    # ...
+)
+</pre>
+
+<p id="96">
+کد فوق با URL هایی از قبیل /myblog/entries/add/ و /auth/groups/add/ تطبیق پیدا می کند. اگرچه صفحه ی "add" برای یک آبجکت user (/auth/user/add/) یک مورد خاص می باشد – تمام فیلدهای فرم را نمایش نمی دهد، بلکه دو فیلد رمز عبور و الی آخر را نمایش می دهد. ما این مشکل را به شکل زیر حل کرده ایم:
+</p>
+
+<pre class="brush: py">
+def add_stage(request, app_label, model_name):
+    if app_label == 'auth' and model_name == 'user':
+        # do special-case code
+    else:
+        # do normal code
+</pre>
+
+<p id="97">
+ولی روش فوق برای یک دلیل که چندین بار در این فصل آن را لمس کرده ایم روش زیبایی نیست: روش فوق منطق URL را درون view قرار می دهد. راهکار بهتر این است که، از این واقعیت سود ببریم که URLconf ها از بالا به پایین پردازش می شوند:
+</p>
+
+<pre class="brush: py">
+urlpatterns = patterns('',
+    # ...
+    ('^auth/user/add/$', views.user_add_stage),
+    ('^([^/]+)/([^/]+)/add/$', views.add_stage),
+    # ...
+)
+</pre>
+
+<p id="98">
+با استفاده از روش فوق، درخواست برای /auth/user/add/ از طریق user_add_stage کنترل خواهد شد. اگرچه که URL با الگوی دوم مطابقت دارد، ولی ابتدا با الگوی بالاتر تطبیق پیدا می کند.
+</p>
+
+<h4 id="99">
+پوشش دادن متن در URL ها
+</h4>
+
+<p id="100">
+هر آرگومان پوشش داده شده ای به صورت یک رشته ی یونیکد پایتون به view فرستاده می شود. به عنوان مثال در خط URLconf زیر:
+</p>
+
+<pre class="brush: py">
+(r'^articles/(?P&lt;year&gt;\d&#123;4&#125;)/$', views.year_archive),
+</pre>
+
+<p id="101">
+آرگومان year برای <span dir='ltr'>views.year_archive()</span> یک رشته خواهد بود، نه یک integer، حتی اگر <span dir='ltr'>\d&#123;4&#125;</span> تنها با رشته های از نوع integer مطابقت داشته باشد.
+</p>
+
+<p id="102">
+بخاطر داشتن این موضوع هنگامی که کد view را می نویسید مهم می باشد. بسیاری از توابع داخلی پایتون نسبت به قبول کردن تنها آبجکت های از نوع مشخص حساس می باشند. یکی از خطاهای متداول ساختن یک آبجکت datetime.date با مقادیر رشته به جای مقادیر integer می باشد:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; import datetime
+&gt;&gt;&gt; datetime.date('1993', '7', '9')
+Traceback (most recent call last):
+    ...
+TypeError: an integer is required
+&gt;&gt;&gt; datetime.date(1993, 7, 9)
+datetime.date(1993, 7, 9)
+</pre>
+
+<p id="103">
+تبدیل شده ی به یک URLconf و view، خطایی مانند زیر خواهد بود:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    (r'^articles/(\d&#123;4&#125;)/(\d&#123;2&#125;)/(\d&#123;2&#125;)/$', views.day_archive),
+)
+
+# views.py
+
+import datetime
+
+def day_archive(request, year, month, day):
+    # The following statement raises a TypeError!
+    date = datetime.date(year, month, day)
+</pre>
+
+<p id="104">
+به جای <span dir='ltr'>day_archive()</span> می توان به این شکل آنرا اصلاح نمود:
+</p>
+
+<pre class="brush: py">
+def day_archive(request, year, month, day):
+    date = datetime.date(int(year), int(month), int(day))
+</pre>
+
+<p id="105">
+توجه داشته باشید که تابع <span dir='ltr'>int()</span> خودش هنگامی که یک رشته ی غیر قابل تبدیل به integer به آن ارسال شود یک خطای ValueError ایجاد می کند، ولی از آن جهت که regular expression در URLconf در این مورد تنها رشته های قابل تبدیل به integer (مانند "245") را قبول می کند دیگر نگرانی برای این موضوع وجود نخواهد داشت.
+</p>
+
+<h4 id="106">
+تعیین آنچه را که URLconf به دنبال آن جستجو می کند
+</h4>
+
+<p id="107">
+هنگامی که یک درخواست ارسال می شود، جنگو در تلاش بر می آید که الگوهای URLconf را برای URL درخواست شده به صورت رشته ی پایتون تطبیق دهد. این شامل پارامترهای GET یا POST و یا نام دامین نمی شود. همچنین شامل علامت (/) آغازین نیز نمی شود، زیرا هر URL دارای یک علامت (/) آغازین می باشد.
+</p>
+
+<p id="108">
+برای عنوان مثال، در یک درخواست به http://www.example.com/myapp/، جنگو تلاش می کند تا آن را با myapp/ تطبیق دهد. در یک درخواست به http://www.exampl.com/myapp/?page=3 جنگو تلاش می کند تا آن را با myapp/ تطبیق دهد.
+</p>
+
+<p id="109">
+method درخواست (مانند POST، GET) هنگام عبور کردن URLconf به حساب نمی آید. به عبارت دیگر، تمام method های درخواست درون تابع همسان برای URL همسان بررسی می شوند. اجرا کردن method های درخواست به عهده ی تابع view می باشد.
+</p>
+
+<h4 id="110">
+تصور سطح بالا از توابع view
+</h4>
+
+<p id="111">
+صحبت کردن درباره ی روش branching based در method درخواست، اجازه دهید به نحوه ی ساخت یک روش زیبا از انجام این روش نگاهی بیاندازیم. لایه ی URLconf و view زیر را ملاحظه کنید:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    # ...
+    (r'^somepage/$', views.some_page),
+    # ...
+)
+
+# views.py
+
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+def some_page(request):
+    if request.method == 'POST':
+        do_something_for_post()
+        return HttpResponseRedirect('/someurl/')
+    elif request.method == 'GET':
+        do_something_for_get()
+        return render_to_response('page.html')
+    else:
+        raise Http404()
+</pre>
+
+<p id="112">
+در مثال فوق، <span dir='ltr'>some_page()</span>، درخواست های POST و  GET را کاملا متفاوت کنترل می کند. تنها چیزی که به صورت مشترک دارا می باشند یک URL به اشتراک گذاشته می باشد: /somepage/. به همین دلیل، اینکه با هر دوی POST و GET در یک تابع view سر و کار داشت، روش زیبایی نمی باشد. روش مناسب آن است که دو تابع view مجزا داشته باشیم – یکی درخواست های GET را کنترل کرده و دیگری درخواست های POST را – و مطمئن بود که  هر یک تنها در زمان مناسب فراخوانی می شوند.
+</p>
+
+<p id="113">
+می توان با توشتن یک تابع view که نماینده ی دیگر view ها می باشد، قبل و بعد اجرا برخی جملات منطقی این کار را انجام داد. در مثال زیر نحوه ی انجام این روش در <span dir='ltr'>some_page()</span> وجود دارد:
+</p>
+
+<pre class="brush: py">
+# views.py
+
+from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render_to_response
+
+def method_splitter(request, GET=None, POST=None):
+    if request.method == 'GET' and GET is not None:
+        return GET(request)
+    elif request.method == 'POST' and POST is not None:
+        return POST(request)
+    raise Http404
+
+def some_page_get(request):
+    assert request.method == 'GET'
+    do_something_for_get()
+    return render_to_response('page.html')
+
+def some_page_post(request):
+    assert request.method == 'POST'
+    do_something_for_post()
+    return HttpResponseRedirect('/someurl/')
+
+# urls.py
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+    # ...
+    (r'^somepage/$', views.method_splitter, &#123;'GET': views.some_page_get, 'POST': views.some_page_post&#125;),
+    # ...
+)
+</pre>
+
+<p id="114">
+اجازه دهید کد فوق را مورد بررسی قرار دهیم:
+</p>
+
+<ul >
+<li id="115">
+یک view جدید با نام method_splitter() نوشته شده است، که نماینده ی view های دیگر می باشد. این تابع دو آرگومان کیورد یعنی GET و POST که باید توابع view باشند را جستجو می کند. در صورتیکه request.method مقدارش 'GET' باشد، view مورد نظر یعنی GET را فراخوانی و در صورتیکه مقدار آن 'POST' باشد POST را فراخوانی می کند. همچنین در صورتیکه request.method چیزی غیر از موارد ذکر شده باشد (مانند HEAD و غیره ...) و یا در صورتیکه GET یا POST در تابع عرضه نشده باشند، سپس یک Http404 ایجاد خواهد شد.
+</li>
+
+<li id="116">
+درون URLconf به /somepage/ در method_splitter() اشاره شده و آرگومان های اضافه به آن ارسال شده اند – توابع view به ترتیب برای استفاده از GET و POST.
+</li>
+
+<li id="117">
+در پایان، تابع <span dir='ltr'>some_page()</span> به دو تابع view تقسیم شده است – <span dir='ltr'>some_page_get()</span> و <span dir='ltr'>some_page_post()</span>. این روش بسیار زیباتر از نشان دادن تمام منطق درون یک view می باشد.
+</li>
+
+<p id="118">
+توجه داشته باشید این توابع view از نظر فنی دیگر لازم نیست request.method را بررسی کنند، زیرا method_splitter() این کار را انجام می دهد. (در آن زمان که some_page_post() فراخوانی شده است، می توان مطئمن بود که مقدار request.method، 'post' می باشد.) 
+</p>
+</ul>
+
+<p id="119">
+حالا، ما دارای یک تابع generic خوب برای خودمان می باشیم که منطق نمایندگی دادن به یک view را با استفاده از request.method به اصطلاح encapsulate کرده است. هیچ چیزی درباره ی <span dir='ltr'>method_splitter()</span> گره خورده به برنامه ی خاص نیست، بنابراین می توان در پروژه های دیگر نیز از آن استفاده کرد.
+</p>
+
+<p id="120">
+یک روش برای بهبود method_splitter() وجود دارد. همانطور که نوشته شده است، این تابع فرض می کند که view های GET و POST آرگومان های غیر از request دریافت نمی کنند. چه می شود اگر بخواهیم از method_splitter یا view هایی که، پارامترهایی متنی را از URL ها می گیرند و یا آرگومان های اختیاری برای خود می گیرند استفاده کنیم؟
+</p>
+
+<p id="121">
+برای انجام چنین کاری، می توان از یک ویژگی زیبای پایتون استفاده کرد: آرگومان های متغیر با علامت ستاره. در ابتدا مثالی را نشان خواهیم داد و سپس آن را توضیح می دهیم:
+</p>
+
+<pre class="brush: py">
+def method_splitter(request, *args, **kwargs):
+    get_view = kwargs.pop('GET', None)
+    post_view = kwargs.pop('POST', None)
+    if request.method == 'GET' and get_view is not None:
+        return get_view(request, *args, **kwargs)
+    elif request.method == 'POST' and post_view is not None:
+        return post_view(request, *args, **kwargs)
+    raise Http404
+</pre>
+
+<p id="122">
+در کد فوق، <span dir='ltr'>method_splitter()</span> را تغییر داده ایم، به طوری که آرگومان های کیورد GET و POST در آن حذف شده اند و جای آن ها از *args و **kwargs (به علامت ستاره توجه کنید) استفاده شده است. این یک خصوصیت پویای پایتون می باشد که به یک تابع اجازه می دهد یک تعداد دلخواه از آرگومان ها را که نام آن ها تا زمان اجرا مشخص نخواهد بود قبول کند. در صورتیکه یک علامت ستاره تکی در تعریف یک تابع قبل یک پارامتر قرار دهید، هر آرگومان موضعی به آن تابع در یک تاپل جمع خواهد شد. در صورتیکه دو علامت ستاره قبل از یک پارامتر در تعریف تابع قرار دهید، هر آرگومان کیورد به آن تابع داخل یک دیکشنری جمع می شوند.
+</p>
+
+<p id="123">
+برای مثال:
+</p>
+
+<pre class="brush: py">
+def foo(*args, **kwargs):
+    print "Positional arguments are:"
+    print args
+    print "Keyword arguments are:"
+    print kwargs
+</pre>
+
+<p id="124">
+در زیر نحوه ی عملکرد آن مشخص شده است:
+</p>
+
+<pre class="brush: py">
+&gt;&gt;&gt; foo(1, 2, 3)
+Positional arguments are:
+(1, 2, 3)
+Keyword arguments are:
+&#123;&#125;
+&gt;&gt;&gt; foo(1, 2, name='Adrian', framework='Django')
+Positional arguments are:
+(1, 2)
+Keyword arguments are:
+&#123;'framework': 'Django', 'name': 'Adrian'&#125;
+</pre>
+
+<p id="125">
+به <span dir='ltr'>method_splitter()</span> باز می گردیم، می توانید مشاهده کنید که برای قبول کردن هر آرگومان به تابع و ارسال آنها به همراه view مناسب از *args و **kwargs استفاده کرده ایم. ولی بعد از انجام این کار، دو فراخوانی به kwargs.pop() برای بدست آوردن آرگومان های GET و POST در صورت دسترس ایجاد کرده ایم. (از pop() با یک مقدار پیشفرض None جهت دوری از خطای KeyError در صورتیکه یکی از آن ها تعریف نشده باشد استفاده شده است.)
+</p>
+
+<h4 id="126">
+Wrapping View Functions
+</h4>
+
+<p id="127">
+آخرین فن view سود جستن از یک تکنیک پیشرفته ی پایتون می باشد. تصور کنید در سرتاسر view های مختلف متوجه دسته ای از کدهای تکراری شده اید مانند مثال زیر:
+</p>
+
+<pre class="brush: py">
+def my_view1(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/accounts/login/')
+    # ...
+    return render_to_response('template1.html')
+
+def my_view2(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/accounts/login/')
+    # ...
+    return render_to_response('template2.html')
+
+def my_view3(request):
+    if not request.user.is_authenticated():
+        return HttpResponseRedirect('/accounts/login/')
+    # ...
+    return render_to_response('template3.html')
+</pre>
+
+<p id="128">
+در کد فوق، هر view با بررسی اینکه request.user تایید شده است یا خیر شروع می شود – کاربر فعلی با موفقیت وارد سایت شده است – و به مسیر /accounts/login/ تغییر مسیر داده می شود. (توجه داشته باشید که هنوز request.user توضیح داده نشده است – در فصل چهاردهم درباره ی این موضوع بحث شده است – ولی، همانطور که ممکن است تصور کنید، request.user کاربر فعلی را نمایش می دهد)
+</p>
+
+<p id="129">
+بسیار زیبا می باشد اگر قسمت های تکراری کد موجود در هر کدام از view ها حذف شوند و تنها در صورت نیاز آن ها را علامت گذاری کرد. می توان این کار را با ساختن یک view wrapper انجام داد. چند لحظه ای کد زیر را مطالعه کنید:
+</p>
+
+<pre class="brush: py">
+def requires_login(view):
+    def new_view(request, *args, **kwargs):
+        if not request.user.is_authenticated():
+            return HttpResponseRedirect('/accounts/login/')
+        return view(request, *args, **kwargs)
+    return new_view
+</pre>
+
+<p id="130">
+تابع فوق، requires_login، یک تابع view (view) را دریافت می کند و یک تابع view جدید (new_view) بر می گرداند. تابع جدید، new_view داخل requires_login تعریف شده و منطق بررسی request.user.is_authenticated() و محول کردن view اصلی (view) را کنترل می کند.
+</p>
+
+<p id="131">
+حالا می توان بررسی if not request.user.is_authenticated() از view ها حذف کرد و با requires_login در URLconf قرار داد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+from mysite.views import requires_login, my_view1, my_view2, my_view3
+
+urlpatterns = patterns('',
+    (r'^view1/$', requires_login(my_view1)),
+    (r'^view2/$', requires_login(my_view2)),
+    (r'^view3/$', requires_login(my_view3)),
+)
+</pre>
+
+<p id="132">
+کد فوق تاثیر یکسانی را به صورت قبل داراست، ولی با زوائد کد کمتر. حالا ما یک تابع generic زیبا ساخته ایم – requires_login() که می توان برای هر تابع view به منظور نیاز به ورود به سایت استفاده کرد.
+</p>
+
+<h3 id="133">
+در بر داشتن URLconf های دیگر
+</h3>
+
+<p id="134">
+در صورتیکه قصد دارید کد شما در سایت های گوناگون ایجاد شده توسط جنگو استفاده شود، شما باید URLconf های خود را به روشی تنظیم کنید که "including" برای آن ها مقدور باشد.
+</p>
+
+<p id="135">
+در هر نقطه، URLconf شما می تواند ماژول های دیگر URLconf را شامل شود. برای مثال، URLconf زیر حاوی URLconf های دیگری نیز می باشد:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^weblog/', include('mysite.blog.urls')),
+    (r'^photos/', include('mysite.photos.urls')),
+    (r'^about/$', 'mysite.views.about'),
+)
+</pre>
+
+<p id="136">
+(روش فوق را قبل تر در فصل ششم مشاهده کرده اید، هنگامی که سایت مدیر جنگو معرفی شده است. سایت مدیر دارای URLconf خودش می باشد که شما تنها داخل URLconf دیگر آن ها را وارد کردید.)
+</p>
+
+<p id="137">
+یک مفهوم مهم در اینجا وجود دارد: regular expression ها که در این مثال به یک <span dir='ltr'>include()</span> اشاره می کنند، دارای علامت ($) نمی باشند. هر زمان که جنگو با <span dir='ltr'>include()</span> برخورد می کند، هر بخش از URL مطابقت داده شده با آن نقطه را برش می دهد و رشته ی باقیمانده برای URLconf ای که Include شده را جهت پردازش بیشتر می فرستد. 
+</p>
+
+<p id="138">
+به مثال زیر توجه کنید:
+</p>
+
+<pre class="brush: py">
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^(\d\d\d\d)/$', 'mysite.blog.views.year_detail'),
+    (r'^(\d\d\d\d)/(\d\d)/$', 'mysite.blog.views.month_detail'),
+)
+</pre>
+
+<p id="139">
+با این دو URLconf، در اینجا نحوه ی کنترل تعدادی از درخواست ها وجود دارند: 
+</p>
+
+<ul >
+<li id="140">
+/weblog/2007/: در اولین URLconf، الگوی r'weblog/' تطبیق داده می شود. زیرا آن یک <span dir='ltr'>include()</span> است، جنگو تمام متن مطابق را در می آورد، که در این مورد 'weblog/' می باشد. پاقیمانده ی بخش URL 2007/ می باشد، که اولین خط در URlconf مورد نظر یعنی mysite.blog.urls تطبیق داده می شود.
+</li>
+
+<li id="141">
+/weblog//2007/ (با دو علامت /) در اولین URLconf، الگوی r'weblog/' تطبیق داده می شود. زیرا یک include() می باشد، جنگو تمام متن مطابق را در می آورد، که در این مورد 'weblog/' می باشد. باقیمانده ی بخش URL /2007/ می باشد (با یک علامت / اولیه)، که هیچ خطی از URLconf مورد نظر یعنی mysite.blog.urls با آن تطبیق داده نمی شود.
+</li>
+
+<li id="142">
+/about/: این URL در URLconf اول و view مورد نظر یعنی mystie.views.about تطبیق داده می شود، نشان می دهد که می توان الگوهای <span dir='ltr'>include()</span> را با الگوهای non-include() ترکیب کرد.
+</li>
+</ul>
+
+<h4 id="143">
+نحوه ی کار با <span dir='ltr'>include()</span> پارامترهای پوشش داده شده
+</h4>
+
+<p id="144">
+یک URLconf شامل شده، هر پارامتر پوشش داده شده ای از URLconf های پدر را دریافت می کند، برای مثال:
+</p>
+
+<pre class="brush: py">
+# root urls.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^(?P&lt;username&gt;\w+)/blog/', include('foo.urls.blog')),
+)
+
+# foo/urls/blog.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^$', 'foo.views.blog_index'),
+    (r'^archive/$', 'foo.views.blog_archive'),
+)
+</pre>
+
+<p id="145">
+در مثال فوق، متغیر پوشش داده شده ی username به URLconf شامل شده و هر تابع view موجود در آن URLconf ارسال شده است.
+</p>
+
+<p id="146">
+توجه داشته باشید که پارامترهای پوشش داده شده همواره به هر خط در URLconf شامل شده صرف نظر از اینکه آیا view آن خط واقعا آن پارامتر های به صورت معتبر قبول خواهد کرد یا خیر ارسال شده خواهند بود. به همین دلیل، این تکنیک تنها در صورتیکه شما مطمئن باشید که هر view در URLconf شامل شده پارامترهای ارسال شده را قبول می کند مفید خواهد بود.
+</p>
+
+<h4 id="147">
+نحوه option های اضافه URLconf در کار با <span dir='ltr'>include()</span>
+</h4>
+
+<p id="148">
+به طور مشابه، می توان انتخاب های اضافه ی URLconf به include() ارسال کرد، همانطور که می توان option های اضافه ی URLconf را به یک view معمولی ارسال کرد – به صورت یک دیکشنری. هنگامی که شما این کار را انجام دهید، هر خط در URLconf شامل شده، option اضافه ی ارسال شده خواهد بود.
+</p>
+
+<p id="149">
+برای مثال، دو دسته ی URLconf زیر دارای عملکرد یکسان می باشند.
+</p>
+
+<p id="150">
+دسته ی اول:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^blog/', include('inner'), &#123;'blogid': 3&#125;),
+)
+
+# inner.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^archive/$', 'mysite.views.archive'),
+    (r'^about/$', 'mysite.views.about'),
+    (r'^rss/$', 'mysite.views.rss'),
+)
+</pre>
+
+<p id="151">
+دسته ی دوم:
+</p>
+
+<pre class="brush: py">
+# urls.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^blog/', include('inner')),
+)
+
+# inner.py
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+    (r'^archive/$', 'mysite.views.archive', &#123;'blogid': 3&#125;),
+    (r'^about/$', 'mysite.views.about', &#123;'blogid': 3&#125;),
+    (r'^rss/$', 'mysite.views.rss', &#123;'blogid': 3&#125;),
+)
+</pre>
+
+<h3 id="152">
+گام بعدی
+</h3>
+
+<p id="153">
+این فصل دارای ارائه ی بسیاری راهنمایی ها و ترفندها برای view ها و urlconf ها می باشد. در فصل بعدی، یعنی فصل نهم، مسائل پیشرفته در مورد سیستم template جنگو را مورد بررسی قرار خواهیم داد.
+</p>
+
+
+		</div>
+		
+
+			<div class="footer">
+This work is licensed under the GNU Free Document License
+                                <br />
+                                Copyright © 2011 - <a href="http://www.aminpy.com/" target="_blank">Amin Oruji</a>
+				
+    <div class='phn1'>
+        <div style="text-align: center; float: left;">
+        
+            <a href='chapter09.html'>بعدی</a>
+        
+        </div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="float: left; text-align: center"><a href='toc.html'>فهرست مطالب</a></div>
+        <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
+        <div style="text-align: center">
+        
+            <a href='chapter07.html'>قبلی</a>
+        
+        </div>
+    </div>
+
+			</div>
+<!-- Begin WebGozar.com Counter code -->
+<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2602278&amp;t=counter" ></script>
+<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2602278" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
+<!-- End WebGozar.com Counter code -->
+		
+	</div>
+</body>
+</html>
+
