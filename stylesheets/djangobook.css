@@ -223,7 +223,7 @@ ul {
 }
 
 ul li {
-	list-style-type: square;
+	list-style-type: disc;
 	margin-bottom: 10px;
 	text-align: justify;
 }
