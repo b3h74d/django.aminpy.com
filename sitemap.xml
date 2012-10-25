@@ -1,105 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
-
-<url>
-  <loc>http://djangobook.ir/</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/toc.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/about_book.html</loc>
-  <lastmod>2012-10-24T18:10:52+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/index.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter01.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter02.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter03.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter04.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter05.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter06.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter07.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter08.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter09.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter10.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter11.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter12.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter13.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter14.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter15.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter16.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter17.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter18.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter19.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
-<url>
-  <loc>http://djangobook.ir/chapter20.html</loc>
-  <lastmod>2012-10-24T17:38:51+00:00</lastmod>
-</url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url><loc>http://django.aminpy.com/</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>1.00</priority></url>
+<url><loc>http://django.aminpy.com/toc.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.85</priority></url>
+<url><loc>http://django.aminpy.com/about_book.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.85</priority></url>
+<url><loc>http://django.aminpy.com/chapter01.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter02.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter03.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter04.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter05.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter06.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter07.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter08.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter09.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter10.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter11.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter12.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter13.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter14.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter15.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter17.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter18.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter16.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter19.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<url><loc>http://django.aminpy.com/chapter20.html</loc><lastmod>2012-10-25T16:06:35+00:00</lastmod><changefreq>daily</changefreq><priority>0.69</priority></url>
+<!-- Generated by www.web-site-map.com -->
 </urlset>
+ 
