@@ -1,52 +1,32 @@
 
 <html>
 <head>
-<meta name="google-site-verification" content="4pN93apsdh0knxnQvjVcXz3FbZSJ3N1zZ2yRLeJZhsQ" />
-<meta name="msvalidate.01" content="1309BF972A6186CC2B633EA8127F134E" />
+
+<meta name="google-site-verification" content="_n5bYVtSMu-h5rCV2Uixj98pliCE6YSJpo-Mms3v0kg" />
 <title>Session ها، کاربران، و عضویت در جنگو</title>
 <meta name="keywords" content="جنگو, کتاب, کاربر, عضویت, ورود, خروج, django, book, login, logout, session, register, کوکی, cookie" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta http-equiv="content-language" content="fa" />
 
-<link rel="shortcut icon" href="images/favicon.ico" />
-<link rel="stylesheet" href="stylesheets/djangobook.css"
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="stylesheet" href="/statics/stylesheets/djangobook.css"
 				type="text/css" />
-
-<script type="text/javascript">
-	var _gaq = _gaq || [];
-	_gaq.push([ '_setAccount', 'UA-24333256-1' ]);
-	_gaq.push([ '_trackPageview' ]);
-
-	(function() {
-		var ga = document.createElement('script');
-		ga.type = 'text/javascript';
-		ga.async = true;
-		ga.src = ('https:' == document.location.protocol ? 'https://ssl'
-				: 'http://www')
-				+ '.google-analytics.com/ga.js';
-		var s = document.getElementsByTagName('script')[0];
-		s.parentNode.insertBefore(ga, s);
-	})();
-</script>
-
-
-
 </head>
 
 <body>
 	<div class='main'>
 		<div class="top">
 			
-				<a href="index.html" class="top">صفحه اصلی</a>
+				<a href="/" class="top">صفحه اصلی</a>
 			
 			 | 
 			
-				<a href="toc.html" class="top">فهرست مطالب</a>
+				<a href="/toc.html" class="top">فهرست مطالب</a>
 			
 			 | 
 
 			
-				<a href="about_book.html" class="top">درباره کتاب</a>
+				<a href="/about_book.html" class="top">درباره کتاب</a>
 			
 			 | 
 
@@ -54,7 +34,7 @@
 				<a href="http://aminpy.com" class="top">تماس با ما</a>
 			
 			 | 
-			<a href="http://www.pythonbook.ir" title="جدید">
+			<a href="http://python.aminpy.com" title="جدید">
 				پایتون
 			</a>
 		</div>
@@ -63,7 +43,7 @@
     <div class='phn'>
         <div style="text-align: center; float: left;">
         
-            <a href='chapter15.html'>بعدی</a>
+            <a href='/chapter15.html'>بعدی</a>
         
         </div>
         <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
@@ -71,14 +51,14 @@
         <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
         <div style="text-align: center">
         
-            <a href='chapter13.html'>قبلی</a>
+            <a href='/chapter13.html'>قبلی</a>
         
         </div>
     </div>
 
 
 		<div style="padding-bottom: 20px; padding-top: 10px;">
-			<a href="index.html">
+			<a href="/">
 			<h1 style='color: white;'>کتاب جنگو</h1>
 		</a></div>
 
@@ -203,7 +183,7 @@ def set_color(request):
 <table class='note'>
     <tr>
         <td>
-            <img src='images/table.png' width='45' height='40' />
+            <img src='/statics/images/table.png' width='45' height='40' />
         </td>
         <td valign='middle' width='95%'><h4>جدول ۱-۱۴</h4></td></tr><tr><td colspan='2'><table class='puzzle'>
 <tr >
@@ -482,7 +462,7 @@ def logout(request):
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 
@@ -544,7 +524,7 @@ def login(request):
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 
@@ -641,7 +621,7 @@ Session های Browser-Length در مقابل Session های مقاوم
 <table class='note'>
     <tr>
         <td>
-            <img src='images/table.png' width='45' height='40' />
+            <img src='/statics/images/table.png' width='45' height='40' />
         </td>
         <td valign='middle' width='95%'><h4>جدول ۲-۱۴</h4></td></tr><tr><td colspan='2'><table class='puzzle'>
 <tr >
@@ -660,7 +640,7 @@ Session های Browser-Length در مقابل Session های مقاوم
 
 <tr >
 <td >SESSION_COOKIE_DOMAIN</td>
-<td [td/
+<td>
 ]دامنه ی مورد استفاده برای کوکی های session. برای این تنظیم یک رشته مانند ".example.com" برای کوکی های cross‑domain قرار دهید، یا برای یک کوکی استاندارد از None استفاده کنید.
 </td>
 
@@ -693,7 +673,7 @@ SESSION_COOKIE_SECURE
 
 <td >
 False
-<td 
+</td>
 </tr>
 </table></td></tr></table>
 
@@ -701,7 +681,7 @@ False
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 جزئیات فنی</h4>
@@ -837,7 +817,7 @@ else:
 <table class='note'>
     <tr>
         <td>
-            <img src='images/table.png' width='45' height='40' />
+            <img src='/statics/images/table.png' width='45' height='40' />
         </td>
         <td valign='middle' width='95%'><h4>جدول ۳-۱۴</h4></td></tr><tr><td colspan='2'><table class='puzzle'>
 <tr >
@@ -872,7 +852,7 @@ else:
 
 <tr >
 <td >Is_staff</td>
-<td Boolean. اینکه کاربر می تواند به سایت مدیر دسترسی پیدا کند یا خیر را مشخص می کند.</td>
+<td> Boolean. اینکه کاربر می تواند به سایت مدیر دسترسی پیدا کند یا خیر را مشخص می کند.</td>
 </tr>
 
 <tr >
@@ -900,7 +880,7 @@ else:
 <table class='note'>
     <tr>
         <td>
-            <img src='images/table.png' width='45' height='40' />
+            <img src='/statics/images/table.png' width='45' height='40' />
         </td>
         <td valign='middle' width='95%'><h4>جدول ۴-۱۴</h4></td></tr><tr><td colspan='2'><table class='puzzle'>
 <tr >
@@ -1216,7 +1196,7 @@ def vote(request):
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 
@@ -1319,7 +1299,7 @@ sha1$a1976$a36cc8cbf81742a8fb52e221aaeab48ed7f58ab4
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 
@@ -1413,7 +1393,7 @@ def register(request):
 <table class='note'>
     <tr>
         <td valign='top'>
-            <img src='images/note.png' width='40' height='35' />
+            <img src='/statics/images/note.png' width='40' height='35' />
         </td>
         <td width='95%'><h4>
 
@@ -1612,12 +1592,12 @@ def create_playlist(request, songs):
 			<div class="footer">
 This work is licensed under the GNU Free Document License
                                 <br />
-                                Copyright © 2011 - <a href="http://www.aminpy.com/" target="_blank">Amin Oruji</a>
+                                Copyright © 2011 - <a href="http://aminpy.com/" target="_blank">Amin Oruji</a>
 				
     <div class='phn1'>
         <div style="text-align: center; float: left;">
         
-            <a href='chapter15.html'>بعدی</a>
+            <a href='/chapter15.html'>بعدی</a>
         
         </div>
         <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
@@ -1625,15 +1605,15 @@ This work is licensed under the GNU Free Document License
         <div style="color: #487858; float: left; padding-right: 10px; padding-left: 10px">◊</div>
         <div style="text-align: center">
         
-            <a href='chapter13.html'>قبلی</a>
+            <a href='/chapter13.html'>قبلی</a>
         
         </div>
     </div>
 
 			</div>
 <!-- Begin WebGozar.com Counter code -->
-<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2602278&amp;t=counter" ></script>
-<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2602278" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
+<script type="text/javascript" language="javascript" src="http://www.webgozar.ir/c.aspx?Code=2715272&amp;t=counter" ></script>
+<noscript><a href="http://www.webgozar.com/counter/stats.aspx?code=2715272" target="_blank">&#1570;&#1605;&#1575;&#1585;</a></noscript>
 <!-- End WebGozar.com Counter code -->
 		
 	</div>
